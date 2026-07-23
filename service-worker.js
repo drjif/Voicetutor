@@ -1,4 +1,4 @@
-const CACHE_NAME = 'voicetutor-v3';
+const CACHE_NAME = 'voicetutor-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   './sheet-data.js',
   './session.js',
   './voice.js',
+  './grading.js',
   './lib.js',
   './manifest.webmanifest',
   './icon.svg',
