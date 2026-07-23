@@ -41,6 +41,11 @@ export const elements = {
   transcript: document.querySelector('#transcript'),
   matchResult: document.querySelector('#matchResult'),
   listeningIndicator: document.querySelector('#listeningIndicator'),
+  reviewDecision: document.querySelector('#reviewDecision'),
+  reviewMessage: document.querySelector('#reviewMessage'),
+  tryAgainButton: document.querySelector('#tryAgainButton'),
+  markCorrectButton: document.querySelector('#markCorrectButton'),
+  continueButton: document.querySelector('#continueButton'),
   browserWarning: document.querySelector('#browserWarning'),
   installButton: document.querySelector('#installButton')
 };
@@ -57,7 +62,8 @@ export const state = {
   voices: [],
   resumeResolvers: [],
   deferredInstallPrompt: null,
-  restartCurrentQuestion: false
+  restartCurrentQuestion: false,
+  reviewChoice: null
 };
 
 export function loadSettings() {
