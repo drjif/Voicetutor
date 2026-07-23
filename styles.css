@@ -19,6 +19,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body {
   margin: 0;
   min-height: 100vh;
@@ -121,6 +122,22 @@ input[type="range"] { width: 100%; accent-color: var(--primary); }
 .listening span:nth-child(2) { animation-delay: 120ms; }
 .listening span:nth-child(3) { animation-delay: 240ms; }
 @keyframes pulse { 0%,100% { transform: scaleY(0.45); } 50% { transform: scaleY(1); } }
+
+.review-decision {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #fedf89;
+  border-radius: 14px;
+  background: var(--warning-soft);
+  color: #7a2e0e;
+}
+.review-decision > span { line-height: 1.45; font-size: 0.92rem; }
+.review-decision > div { display: flex; flex-wrap: wrap; gap: 8px; flex: 0 0 auto; }
+
 .transport-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 22px; }
 .icon-button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border); background: white; font-size: 1.25rem; }
 .shortcut-help { margin: 14px 0 0; text-align: center; color: var(--muted); font-size: 0.82rem; }
@@ -136,4 +153,7 @@ footer { margin-top: 24px; color: var(--muted); font-size: 0.82rem; line-height:
   .setup-card, .player-card { padding: 20px; border-radius: 18px; }
   .transport-controls .button { flex: 1 1 110px; }
   .player-topline { align-items: flex-start; }
+  .review-decision { align-items: stretch; flex-direction: column; }
+  .review-decision > div { width: 100%; }
+  .review-decision .button { flex: 1 1 100px; }
 }
