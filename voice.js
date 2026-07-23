@@ -13,7 +13,9 @@ export function populateVoices() {
     option.textContent = `${voice.name} (${voice.lang})${voice.default ? ' — default' : ''}`;
     elements.voiceSelect.append(option);
   });
-  if (savedVoice && list.some((voice) => voice.voiceURI === savedVoice)) elements.voiceSelect.value = savedVoice;
+  if (savedVoice && list.some((voice) => voice.voiceURI === savedVoice)) {
+    elements.voiceSelect.value = savedVoice;
+  }
 }
 
 function selectedVoice() {
@@ -66,8 +68,11 @@ export function speak(text, generation) {
       };
       utterance.onerror = (event) => {
         state.currentUtterance = null;
-        if (event.error === 'canceled' || event.error === 'interrupted') reject(createCancellationError());
-        else reject(new Error(`Speech synthesis error: ${event.error}`));
+        if (event.error === 'canceled' || event.error === 'interrupted') {
+          reject(createCancellationError());
+        } else {
+          reject(new Error(`Speech synthesis error: ${event.error}`));
+        }
       };
       window.speechSynthesis.speak(utterance);
     } catch (error) {
@@ -78,6 +83,49 @@ export function speak(text, generation) {
 
 export function recognitionConstructor() {
   return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+
+function combineRecognitionAlternatives(finalResults) {
+  const orderedResults = [...finalResults.entries()]
+    .sort(([left], [right]) => left - right)
+    .map(([, value]) => value);
+
+  if (!orderedResults.length) return [];
+
+  let combinations = [{ transcript: '', confidenceTotal: 0, confidenceCount: 0 }];
+
+  for (const resultAlternatives of orderedResults) {
+    const next = [];
+    for (const combination of combinations) {
+      for (const alternative of resultAlternatives) {
+        const hasConfidence = Number.isFinite(alternative.confidence) && alternative.confidence > 0;
+        next.push({
+          transcript: `${combination.transcript} ${alternative.transcript}`.trim(),
+          confidenceTotal: combination.confidenceTotal + (hasConfidence ? alternative.confidence : 0),
+          confidenceCount: combination.confidenceCount + (hasConfidence ? 1 : 0)
+        });
+      }
+    }
+
+    combinations = next
+      .sort((left, right) => {
+        const leftConfidence = left.confidenceCount
+          ? left.confidenceTotal / left.confidenceCount
+          : 0;
+        const rightConfidence = right.confidenceCount
+          ? right.confidenceTotal / right.confidenceCount
+          : 0;
+        return rightConfidence - leftConfidence;
+      })
+      .slice(0, 5);
+  }
+
+  return combinations.map((item) => ({
+    transcript: item.transcript,
+    confidence: item.confidenceCount
+      ? item.confidenceTotal / item.confidenceCount
+      : null
+  }));
 }
 
 export function listenForAnswer(generation) {
@@ -93,8 +141,9 @@ export function listenForAnswer(generation) {
     recognition.lang = 'en-US';
     recognition.interimResults = true;
     recognition.continuous = false;
-    recognition.maxAlternatives = 1;
-    let finalTranscript = '';
+    recognition.maxAlternatives = 5;
+
+    const finalResults = new Map();
     let settled = false;
 
     const finish = (value) => {
@@ -111,23 +160,54 @@ export function listenForAnswer(generation) {
       elements.transcriptCard.hidden = false;
       elements.transcript.textContent = 'Listening…';
     };
+
     recognition.onresult = (event) => {
       let interim = '';
-      for (let i = event.resultIndex; i < event.results.length; i += 1) {
-        const value = event.results[i][0].transcript;
-        if (event.results[i].isFinal) finalTranscript += value;
-        else interim += value;
+
+      for (let i = 0; i < event.results.length; i += 1) {
+        const result = event.results[i];
+        if (result.isFinal) {
+          const alternatives = Array.from(result)
+            .slice(0, 5)
+            .map((alternative) => ({
+              transcript: alternative.transcript.trim(),
+              confidence: alternative.confidence
+            }))
+            .filter((alternative) => alternative.transcript);
+          finalResults.set(i, alternatives);
+        } else if (i >= event.resultIndex) {
+          interim += result[0]?.transcript ?? '';
+        }
       }
-      elements.transcript.textContent = finalTranscript || interim || 'Listening…';
+
+      const alternatives = combineRecognitionAlternatives(finalResults);
+      const finalTranscript = alternatives[0]?.transcript ?? '';
+      elements.transcript.textContent = finalTranscript || interim.trim() || 'Listening…';
     };
+
     recognition.onerror = (event) => {
-      if (event.error === 'aborted' && state.status === 'paused') return finish({ transcript: '', paused: true });
-      if (event.error === 'no-speech') return finish({ transcript: '', noSpeech: true });
-      if (event.error === 'not-allowed') return reject(new Error('Microphone access was denied. Allow microphone access and try again.'));
+      if (event.error === 'aborted' && state.status === 'paused') {
+        finish({ transcript: '', alternatives: [], paused: true });
+        return;
+      }
+      if (event.error === 'no-speech') {
+        finish({ transcript: '', alternatives: [], noSpeech: true });
+        return;
+      }
+      if (event.error === 'not-allowed') {
+        reject(new Error('Microphone access was denied. Allow microphone access and try again.'));
+        return;
+      }
       reject(new Error(`Speech recognition error: ${event.error}`));
     };
+
     recognition.onend = () => {
-      if (!settled) finish({ transcript: finalTranscript.trim() });
+      if (settled) return;
+      const alternatives = combineRecognitionAlternatives(finalResults);
+      finish({
+        transcript: alternatives[0]?.transcript ?? '',
+        alternatives
+      });
     };
 
     try {
