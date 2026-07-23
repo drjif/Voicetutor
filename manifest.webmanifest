@@ -1,0 +1,17 @@
+{
+  "name": "VoiceTutor",
+  "short_name": "VoiceTutor",
+  "description": "A lightweight voice tutor for Google Sheets question banks.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#101828",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
