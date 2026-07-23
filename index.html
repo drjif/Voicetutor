@@ -108,7 +108,7 @@
             <input type="radio" name="mode" value="active" />
             <span class="mode-copy">
               <strong>Active Recall</strong>
-              <small>Listens to your answer and performs a basic local match.</small>
+              <small>Listens for several transcript alternatives, detects partial answers, and lets you retry or override recognition errors.</small>
             </span>
           </label>
         </fieldset>
@@ -171,6 +171,15 @@
           Listening
         </div>
 
+        <div id="reviewDecision" class="review-decision" hidden>
+          <span id="reviewMessage">Recognition can be corrected before moving on.</span>
+          <div>
+            <button id="tryAgainButton" class="button secondary">Try again</button>
+            <button id="markCorrectButton" class="button secondary">Mark correct</button>
+            <button id="continueButton" class="button primary">Continue</button>
+          </div>
+        </div>
+
         <div class="transport-controls">
           <button id="previousButton" class="icon-button" aria-label="Previous question" title="Previous question">←</button>
           <button id="repeatButton" class="button secondary">Repeat</button>
@@ -179,12 +188,12 @@
           <button id="nextButton" class="icon-button" aria-label="Next question" title="Next question">→</button>
           <button id="stopButton" class="button danger" disabled>Stop</button>
         </div>
-        <p class="shortcut-help">Keyboard: Space pause/resume · ←/→ move · R repeat · Esc stop</p>
+        <p class="shortcut-help">Keyboard: Space pause/resume · ←/→ move · R repeat · T retry · M mark correct · Esc stop</p>
       </section>
     </main>
 
     <footer>
-      <p>VoiceTutor runs locally in your browser. Active Recall uses the browser’s speech-recognition service and a basic text-matching heuristic; it is not a clinical or educational assessment engine.</p>
+      <p>VoiceTutor runs locally in your browser. Active Recall uses the browser’s speech-recognition service with multiple transcript alternatives and local answer matching. Use Try again or Mark correct when a medical term is transcribed incorrectly.</p>
     </footer>
   </div>
 
