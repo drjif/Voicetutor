@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#101828" />
+  <meta name="description" content="A lightweight browser-based voice tutor for Google Sheets question banks." />
+  <title>VoiceTutor</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <div>
+        <p class="eyebrow">Nightly oral review</p>
+        <h1>VoiceTutor</h1>
+        <p class="subtitle">Turn a Google Sheet into a hands-free question-and-answer session.</p>
+      </div>
+      <button id="installButton" class="button ghost" hidden>Install app</button>
+    </header>
+
+    <div id="browserWarning" class="notice warning" hidden></div>
+
+    <main class="layout">
+      <section class="card setup-card" aria-labelledby="source-heading">
+        <div class="section-heading">
+          <span class="step">1</span>
+          <div>
+            <h2 id="source-heading">Load your question bank</h2>
+            <p>Columns should contain at least a question and its correct answer.</p>
+          </div>
+        </div>
+
+        <label class="field full-width">
+          <span>Google Sheet URL</span>
+          <div class="input-row">
+            <input id="sheetUrl" type="url" placeholder="https://docs.google.com/spreadsheets/d/.../edit#gid=0" autocomplete="off" />
+            <button id="loadSheet" class="button primary">Load sheet</button>
+          </div>
+        </label>
+
+        <div class="source-actions">
+          <button id="loadDemo" class="button secondary">Try demo data</button>
+          <label class="button secondary file-button">
+            Upload CSV
+            <input id="csvUpload" type="file" accept=".csv,text/csv" hidden />
+          </label>
+          <label class="checkbox-row">
+            <input id="hasHeaders" type="checkbox" checked />
+            First row contains headers
+          </label>
+        </div>
+
+        <p class="helper">For direct Google Sheet loading, set General access to <strong>Anyone with the link — Viewer</strong>. Your data is processed in your browser and is not stored by this app.</p>
+        <div id="sheetStatus" class="inline-status" data-type="neutral">No sheet loaded.</div>
+
+        <div id="mappingPanel" class="mapping-panel" hidden>
+          <h3>Confirm columns</h3>
+          <div class="grid three-columns">
+            <label class="field">
+              <span>Question</span>
+              <select id="questionColumn"></select>
+            </label>
+            <label class="field">
+              <span>Correct answer</span>
+              <select id="answerColumn"></select>
+            </label>
+            <label class="field">
+              <span>Accepted alternatives</span>
+              <select id="acceptedColumn"></select>
+            </label>
+          </div>
+          <div class="mapping-footer">
+            <span id="bankSummary">No rows mapped.</span>
+            <button id="applyMapping" class="button secondary">Apply columns</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card setup-card" aria-labelledby="session-heading">
+        <div class="section-heading">
+          <span class="step">2</span>
+          <div>
+            <h2 id="session-heading">Configure the session</h2>
+            <p>Choose where to begin and how the tutor should behave.</p>
+          </div>
+        </div>
+
+        <label class="field full-width">
+          <span>Starting row</span>
+          <select id="startRow" disabled>
+            <option>Load a sheet first</option>
+          </select>
+        </label>
+
+        <fieldset class="mode-picker">
+          <legend>Review mode</legend>
+          <label class="mode-card">
+            <input type="radio" name="mode" value="passive" checked />
+            <span class="mode-copy">
+              <strong>Passive Review</strong>
+              <small>Reads the question, waits, then reads the answer.</small>
+            </span>
+          </label>
+          <label class="mode-card">
+            <input type="radio" name="mode" value="active" />
+            <span class="mode-copy">
+              <strong>Active Recall</strong>
+              <small>Listens to your answer and performs a basic local match.</small>
+            </span>
+          </label>
+        </fieldset>
+
+        <div class="grid two-columns">
+          <label class="field">
+            <span>Answer delay <output id="delayValue">3s</output></span>
+            <input id="answerDelay" type="range" min="1" max="15" value="3" step="1" />
+          </label>
+          <label class="field">
+            <span>Speech rate <output id="rateValue">1.0×</output></span>
+            <input id="speechRate" type="range" min="0.7" max="1.7" value="1" step="0.1" />
+          </label>
+          <label class="field">
+            <span>Voice</span>
+            <select id="voiceSelect"></select>
+          </label>
+          <label class="field">
+            <span>Answer matching</span>
+            <select id="strictness">
+              <option value="lenient">Lenient</option>
+              <option value="standard" selected>Standard</option>
+              <option value="strict">Strict</option>
+            </select>
+          </label>
+        </div>
+
+        <button id="startButton" class="button primary start-button" disabled>Start session</button>
+      </section>
+
+      <section id="sessionPanel" class="card player-card" hidden aria-live="polite">
+        <div class="player-topline">
+          <div>
+            <span id="progressText">Question 1 of 1</span>
+            <span id="sourceRowBadge" class="badge">Sheet row 2</span>
+          </div>
+          <span id="statusBadge" class="status-badge" data-status="idle">Ready</span>
+        </div>
+
+        <div class="progress-track" aria-hidden="true"><div id="progressBar"></div></div>
+
+        <article class="question-card">
+          <span class="card-label">Question</span>
+          <p id="currentQuestion">Your question will appear here.</p>
+        </article>
+
+        <article id="transcriptCard" class="response-card" hidden>
+          <span class="card-label">Your answer</span>
+          <p id="transcript"></p>
+          <small id="matchResult"></small>
+        </article>
+
+        <article id="answerCard" class="answer-card" hidden>
+          <span class="card-label">Correct answer</span>
+          <p id="currentAnswer"></p>
+        </article>
+
+        <div id="listeningIndicator" class="listening" hidden>
+          <span></span><span></span><span></span>
+          Listening
+        </div>
+
+        <div class="transport-controls">
+          <button id="previousButton" class="icon-button" aria-label="Previous question" title="Previous question">←</button>
+          <button id="repeatButton" class="button secondary">Repeat</button>
+          <button id="pauseButton" class="button primary" disabled>Pause</button>
+          <button id="resumeButton" class="button primary" disabled>Resume</button>
+          <button id="nextButton" class="icon-button" aria-label="Next question" title="Next question">→</button>
+          <button id="stopButton" class="button danger" disabled>Stop</button>
+        </div>
+        <p class="shortcut-help">Keyboard: Space pause/resume · ←/→ move · R repeat · Esc stop</p>
+      </section>
+    </main>
+
+    <footer>
+      <p>VoiceTutor runs locally in your browser. Active Recall uses the browser’s speech-recognition service and a basic text-matching heuristic; it is not a clinical or educational assessment engine.</p>
+    </footer>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
