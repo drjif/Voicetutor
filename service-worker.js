@@ -1,9 +1,13 @@
-const CACHE_NAME = 'voicetutor-v1';
+const CACHE_NAME = 'voicetutor-v2';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
+  './dom.js',
+  './sheet.js',
+  './session.js',
+  './voice.js',
   './lib.js',
   './manifest.webmanifest',
   './icon.svg',
