@@ -6,7 +6,7 @@ import {
   state,
   updateControls
 } from './dom.js';
-import { setupSheetEvents } from './sheet.js';
+import { setupSheetEvents } from './sheet-v2.js';
 import { setupSessionEvents } from './session.js';
 import { checkBrowserSupport, populateVoices } from './voice.js';
 
