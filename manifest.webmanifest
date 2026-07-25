@@ -1,6 +1,6 @@
 {
-  "name": "VoiceTutor",
-  "short_name": "VoiceTutor",
+  "name": "GIJAD Tutor",
+  "short_name": "GIJAD Tutor",
   "description": "A lightweight voice tutor for Google Sheets question banks.",
   "start_url": "./",
   "display": "standalone",
