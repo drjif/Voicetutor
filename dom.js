@@ -1,5 +1,16 @@
-export const STORAGE_KEY = 'voicetutor.settings.v1';
-export const PROGRESS_KEY = 'voicetutor.progress.v1';
+export const STORAGE_KEY = 'samme3le.settings.v1';
+export const PROGRESS_KEY = 'samme3le.progress.v1';
+const LEGACY_STORAGE_KEY = 'voicetutor.settings.v1';
+const LEGACY_PROGRESS_KEY = 'voicetutor.progress.v1';
+
+function migrateLegacyStorage() {
+  if (localStorage.getItem(STORAGE_KEY) === null && localStorage.getItem(LEGACY_STORAGE_KEY) !== null) {
+    localStorage.setItem(STORAGE_KEY, localStorage.getItem(LEGACY_STORAGE_KEY));
+  }
+  if (localStorage.getItem(PROGRESS_KEY) === null && localStorage.getItem(LEGACY_PROGRESS_KEY) !== null) {
+    localStorage.setItem(PROGRESS_KEY, localStorage.getItem(LEGACY_PROGRESS_KEY));
+  }
+}
 
 export const elements = {
   betaSignupForm: document.querySelector('#betaSignupForm'),
@@ -68,7 +79,7 @@ export const state = {
   rawRows: [],
   questions: [],
   currentIndex: 0,
-  mode: 'passive',
+  mode: 'active',
   status: 'idle',
   generation: 0,
   recognition: null,
@@ -84,6 +95,7 @@ export const state = {
 };
 
 export function loadSettings() {
+  migrateLegacyStorage();
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
   } catch {
@@ -92,7 +104,7 @@ export function loadSettings() {
 }
 
 export function selectedMode() {
-  return elements.modeInputs.find((input) => input.checked)?.value ?? 'passive';
+  return elements.modeInputs.find((input) => input.checked)?.value ?? 'active';
 }
 
 export function saveSettings() {
@@ -108,6 +120,7 @@ export function saveSettings() {
 }
 
 export function restoreSettings() {
+  migrateLegacyStorage();
   const settings = loadSettings();
   if (settings.sheetUrl && settings.sheetUrl !== 'Built-in demo') elements.sheetUrl.value = settings.sheetUrl;
   if (typeof settings.hasHeaders === 'boolean') elements.hasHeaders.checked = settings.hasHeaders;
@@ -123,6 +136,7 @@ export function restoreSettings() {
 }
 
 export function saveProgress() {
+  migrateLegacyStorage();
   if (!state.questions.length) return;
   localStorage.setItem(PROGRESS_KEY, JSON.stringify({
     sheetUrl: elements.sheetUrl.value,
