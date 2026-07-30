@@ -6,6 +6,7 @@ import {
   state,
   updateControls
 } from './dom.js';
+import { setupBetaFunnel } from './beta.js';
 import { setupSheetEvents } from './sheet-v2.js';
 import { setupSessionEvents } from './session.js';
 import { checkBrowserSupport, populateVoices } from './voice.js';
@@ -46,6 +47,7 @@ function setupInstallation() {
 
 function initialize() {
   restoreSettings();
+  setupBetaFunnel();
   setupSheetEvents();
   setupSessionEvents();
   setupPreferences();
