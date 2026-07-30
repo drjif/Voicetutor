@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#101828" />
-  <meta name="description" content="A lightweight browser-based voice tutor for Google Sheets question banks." />
+  <meta name="description" content="GIJAD Tutor turns question banks into hands-free spoken study sessions." />
   <title>GIJAD Tutor</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./icon.svg" type="image/svg+xml" />
@@ -14,9 +14,12 @@
   <div class="page-shell">
     <header class="site-header">
       <div>
-        <p class="eyebrow">Nightly oral review</p>
+        <div class="eyebrow-row">
+          <p class="eyebrow">Hands-free active recall</p>
+          <span class="prototype-badge">Prototype beta</span>
+        </div>
         <h1>GIJAD Tutor</h1>
-        <p class="subtitle">Turn a Google Sheet into a hands-free question-and-answer session.</p>
+        <p class="subtitle">Turn a question bank into a spoken tutor that reads, listens, and helps you review hands-free.</p>
       </div>
       <button id="installButton" class="button ghost" hidden>Install app</button>
     </header>
@@ -24,64 +27,113 @@
     <div id="browserWarning" class="notice warning" hidden></div>
 
     <main class="layout">
-      <section class="card setup-card" aria-labelledby="source-heading">
-        <div class="section-heading">
+      <section class="card funnel-card" aria-labelledby="access-heading">
+        <div class="section-heading compact-heading">
           <span class="step">1</span>
           <div>
+            <h2 id="access-heading">Try it, then unlock your own question bank</h2>
+            <p>No payment information. Registered beta users receive unlimited access during the prototype beta.</p>
+          </div>
+        </div>
+
+        <div class="funnel-grid">
+          <article class="funnel-option demo-option">
+            <span class="option-kicker">No account needed</span>
+            <h3>Try five demo questions</h3>
+            <p>Test the voice, answer matching, and study flow before entering any information.</p>
+            <button id="loadDemo" class="button primary">Start 5-question demo</button>
+          </article>
+
+          <article id="betaSignupPanel" class="funnel-option">
+            <span class="option-kicker">Free prototype access</span>
+            <h3>Use your own question bank</h3>
+            <form id="betaSignupForm" novalidate>
+              <label class="field">
+                <span>Email address</span>
+                <input id="betaEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required />
+              </label>
+              <label class="checkbox-row consent-row">
+                <input id="betaConsent" type="checkbox" required />
+                I want free beta access and may be contacted about GIJAD Tutor updates.
+              </label>
+              <button class="button secondary full-button" type="submit">Create free beta account</button>
+            </form>
+            <div id="betaSignupStatus" class="inline-status" data-type="neutral" aria-live="polite">Prototype access is saved on this device only. This build does not send your email to a server.</div>
+          </article>
+
+          <article id="betaMemberPanel" class="funnel-option member-option" hidden>
+            <span class="option-kicker">Beta access active</span>
+            <h3>You can use personal question banks</h3>
+            <p>Signed in locally as <strong id="betaMemberEmail"></strong>.</p>
+            <p class="helper">This prototype stores access on this browser only. A real verified account system will replace it before a production launch.</p>
+            <button id="signOutButton" class="button secondary" type="button">Remove local beta access</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="card setup-card" aria-labelledby="source-heading">
+        <div class="section-heading">
+          <span class="step">2</span>
+          <div>
             <h2 id="source-heading">Load your question bank</h2>
-            <p>Columns should contain at least a question and its correct answer.</p>
+            <p>Free beta access is required for personal Google Sheets and CSV files.</p>
           </div>
         </div>
 
-        <label class="field full-width">
-          <span>Google Sheet URL</span>
-          <div class="input-row">
-            <input id="sheetUrl" type="url" placeholder="https://docs.google.com/spreadsheets/d/.../edit#gid=0" autocomplete="off" />
-            <button id="loadSheet" class="button primary">Load sheet</button>
-          </div>
-        </label>
+        <div id="personalBankLock" class="lock-notice">
+          Complete the free beta form above to unlock Google Sheet and CSV import.
+        </div>
 
-        <div class="source-actions">
-          <button id="loadDemo" class="button secondary">Try demo data</button>
-          <label class="button secondary file-button">
-            Upload CSV
-            <input id="csvUpload" type="file" accept=".csv,text/csv" hidden />
+        <fieldset id="personalBankControls" class="plain-fieldset" disabled>
+          <label class="field full-width">
+            <span>Google Sheet URL</span>
+            <div class="input-row">
+              <input id="sheetUrl" type="url" placeholder="https://docs.google.com/spreadsheets/d/.../edit#gid=0" autocomplete="off" />
+              <button id="loadSheet" class="button primary" type="button">Load sheet</button>
+            </div>
           </label>
-          <label class="checkbox-row">
-            <input id="hasHeaders" type="checkbox" checked />
-            First row contains headers
-          </label>
-        </div>
 
-        <p class="helper">For direct Google Sheet loading, set General access to <strong>Anyone with the link — Viewer</strong>. Your data is processed in your browser and is not stored by this app.</p>
-        <div id="sheetStatus" class="inline-status" data-type="neutral">No sheet loaded.</div>
-
-        <div id="mappingPanel" class="mapping-panel" hidden>
-          <h3>Confirm columns</h3>
-          <div class="grid three-columns">
-            <label class="field">
-              <span>Question</span>
-              <select id="questionColumn"></select>
+          <div class="source-actions">
+            <label class="button secondary file-button">
+              Upload CSV
+              <input id="csvUpload" type="file" accept=".csv,text/csv" hidden />
             </label>
-            <label class="field">
-              <span>Correct answer</span>
-              <select id="answerColumn"></select>
-            </label>
-            <label class="field">
-              <span>Accepted alternatives</span>
-              <select id="acceptedColumn"></select>
+            <label class="checkbox-row">
+              <input id="hasHeaders" type="checkbox" checked />
+              First row contains headers
             </label>
           </div>
-          <div class="mapping-footer">
-            <span id="bankSummary">No rows mapped.</span>
-            <button id="applyMapping" class="button secondary">Apply columns</button>
+
+          <p class="helper">For direct Google Sheet loading, set General access to <strong>Anyone with the link — Viewer</strong>. CSV files are read locally. Google Sheet data is requested directly from Google by your browser.</p>
+          <div id="sheetStatus" class="inline-status" data-type="neutral">No personal question bank loaded.</div>
+
+          <div id="mappingPanel" class="mapping-panel" hidden>
+            <h3>Confirm columns</h3>
+            <div class="grid three-columns">
+              <label class="field">
+                <span>Question</span>
+                <select id="questionColumn"></select>
+              </label>
+              <label class="field">
+                <span>Correct answer</span>
+                <select id="answerColumn"></select>
+              </label>
+              <label class="field">
+                <span>Accepted alternatives</span>
+                <select id="acceptedColumn"></select>
+              </label>
+            </div>
+            <div class="mapping-footer">
+              <span id="bankSummary">No rows mapped.</span>
+              <button id="applyMapping" class="button secondary" type="button">Apply columns</button>
+            </div>
           </div>
-        </div>
+        </fieldset>
       </section>
 
       <section class="card setup-card" aria-labelledby="session-heading">
         <div class="section-heading">
-          <span class="step">2</span>
+          <span class="step">3</span>
           <div>
             <h2 id="session-heading">Configure the session</h2>
             <p>Choose where to begin and how the tutor should behave.</p>
@@ -91,7 +143,7 @@
         <label class="field full-width">
           <span>Starting row</span>
           <select id="startRow" disabled>
-            <option>Load a sheet first</option>
+            <option>Load a question bank first</option>
           </select>
         </label>
 
@@ -190,10 +242,22 @@
         </div>
         <p class="shortcut-help">Keyboard: Space pause/resume · ←/→ move · R repeat · T retry · M mark correct · Esc stop</p>
       </section>
+
+      <section id="conversionCard" class="card conversion-card" hidden aria-labelledby="conversion-heading">
+        <span class="option-kicker">Help shape the next version</span>
+        <h2 id="conversion-heading">Would you pay for GIJAD Tutor Pro?</h2>
+        <p>Pro would eventually include unlimited question banks, cross-device progress, performance history, and weak-topic review.</p>
+        <div class="conversion-actions">
+          <button id="wouldPayButton" class="button primary" type="button">I would pay for Pro</button>
+          <button id="notNowButton" class="button secondary" type="button">Not yet</button>
+        </div>
+        <div id="conversionStatus" class="inline-status" data-type="neutral" aria-live="polite">This is interest research only. No payment will be collected.</div>
+      </section>
     </main>
 
     <footer>
-      <p>GIJAD Tutor runs locally in your browser. Active Recall uses the browser’s speech-recognition service with multiple transcript alternatives and local answer matching. Use Try again or Mark correct when a medical term is transcribed incorrectly.</p>
+      <p><strong>Prototype:</strong> GIJAD Tutor is an educational study tool and is not for patient care. Do not enter patient information, protected health information, confidential institutional data, or question-bank content you are not authorized to use.</p>
+      <p>CSV content and prototype access are stored locally in this browser. Google Sheet requests and speech recognition may be processed by Google or your browser provider. This version has no payment system and no production account backend.</p>
     </footer>
   </div>
 
