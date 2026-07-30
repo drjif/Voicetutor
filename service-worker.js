@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gijad-tutor-v5';
+const CACHE_NAME = 'samme3le-v6';
 const ASSETS = [
   './',
   './index.html',
