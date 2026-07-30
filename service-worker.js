@@ -1,9 +1,10 @@
-const CACHE_NAME = 'voicetutor-v4';
+const CACHE_NAME = 'gijad-tutor-v5';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
+  './beta.js',
   './dom.js',
   './sheet-v2.js',
   './sheet-data.js',
