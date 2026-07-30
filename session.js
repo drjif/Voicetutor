@@ -10,6 +10,7 @@ import {
   state,
   updateControls
 } from './dom.js';
+import { noteQuestionCompleted, noteSessionCompleted, noteSessionStarted } from './beta.js';
 import { assertGeneration, listenForAnswer, pausableWait, speak, waitUntilResumed } from './voice.js';
 
 function hideReviewControls() {
@@ -28,7 +29,7 @@ export function renderCurrentQuestion() {
   elements.listeningIndicator.hidden = true;
   elements.transcript.textContent = '';
   elements.matchResult.textContent = '';
-  elements.sourceRowBadge.textContent = `Sheet row ${item.sourceRow}`;
+  elements.sourceRowBadge.textContent = `${state.sourceType === 'demo' ? 'Demo' : 'Sheet'} row ${item.sourceRow}`;
   elements.progressText.textContent = `Question ${state.currentIndex + 1} of ${state.questions.length}`;
   elements.progressBar.style.width = `${((state.currentIndex + 1) / state.questions.length) * 100}%`;
   elements.startRow.value = String(state.currentIndex);
@@ -206,6 +207,7 @@ async function runSession(generation) {
       assertGeneration(generation);
       if (state.status === 'idle' || state.status === 'complete') return;
       if (state.restartCurrentQuestion) continue;
+      noteQuestionCompleted();
       state.currentIndex += 1;
     }
 
@@ -213,6 +215,7 @@ async function runSession(generation) {
     renderCurrentQuestion();
     setSessionStatus('complete', 'Session complete');
     elements.startButton.disabled = false;
+    noteSessionCompleted();
     await speak('Session complete.', generation).catch(() => {});
   } catch (error) {
     if (error.name === 'SessionCancelledError') return;
@@ -232,6 +235,7 @@ export function startSession() {
   state.status = 'running';
   state.resumeResolvers.splice(0).forEach((resolve) => resolve());
   renderCurrentQuestion();
+  noteSessionStarted();
   setSessionStatus('running', state.mode === 'passive' ? 'Starting review' : 'Starting recall');
   updateControls();
   runSession(state.generation);
