@@ -8,6 +8,7 @@ import {
   state,
   updateControls
 } from './dom.js';
+import { noteSourceLoaded, requireBetaAccess } from './beta.js';
 
 let currentHeaderRowIndex = 0;
 
@@ -70,22 +71,22 @@ export function applyColumnMapping() {
   state.questions.forEach((item, index) => {
     const option = document.createElement('option');
     option.value = String(index);
-    option.textContent = `Sheet row ${item.sourceRow} — ${truncate(item.question, 90)}`;
+    option.textContent = `${state.sourceType === 'demo' ? 'Demo' : 'Sheet'} row ${item.sourceRow} — ${truncate(item.question, 90)}`;
     elements.startRow.append(option);
   });
 
   const saved = safeJson(localStorage.getItem(PROGRESS_KEY));
-  if (saved?.sheetUrl === elements.sheetUrl.value && saved.sourceRow) {
+  if (state.sourceType === 'personal' && saved?.sheetUrl === elements.sheetUrl.value && saved.sourceRow) {
     const resumeIndex = state.questions.findIndex((item) => item.sourceRow === saved.sourceRow);
     if (resumeIndex >= 0) elements.startRow.value = String(resumeIndex);
   }
 
   elements.bankSummary.textContent = state.questions.length
-    ? `${state.questions.length} usable question${state.questions.length === 1 ? '' : 's'} loaded from ${state.rawRows.length} sheet rows.`
+    ? `${state.questions.length} usable question${state.questions.length === 1 ? '' : 's'} loaded from ${state.rawRows.length} rows.`
     : 'No usable question-answer rows were found.';
   setSheetStatus(
     state.questions.length
-      ? `Sheet loaded. Using ${elements.questionColumn.options[elements.questionColumn.selectedIndex]?.textContent} as the question and ${elements.answerColumn.options[elements.answerColumn.selectedIndex]?.textContent} as the answer.`
+      ? `${state.sourceType === 'demo' ? 'Demo' : 'Question bank'} loaded. Using ${elements.questionColumn.options[elements.questionColumn.selectedIndex]?.textContent} as the question and ${elements.answerColumn.options[elements.answerColumn.selectedIndex]?.textContent} as the answer.`
       : 'Check the selected columns and row contents.',
     state.questions.length ? 'success' : 'error'
   );
@@ -105,6 +106,7 @@ async function fetchSheetText(urlString) {
 }
 
 export async function loadGoogleSheet() {
+  if (!requireBetaAccess()) return;
   const parsed = parseGoogleSheetUrl(elements.sheetUrl.value);
   if (!parsed) {
     setSheetStatus('Paste a valid Google Sheets URL or direct CSV URL.', 'error');
@@ -131,7 +133,9 @@ export async function loadGoogleSheet() {
     }
 
     if (!rows) throw lastError ?? new Error('No readable sheet endpoint was available');
+    state.sourceType = 'personal';
     prepareRows(rows);
+    noteSourceLoaded('personal', state.questions.length);
   } catch (error) {
     console.error(error);
     setSheetStatus(
@@ -144,20 +148,29 @@ export async function loadGoogleSheet() {
 }
 
 export async function loadDemo() {
-  setSheetStatus('Loading demo questions…', 'loading');
+  setSheetStatus('Loading five demo questions…', 'loading');
   const response = await fetch('./data/sample-questions.csv');
   const text = await response.text();
+  state.sourceType = 'demo';
   elements.sheetUrl.value = 'Built-in demo';
   prepareRows(parseDelimited(text));
+  noteSourceLoaded('demo', state.questions.length);
+  document.querySelector('#session-heading')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 export function handleCsvUpload(event) {
+  if (!requireBetaAccess()) {
+    event.target.value = '';
+    return;
+  }
   const [file] = event.target.files;
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
+    state.sourceType = 'personal';
     elements.sheetUrl.value = `Uploaded: ${file.name}`;
     prepareRows(parseDelimited(String(reader.result ?? '')));
+    noteSourceLoaded('personal', state.questions.length);
   };
   reader.onerror = () => setSheetStatus('Unable to read that CSV file.', 'error');
   reader.readAsText(file);
