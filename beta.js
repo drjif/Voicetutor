@@ -1,10 +1,23 @@
 import { elements, setSessionStatus, setSheetStatus, state, updateControls } from './dom.js';
 
-const ACCOUNT_KEY = 'gijadTutor.betaAccount.v1';
-const METRICS_KEY = 'gijadTutor.prototypeMetrics.v1';
-const VISIT_KEY = 'gijadTutor.prototypeVisit.v1';
-const SESSION_VISIT_KEY = 'gijadTutor.visitRecorded';
+const ACCOUNT_KEY = 'samme3le.betaAccount.v1';
+const METRICS_KEY = 'samme3le.prototypeMetrics.v1';
+const VISIT_KEY = 'samme3le.prototypeVisit.v1';
+const SESSION_VISIT_KEY = 'samme3le.visitRecorded';
+const LEGACY_KEYS = [
+  ['gijadTutor.betaAccount.v1', ACCOUNT_KEY],
+  ['gijadTutor.prototypeMetrics.v1', METRICS_KEY],
+  ['gijadTutor.prototypeVisit.v1', VISIT_KEY]
+];
 const MAX_EVENTS = 100;
+
+function migrateLegacyStorage() {
+  LEGACY_KEYS.forEach(([legacyKey, currentKey]) => {
+    if (localStorage.getItem(currentKey) === null && localStorage.getItem(legacyKey) !== null) {
+      localStorage.setItem(currentKey, localStorage.getItem(legacyKey));
+    }
+  });
+}
 
 function readJson(key, fallback) {
   try {
@@ -69,9 +82,9 @@ function resetLoadedContent() {
   elements.mappingPanel.hidden = true;
   elements.sessionPanel.hidden = true;
   elements.conversionCard.hidden = true;
-  elements.startRow.innerHTML = '<option>Load a question bank first</option>';
+  elements.startRow.innerHTML = '<option>Load questions first</option>';
   elements.startRow.disabled = true;
-  setSheetStatus('No personal question bank loaded.', 'neutral');
+  setSheetStatus('No personal question list loaded.', 'neutral');
   setSessionStatus('idle', 'Ready');
   updateControls();
 }
@@ -92,7 +105,7 @@ function isValidEmail(value) {
 
 export function requireBetaAccess() {
   if (hasBetaAccess()) return true;
-  elements.betaSignupStatus.textContent = 'Create free beta access before loading a personal question bank.';
+  elements.betaSignupStatus.textContent = 'Unlock free prototype access before adding your own questions.';
   elements.betaSignupStatus.dataset.type = 'error';
   elements.betaSignupPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
   elements.betaEmail.focus();
@@ -100,6 +113,7 @@ export function requireBetaAccess() {
 }
 
 export function setupBetaFunnel() {
+  migrateLegacyStorage();
   recordVisit();
   renderAccessState();
 
@@ -113,7 +127,7 @@ export function setupBetaFunnel() {
       return;
     }
     if (!elements.betaConsent.checked) {
-      elements.betaSignupStatus.textContent = 'Confirm that you want free beta access and product updates.';
+      elements.betaSignupStatus.textContent = 'Confirm that you understand access is saved only on this device.';
       elements.betaSignupStatus.dataset.type = 'error';
       elements.betaConsent.focus();
       return;
@@ -122,12 +136,12 @@ export function setupBetaFunnel() {
     writeJson(ACCOUNT_KEY, {
       email,
       createdAt: new Date().toISOString(),
-      accountType: 'local-prototype'
+      accountType: 'samme3le-local-prototype'
     });
     recordMetric('beta_account_created');
     renderAccessState();
     elements.betaSignupForm.reset();
-    elements.personalBankControls.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    elements.personalBankControls.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
   elements.signOutButton.addEventListener('click', () => {
@@ -141,7 +155,7 @@ export function setupBetaFunnel() {
     recordMetric('would_pay_for_pro');
     elements.wouldPayButton.disabled = true;
     elements.notNowButton.disabled = true;
-    elements.conversionStatus.textContent = 'Thank you. Your interest was recorded on this device for prototype testing.';
+    elements.conversionStatus.textContent = 'Thank you. Your answer was recorded on this device for prototype testing.';
     elements.conversionStatus.dataset.type = 'success';
   });
 
@@ -149,11 +163,12 @@ export function setupBetaFunnel() {
     recordMetric('not_ready_to_pay');
     elements.wouldPayButton.disabled = true;
     elements.notNowButton.disabled = true;
-    elements.conversionStatus.textContent = 'Thank you. Your response was recorded on this device for prototype testing.';
+    elements.conversionStatus.textContent = 'Thank you. Your answer was recorded on this device for prototype testing.';
     elements.conversionStatus.dataset.type = 'neutral';
   });
 
-  window.gijadTutorPrototypeMetrics = () => readJson(METRICS_KEY, []);
+  window.samme3lePrototypeMetrics = () => readJson(METRICS_KEY, []);
+  window.gijadTutorPrototypeMetrics = window.samme3lePrototypeMetrics;
 }
 
 export function noteSourceLoaded(sourceType, questionCount) {
@@ -163,7 +178,7 @@ export function noteSourceLoaded(sourceType, questionCount) {
   elements.conversionCard.hidden = true;
   elements.wouldPayButton.disabled = false;
   elements.notNowButton.disabled = false;
-  elements.conversionStatus.textContent = 'This is interest research only. No payment will be collected.';
+  elements.conversionStatus.textContent = 'This only measures interest. No payment will be collected.';
   elements.conversionStatus.dataset.type = 'neutral';
 
   if (sourceType === 'demo') {
