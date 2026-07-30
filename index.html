@@ -3,199 +3,276 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#101828" />
-  <meta name="description" content="GIJAD Tutor turns question banks into hands-free spoken study sessions." />
-  <title>GIJAD Tutor</title>
+  <meta name="theme-color" content="#ff5a1f" />
+  <meta name="description" content="samme3le turns a list of questions and answers into a spoken tutor that quizzes you out loud." />
+  <title>samme3le — Turn your notes into a spoken tutor</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
   <div class="page-shell">
-    <header class="site-header">
-      <div>
-        <div class="eyebrow-row">
-          <p class="eyebrow">Hands-free active recall</p>
-          <span class="prototype-badge">Prototype beta</span>
-        </div>
-        <h1>GIJAD Tutor</h1>
-        <p class="subtitle">Turn a question bank into a spoken tutor that reads, listens, and helps you review hands-free.</p>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="samme3le home">
+        <span class="brand-mark" aria-hidden="true">3</span>
+        <span class="brand-copy">
+          <strong>samme3le</strong>
+          <small>recite to me</small>
+        </span>
+      </a>
+
+      <div class="header-actions">
+        <span class="prototype-badge">Free prototype</span>
+        <button id="installButton" class="button ghost compact-button" hidden>Install</button>
       </div>
-      <button id="installButton" class="button ghost" hidden>Install app</button>
     </header>
 
     <div id="browserWarning" class="notice warning" hidden></div>
 
-    <main class="layout">
-      <section class="card funnel-card" aria-labelledby="access-heading">
-        <div class="section-heading compact-heading">
+    <main id="main-content" class="layout">
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="hero-copy">
+          <p class="eyebrow">Study out loud. Remember more.</p>
+          <h1 id="hero-heading">Turn your notes into a tutor that quizzes you.</h1>
+          <p class="hero-subtitle">Give samme3le a list of questions and answers. It reads one question. You answer out loud. Then it checks your answer and keeps going.</p>
+
+          <div class="hero-actions">
+            <button id="loadDemo" class="button primary large-button" type="button">Try 5 questions now</button>
+            <a class="button secondary large-button" href="#your-questions">Use my own questions</a>
+          </div>
+
+          <ul class="hero-proof" aria-label="Prototype details">
+            <li>No download</li>
+            <li>No credit card</li>
+            <li>Works in your browser</li>
+          </ul>
+        </div>
+
+        <div class="hero-demo" aria-label="Example samme3le study flow">
+          <div class="demo-topline">
+            <span class="live-dot" aria-hidden="true"></span>
+            <strong>What using it feels like</strong>
+          </div>
+
+          <div class="conversation-card tutor-message">
+            <span>samme3le asks</span>
+            <p>What does the heart pump?</p>
+          </div>
+
+          <div class="conversation-card user-message">
+            <span>You answer</span>
+            <p>Blood.</p>
+          </div>
+
+          <div class="demo-result">
+            <span aria-hidden="true">✓</span>
+            <p><strong>Correct.</strong> Then you get the next question.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card how-card" aria-labelledby="how-heading">
+        <div class="centered-heading">
+          <p class="eyebrow">How it works</p>
+          <h2 id="how-heading">Three steps. That’s it.</h2>
+        </div>
+
+        <div class="simple-steps">
+          <article class="simple-step">
+            <span class="step-number">1</span>
+            <h3>Add your questions</h3>
+            <p>Use a Google Sheet or CSV with a <strong>Question</strong> column and an <strong>Answer</strong> column.</p>
+          </article>
+
+          <article class="simple-step">
+            <span class="step-number">2</span>
+            <h3>Press start</h3>
+            <p>samme3le reads one question to you out loud.</p>
+          </article>
+
+          <article class="simple-step">
+            <span class="step-number">3</span>
+            <h3>Say your answer</h3>
+            <p>It listens, checks what you said, and gives you the next question.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="your-questions" class="card onboarding-card" aria-labelledby="questions-heading">
+        <div class="section-heading">
           <span class="step">1</span>
           <div>
-            <h2 id="access-heading">Try it, then unlock your own question bank</h2>
-            <p>No payment information. Registered beta users receive unlimited access during the prototype beta.</p>
+            <h2 id="questions-heading">Use your own questions</h2>
+            <p>The prototype is free. Unlock uploads on this device, then add your question list.</p>
           </div>
         </div>
 
-        <div class="funnel-grid">
-          <article class="funnel-option demo-option">
-            <span class="option-kicker">No account needed</span>
-            <h3>Try five demo questions</h3>
-            <p>Test the voice, answer matching, and study flow before entering any information.</p>
-            <button id="loadDemo" class="button primary">Start 5-question demo</button>
-          </article>
+        <div class="onboarding-grid">
+          <article id="betaSignupPanel" class="setup-panel signup-panel">
+            <span class="option-kicker">First: unlock free access</span>
+            <h3>Enter your email</h3>
+            <p class="panel-copy">This temporary prototype saves your email only in this browser. A real account system will replace it later.</p>
 
-          <article id="betaSignupPanel" class="funnel-option">
-            <span class="option-kicker">Free prototype access</span>
-            <h3>Use your own question bank</h3>
             <form id="betaSignupForm" novalidate>
               <label class="field">
                 <span>Email address</span>
                 <input id="betaEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required />
               </label>
+
               <label class="checkbox-row consent-row">
                 <input id="betaConsent" type="checkbox" required />
-                I want free beta access and may be contacted about GIJAD Tutor updates.
+                <span>I understand this is a prototype and my access is saved only on this device.</span>
               </label>
-              <button class="button secondary full-button" type="submit">Create free beta account</button>
+
+              <button class="button primary full-button" type="submit">Unlock my questions</button>
             </form>
-            <div id="betaSignupStatus" class="inline-status" data-type="neutral" aria-live="polite">Prototype access is saved on this device only. This build does not send your email to a server.</div>
+
+            <div id="betaSignupStatus" class="inline-status" data-type="neutral" aria-live="polite">Nothing is sent to a server in this prototype.</div>
           </article>
 
-          <article id="betaMemberPanel" class="funnel-option member-option" hidden>
-            <span class="option-kicker">Beta access active</span>
-            <h3>You can use personal question banks</h3>
-            <p>Signed in locally as <strong id="betaMemberEmail"></strong>.</p>
-            <p class="helper">This prototype stores access on this browser only. A real verified account system will replace it before a production launch.</p>
-            <button id="signOutButton" class="button secondary" type="button">Remove local beta access</button>
+          <article id="betaMemberPanel" class="setup-panel member-panel" hidden>
+            <span class="option-kicker">Access unlocked</span>
+            <h3>You can add your questions</h3>
+            <p>Unlocked on this device as <strong id="betaMemberEmail"></strong>.</p>
+            <p class="helper">This is not yet a verified online account. Access is stored only in this browser.</p>
+            <button id="signOutButton" class="button secondary" type="button">Remove access from this device</button>
+          </article>
+
+          <article class="setup-panel import-panel">
+            <span class="option-kicker">Next: add your list</span>
+            <h3>Google Sheet or CSV</h3>
+            <p class="panel-copy">Your first row should have labels such as <strong>Question</strong>, <strong>Answer</strong>, and optionally <strong>Accepted alternatives</strong>.</p>
+
+            <div id="personalBankLock" class="lock-notice">
+              Enter your email on the left to unlock Google Sheet and CSV import.
+            </div>
+
+            <fieldset id="personalBankControls" class="plain-fieldset" disabled>
+              <label class="field full-width">
+                <span>Google Sheet link</span>
+                <div class="input-row">
+                  <input id="sheetUrl" type="url" placeholder="Paste your Google Sheet link" autocomplete="off" />
+                  <button id="loadSheet" class="button primary" type="button">Load sheet</button>
+                </div>
+              </label>
+
+              <div class="source-actions">
+                <label class="button secondary file-button">
+                  Upload CSV
+                  <input id="csvUpload" type="file" accept=".csv,text/csv" hidden />
+                </label>
+                <label class="checkbox-row">
+                  <input id="hasHeaders" type="checkbox" checked />
+                  First row has column names
+                </label>
+              </div>
+
+              <p class="helper">For a Google Sheet, set access to <strong>Anyone with the link — Viewer</strong>. CSV files stay in your browser.</p>
+              <p class="helper safety-note"><strong>Do not add patient information, private records, or paid question-bank content you do not own.</strong></p>
+              <div id="sheetStatus" class="inline-status" data-type="neutral">No personal question list loaded.</div>
+
+              <div id="mappingPanel" class="mapping-panel" hidden>
+                <h3>Check your columns</h3>
+                <div class="grid three-columns">
+                  <label class="field">
+                    <span>Question</span>
+                    <select id="questionColumn"></select>
+                  </label>
+                  <label class="field">
+                    <span>Correct answer</span>
+                    <select id="answerColumn"></select>
+                  </label>
+                  <label class="field">
+                    <span>Other answers to accept</span>
+                    <select id="acceptedColumn"></select>
+                  </label>
+                </div>
+                <div class="mapping-footer">
+                  <span id="bankSummary">No rows mapped.</span>
+                  <button id="applyMapping" class="button secondary" type="button">Use these columns</button>
+                </div>
+              </div>
+            </fieldset>
           </article>
         </div>
       </section>
 
-      <section class="card setup-card" aria-labelledby="source-heading">
+      <section id="study-setup" class="card setup-card" aria-labelledby="session-heading">
         <div class="section-heading">
           <span class="step">2</span>
           <div>
-            <h2 id="source-heading">Load your question bank</h2>
-            <p>Free beta access is required for personal Google Sheets and CSV files.</p>
+            <h2 id="session-heading">Choose how samme3le should quiz you</h2>
+            <p>Pick one mode, then press start.</p>
           </div>
         </div>
-
-        <div id="personalBankLock" class="lock-notice">
-          Complete the free beta form above to unlock Google Sheet and CSV import.
-        </div>
-
-        <fieldset id="personalBankControls" class="plain-fieldset" disabled>
-          <label class="field full-width">
-            <span>Google Sheet URL</span>
-            <div class="input-row">
-              <input id="sheetUrl" type="url" placeholder="https://docs.google.com/spreadsheets/d/.../edit#gid=0" autocomplete="off" />
-              <button id="loadSheet" class="button primary" type="button">Load sheet</button>
-            </div>
-          </label>
-
-          <div class="source-actions">
-            <label class="button secondary file-button">
-              Upload CSV
-              <input id="csvUpload" type="file" accept=".csv,text/csv" hidden />
-            </label>
-            <label class="checkbox-row">
-              <input id="hasHeaders" type="checkbox" checked />
-              First row contains headers
-            </label>
-          </div>
-
-          <p class="helper">For direct Google Sheet loading, set General access to <strong>Anyone with the link — Viewer</strong>. CSV files are read locally. Google Sheet data is requested directly from Google by your browser.</p>
-          <div id="sheetStatus" class="inline-status" data-type="neutral">No personal question bank loaded.</div>
-
-          <div id="mappingPanel" class="mapping-panel" hidden>
-            <h3>Confirm columns</h3>
-            <div class="grid three-columns">
-              <label class="field">
-                <span>Question</span>
-                <select id="questionColumn"></select>
-              </label>
-              <label class="field">
-                <span>Correct answer</span>
-                <select id="answerColumn"></select>
-              </label>
-              <label class="field">
-                <span>Accepted alternatives</span>
-                <select id="acceptedColumn"></select>
-              </label>
-            </div>
-            <div class="mapping-footer">
-              <span id="bankSummary">No rows mapped.</span>
-              <button id="applyMapping" class="button secondary" type="button">Apply columns</button>
-            </div>
-          </div>
-        </fieldset>
-      </section>
-
-      <section class="card setup-card" aria-labelledby="session-heading">
-        <div class="section-heading">
-          <span class="step">3</span>
-          <div>
-            <h2 id="session-heading">Configure the session</h2>
-            <p>Choose where to begin and how the tutor should behave.</p>
-          </div>
-        </div>
-
-        <label class="field full-width">
-          <span>Starting row</span>
-          <select id="startRow" disabled>
-            <option>Load a question bank first</option>
-          </select>
-        </label>
 
         <fieldset class="mode-picker">
-          <legend>Review mode</legend>
+          <legend class="sr-only">Study mode</legend>
           <label class="mode-card">
-            <input type="radio" name="mode" value="passive" checked />
+            <input type="radio" name="mode" value="active" checked />
+            <span class="mode-icon" aria-hidden="true">🎙</span>
             <span class="mode-copy">
-              <strong>Passive Review</strong>
-              <small>Reads the question, waits, then reads the answer.</small>
+              <strong>Answer out loud</strong>
+              <small>samme3le reads a question, listens to you, and checks your answer.</small>
             </span>
           </label>
+
           <label class="mode-card">
-            <input type="radio" name="mode" value="active" />
+            <input type="radio" name="mode" value="passive" />
+            <span class="mode-icon" aria-hidden="true">▶</span>
             <span class="mode-copy">
-              <strong>Active Recall</strong>
-              <small>Listens for several transcript alternatives, detects partial answers, and lets you retry or override recognition errors.</small>
+              <strong>Listen and review</strong>
+              <small>samme3le reads the question, waits, and then reads the answer.</small>
             </span>
           </label>
         </fieldset>
 
-        <div class="grid two-columns">
-          <label class="field">
-            <span>Answer delay <output id="delayValue">3s</output></span>
-            <input id="answerDelay" type="range" min="1" max="15" value="3" step="1" />
-          </label>
-          <label class="field">
-            <span>Speech rate <output id="rateValue">1.0×</output></span>
-            <input id="speechRate" type="range" min="0.7" max="1.7" value="1" step="0.1" />
-          </label>
-          <label class="field">
-            <span>Voice</span>
-            <select id="voiceSelect"></select>
-          </label>
-          <label class="field">
-            <span>Answer matching</span>
-            <select id="strictness">
-              <option value="lenient">Lenient</option>
-              <option value="standard" selected>Standard</option>
-              <option value="strict">Strict</option>
-            </select>
-          </label>
-        </div>
+        <details class="advanced-options">
+          <summary>Change the voice, speed, or starting question</summary>
+          <div class="advanced-content">
+            <label class="field full-width">
+              <span>Start at</span>
+              <select id="startRow" disabled>
+                <option>Load questions first</option>
+              </select>
+            </label>
 
-        <button id="startButton" class="button primary start-button" disabled>Start session</button>
+            <div class="grid two-columns">
+              <label class="field">
+                <span>Time to think <output id="delayValue">3s</output></span>
+                <input id="answerDelay" type="range" min="1" max="15" value="3" step="1" />
+              </label>
+              <label class="field">
+                <span>Voice speed <output id="rateValue">1.0×</output></span>
+                <input id="speechRate" type="range" min="0.7" max="1.7" value="1" step="0.1" />
+              </label>
+              <label class="field">
+                <span>Voice</span>
+                <select id="voiceSelect"></select>
+              </label>
+              <label class="field">
+                <span>How closely to check answers</span>
+                <select id="strictness">
+                  <option value="lenient">Flexible</option>
+                  <option value="standard" selected>Normal</option>
+                  <option value="strict">Exact</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <button id="startButton" class="button primary start-button" disabled>Start quizzing me</button>
+        <p class="start-note">Microphone access is requested only for “Answer out loud.” Do not use samme3le while driving or during patient care.</p>
       </section>
 
       <section id="sessionPanel" class="card player-card" hidden aria-live="polite">
         <div class="player-topline">
           <div>
             <span id="progressText">Question 1 of 1</span>
-            <span id="sourceRowBadge" class="badge">Sheet row 2</span>
+            <span id="sourceRowBadge" class="badge">Question row 2</span>
           </div>
           <span id="statusBadge" class="status-badge" data-status="idle">Ready</span>
         </div>
@@ -203,12 +280,12 @@
         <div class="progress-track" aria-hidden="true"><div id="progressBar"></div></div>
 
         <article class="question-card">
-          <span class="card-label">Question</span>
+          <span class="card-label">samme3le asks</span>
           <p id="currentQuestion">Your question will appear here.</p>
         </article>
 
         <article id="transcriptCard" class="response-card" hidden>
-          <span class="card-label">Your answer</span>
+          <span class="card-label">What samme3le heard</span>
           <p id="transcript"></p>
           <small id="matchResult"></small>
         </article>
@@ -224,10 +301,10 @@
         </div>
 
         <div id="reviewDecision" class="review-decision" hidden>
-          <span id="reviewMessage">Recognition can be corrected before moving on.</span>
+          <span id="reviewMessage">The browser can mishear words. Choose what happened.</span>
           <div>
             <button id="tryAgainButton" class="button secondary">Try again</button>
-            <button id="markCorrectButton" class="button secondary">Mark correct</button>
+            <button id="markCorrectButton" class="button secondary">I was correct</button>
             <button id="continueButton" class="button primary">Continue</button>
           </div>
         </div>
@@ -240,24 +317,28 @@
           <button id="nextButton" class="icon-button" aria-label="Next question" title="Next question">→</button>
           <button id="stopButton" class="button danger" disabled>Stop</button>
         </div>
-        <p class="shortcut-help">Keyboard: Space pause/resume · ←/→ move · R repeat · T retry · M mark correct · Esc stop</p>
+        <p class="shortcut-help">Keyboard: Space pause/resume · arrows move · Alt+R repeat · Alt+T retry · Alt+M mark correct · Esc stop</p>
       </section>
 
       <section id="conversionCard" class="card conversion-card" hidden aria-labelledby="conversion-heading">
-        <span class="option-kicker">Help shape the next version</span>
-        <h2 id="conversion-heading">Would you pay for GIJAD Tutor Pro?</h2>
-        <p>Pro would eventually include unlimited question banks, cross-device progress, performance history, and weak-topic review.</p>
+        <span class="option-kicker">Help build the next version</span>
+        <h2 id="conversion-heading">Would you pay for samme3le Pro?</h2>
+        <p>Pro could save progress across devices, show weak topics, keep study history, and support more question lists.</p>
         <div class="conversion-actions">
-          <button id="wouldPayButton" class="button primary" type="button">I would pay for Pro</button>
+          <button id="wouldPayButton" class="button primary" type="button">Yes, I would pay</button>
           <button id="notNowButton" class="button secondary" type="button">Not yet</button>
         </div>
-        <div id="conversionStatus" class="inline-status" data-type="neutral" aria-live="polite">This is interest research only. No payment will be collected.</div>
+        <div id="conversionStatus" class="inline-status" data-type="neutral" aria-live="polite">This only measures interest. No payment will be collected.</div>
       </section>
     </main>
 
     <footer>
-      <p><strong>Prototype:</strong> GIJAD Tutor is an educational study tool and is not for patient care. Do not enter patient information, protected health information, confidential institutional data, or question-bank content you are not authorized to use.</p>
-      <p>CSV content and prototype access are stored locally in this browser. Google Sheet requests and speech recognition may be processed by Google or your browser provider. This version has no payment system and no production account backend.</p>
+      <div class="footer-brand">
+        <span class="brand-mark small-mark" aria-hidden="true">3</span>
+        <strong>samme3le</strong>
+      </div>
+      <p><strong>Prototype:</strong> samme3le is an educational study tool. It is not medical advice and must not be used for patient care.</p>
+      <p>CSV content and prototype access stay in this browser. Google Sheet requests and speech recognition may be processed by Google or your browser provider. This version has no payment system and no production account backend.</p>
     </footer>
   </div>
 
