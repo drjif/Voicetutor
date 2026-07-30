@@ -2,6 +2,16 @@ export const STORAGE_KEY = 'voicetutor.settings.v1';
 export const PROGRESS_KEY = 'voicetutor.progress.v1';
 
 export const elements = {
+  betaSignupForm: document.querySelector('#betaSignupForm'),
+  betaSignupPanel: document.querySelector('#betaSignupPanel'),
+  betaEmail: document.querySelector('#betaEmail'),
+  betaConsent: document.querySelector('#betaConsent'),
+  betaSignupStatus: document.querySelector('#betaSignupStatus'),
+  betaMemberPanel: document.querySelector('#betaMemberPanel'),
+  betaMemberEmail: document.querySelector('#betaMemberEmail'),
+  signOutButton: document.querySelector('#signOutButton'),
+  personalBankControls: document.querySelector('#personalBankControls'),
+  personalBankLock: document.querySelector('#personalBankLock'),
   sheetUrl: document.querySelector('#sheetUrl'),
   loadSheet: document.querySelector('#loadSheet'),
   loadDemo: document.querySelector('#loadDemo'),
@@ -47,7 +57,11 @@ export const elements = {
   markCorrectButton: document.querySelector('#markCorrectButton'),
   continueButton: document.querySelector('#continueButton'),
   browserWarning: document.querySelector('#browserWarning'),
-  installButton: document.querySelector('#installButton')
+  installButton: document.querySelector('#installButton'),
+  conversionCard: document.querySelector('#conversionCard'),
+  wouldPayButton: document.querySelector('#wouldPayButton'),
+  notNowButton: document.querySelector('#notNowButton'),
+  conversionStatus: document.querySelector('#conversionStatus')
 };
 
 export const state = {
@@ -63,7 +77,10 @@ export const state = {
   resumeResolvers: [],
   deferredInstallPrompt: null,
   restartCurrentQuestion: false,
-  reviewChoice: null
+  reviewChoice: null,
+  sourceType: 'none',
+  completedQuestionCount: 0,
+  tenQuestionMilestoneRecorded: false
 };
 
 export function loadSettings() {
@@ -92,7 +109,7 @@ export function saveSettings() {
 
 export function restoreSettings() {
   const settings = loadSettings();
-  if (settings.sheetUrl) elements.sheetUrl.value = settings.sheetUrl;
+  if (settings.sheetUrl && settings.sheetUrl !== 'Built-in demo') elements.sheetUrl.value = settings.sheetUrl;
   if (typeof settings.hasHeaders === 'boolean') elements.hasHeaders.checked = settings.hasHeaders;
   if (settings.mode) {
     const input = elements.modeInputs.find((candidate) => candidate.value === settings.mode);
