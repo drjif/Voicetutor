@@ -79,8 +79,8 @@ function recognitionSummary(grading, primaryTranscript) {
 async function waitForReviewDecision(generation, outcome) {
   state.reviewChoice = null;
   elements.reviewMessage.textContent = outcome === 'partial'
-    ? 'A correct component was recognized, but the stored answer contains additional points.'
-    : 'The browser may have misheard a medical term. Correct the result before it advances.';
+    ? 'A correct part was recognized, but the saved answer has more information.'
+    : 'The browser may have misheard a word. Choose what happened before moving on.';
   elements.reviewDecision.hidden = false;
   setSessionStatus('waiting', outcome === 'partial' ? 'Partial answer' : 'Check recognition');
 
@@ -236,7 +236,7 @@ export function startSession() {
   state.resumeResolvers.splice(0).forEach((resolve) => resolve());
   renderCurrentQuestion();
   noteSessionStarted();
-  setSessionStatus('running', state.mode === 'passive' ? 'Starting review' : 'Starting recall');
+  setSessionStatus('running', state.mode === 'passive' ? 'Starting listen mode' : 'Starting answer mode');
   updateControls();
   runSession(state.generation);
 }
@@ -317,16 +317,29 @@ export function setupSessionEvents() {
   });
   document.addEventListener('keydown', (event) => {
     if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+    const key = event.key.toLowerCase();
+
     if (event.code === 'Space') {
       event.preventDefault();
       if (state.status === 'paused') resumeSession();
       else pauseSession();
-    } else if (event.key === 'ArrowRight') restartAt(state.currentIndex + 1);
-    else if (event.key === 'ArrowLeft') restartAt(state.currentIndex - 1);
-    else if (event.key.toLowerCase() === 'r') restartAt(state.currentIndex);
-    else if (event.key.toLowerCase() === 't' && !elements.reviewDecision.hidden) state.reviewChoice = 'retry';
-    else if (event.key.toLowerCase() === 'm' && !elements.reviewDecision.hidden) state.reviewChoice = 'correct';
-    else if (event.key === 'Enter' && !elements.reviewDecision.hidden) state.reviewChoice = 'continue';
-    else if (event.key === 'Escape') stopSession();
+    } else if (event.key === 'ArrowRight') {
+      restartAt(state.currentIndex + 1);
+    } else if (event.key === 'ArrowLeft') {
+      restartAt(state.currentIndex - 1);
+    } else if (event.altKey && key === 'r') {
+      event.preventDefault();
+      restartAt(state.currentIndex);
+    } else if (event.altKey && key === 't' && !elements.reviewDecision.hidden) {
+      event.preventDefault();
+      state.reviewChoice = 'retry';
+    } else if (event.altKey && key === 'm' && !elements.reviewDecision.hidden) {
+      event.preventDefault();
+      state.reviewChoice = 'correct';
+    } else if (event.key === 'Enter' && !elements.reviewDecision.hidden) {
+      state.reviewChoice = 'continue';
+    } else if (event.key === 'Escape') {
+      stopSession();
+    }
   });
 }
