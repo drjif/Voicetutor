@@ -1,11 +1,11 @@
 {
-  "name": "GIJAD Tutor",
-  "short_name": "GIJAD Tutor",
-  "description": "A lightweight voice tutor for Google Sheets question banks.",
+  "name": "samme3le",
+  "short_name": "samme3le",
+  "description": "Turn a list of questions and answers into a spoken tutor that quizzes you out loud.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f4f7fb",
-  "theme_color": "#101828",
+  "background_color": "#fbfaf7",
+  "theme_color": "#ff5a1f",
   "icons": [
     {
       "src": "./icon.svg",
