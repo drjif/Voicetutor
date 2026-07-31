@@ -9,6 +9,7 @@
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./features.css" />
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -208,7 +209,7 @@
           </div>
         </div>
 
-        <fieldset class="mode-picker">
+        <fieldset class="mode-picker three-mode-picker">
           <legend class="sr-only">Study mode</legend>
           <label class="mode-card">
             <input type="radio" name="mode" value="active" checked />
@@ -227,10 +228,30 @@
               <small>samme3le reads the question, waits, and then reads the answer.</small>
             </span>
           </label>
+
+          <label class="mode-card lockscreen-mode-card">
+            <input type="radio" name="mode" value="lockscreen" />
+            <span class="mode-icon" aria-hidden="true">🔒</span>
+            <span class="mode-copy">
+              <span class="mode-title-row"><strong>Lock-screen review</strong><span class="mode-badge">Experimental</span></span>
+              <small>Plays the remaining questions and answers as one continuous spoken track. It does not listen or grade.</small>
+            </span>
+          </label>
         </fieldset>
 
+        <div id="wakeLockControl" class="wake-lock-control">
+          <label class="checkbox-row wake-lock-toggle">
+            <input id="keepScreenAwake" type="checkbox" checked />
+            <span>
+              <strong>Keep my screen awake</strong>
+              <small>Recommended for Answer out loud so the microphone session is not interrupted.</small>
+            </span>
+          </label>
+          <div id="wakeLockStatus" class="feature-status" data-type="neutral" aria-live="polite">The screen stays awake only while an active-recall session is running.</div>
+        </div>
+
         <details class="advanced-options">
-          <summary>Change the voice, speed, or starting question</summary>
+          <summary>Change the voice, speed, thinking time, or starting question</summary>
           <div class="advanced-content">
             <label class="field full-width">
               <span>Start at</span>
@@ -265,7 +286,7 @@
         </details>
 
         <button id="startButton" class="button primary start-button" disabled>Start quizzing me</button>
-        <p class="start-note">Microphone access is requested only for “Answer out loud.” Do not use samme3le while driving or during patient care.</p>
+        <p id="startNote" class="start-note">Microphone access is requested only for “Answer out loud.” Do not use samme3le while driving or during patient care.</p>
       </section>
 
       <section id="sessionPanel" class="card player-card" hidden aria-live="polite">

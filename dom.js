@@ -37,6 +37,10 @@ export const elements = {
   bankSummary: document.querySelector('#bankSummary'),
   startRow: document.querySelector('#startRow'),
   modeInputs: [...document.querySelectorAll('input[name="mode"]')],
+  keepScreenAwake: document.querySelector('#keepScreenAwake'),
+  wakeLockControl: document.querySelector('#wakeLockControl'),
+  wakeLockStatus: document.querySelector('#wakeLockStatus'),
+  startNote: document.querySelector('#startNote'),
   answerDelay: document.querySelector('#answerDelay'),
   delayValue: document.querySelector('#delayValue'),
   voiceSelect: document.querySelector('#voiceSelect'),
@@ -91,7 +95,10 @@ export const state = {
   reviewChoice: null,
   sourceType: 'none',
   completedQuestionCount: 0,
-  tenQuestionMilestoneRecorded: false
+  tenQuestionMilestoneRecorded: false,
+  wakeLock: null,
+  wakeLockRequested: false,
+  lockScreenWatchdog: null
 };
 
 export function loadSettings() {
@@ -112,6 +119,7 @@ export function saveSettings() {
     sheetUrl: elements.sheetUrl.value,
     hasHeaders: elements.hasHeaders.checked,
     mode: selectedMode(),
+    keepScreenAwake: elements.keepScreenAwake?.checked ?? true,
     answerDelay: Number(elements.answerDelay.value),
     speechRate: Number(elements.speechRate.value),
     strictness: elements.strictness.value,
@@ -127,6 +135,11 @@ export function restoreSettings() {
   if (settings.mode) {
     const input = elements.modeInputs.find((candidate) => candidate.value === settings.mode);
     if (input) input.checked = true;
+  }
+  if (elements.keepScreenAwake) {
+    elements.keepScreenAwake.checked = typeof settings.keepScreenAwake === 'boolean'
+      ? settings.keepScreenAwake
+      : true;
   }
   if (settings.answerDelay) elements.answerDelay.value = settings.answerDelay;
   if (settings.speechRate) elements.speechRate.value = settings.speechRate;
