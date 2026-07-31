@@ -10,7 +10,7 @@ import {
 import { setupBetaFunnel } from './beta.js';
 import { handleWakeLockPreferenceChange, releaseSessionWakeLock, setupPowerManagement } from './power.js';
 import { setupSheetEvents } from './sheet-v2.js';
-import { setupSessionEvents } from './session.js';
+import { setupSessionEvents } from './session-next.js';
 import { checkBrowserSupport, populateVoices } from './voice.js';
 
 function updateModePresentation() {
