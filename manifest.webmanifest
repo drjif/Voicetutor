@@ -1,7 +1,7 @@
 {
-  "name": "samme3le",
+  "name": "samme3le — Free Voice Flashcards",
   "short_name": "samme3le",
-  "description": "Turn a list of questions and answers into a spoken tutor that quizzes you out loud.",
+  "description": "Free voice flashcards that read your questions aloud, listen to your answers, and keep the study session moving.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#fbfaf7",

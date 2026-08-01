@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy | samme3le</title>
+  <meta name="description" content="How samme3le handles browser data, question lists, speech services, future Supabase accounts, subscription status, and privacy requests." />
+  <meta name="robots" content="noindex,follow" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/marketing.css" />
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-shell site-header"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>samme3le</strong><small>recite to me</small></span></a><nav class="site-nav"><a href="/terms/">Terms</a><a href="/pricing/">Pricing</a><a class="nav-cta" href="/">Open the app</a></nav></header>
+  <main id="content" class="site-shell content-section">
+    <div class="notice-box"><strong>Pre-launch privacy draft.</strong> This page accurately describes the current browser-only prototype and the intended Supabase subscriber architecture. Production account collection must not begin until the legal operator identity, mailing address, privacy email, vendor configuration, retention schedule, and request workflow are finalized.</div>
+    <article class="prose">
+      <h1>Privacy Policy</h1>
+      <p><strong>Effective date:</strong> August 1, 2026</p>
+      <p>This Privacy Policy explains how samme3le handles information when you use the website, Progressive Web App, voice-study features, and future account or subscription services.</p>
+
+      <h2>1. Current prototype versus production accounts</h2>
+      <p>The current prototype does not have a production account backend or payment system. The email entered to unlock local prototype access, product settings, progress, and prototype metrics are stored in that browser’s local storage. They are not intentionally transmitted to a samme3le application database.</p>
+      <p>When production accounts launch, Supabase is planned to process authentication, subscriber identity, consent records, subscription status, and limited product-usage events. This page will be updated before that collection begins.</p>
+
+      <h2>2. Information handled today</h2>
+      <table class="privacy-table">
+        <thead><tr><th>Information</th><th>How it is used</th><th>Where it is handled</th></tr></thead>
+        <tbody>
+          <tr><td>Prototype email and access state</td><td>Unlocks personal question-list import on the same device.</td><td>Browser local storage only.</td></tr>
+          <tr><td>Settings and progress</td><td>Remembers the Sheet URL, mode, speed, timing, voice, matching preference, and current row.</td><td>Browser local storage only.</td></tr>
+          <tr><td>CSV question lists</td><td>Creates the study session.</td><td>Read locally by the browser; not intentionally uploaded to a samme3le server.</td></tr>
+          <tr><td>Google Sheet data</td><td>Creates the study session.</td><td>Requested directly from Google by the browser using the link you provide.</td></tr>
+          <tr><td>Spoken answers</td><td>Converts speech to text for answer matching.</td><td>May be processed by the browser, operating system, or speech-service provider. samme3le does not intentionally store audio in the current prototype.</td></tr>
+          <tr><td>Technical request information</td><td>Delivers and protects the website.</td><td>The hosting provider may process IP address, user agent, timestamps, and request logs under its own service terms.</td></tr>
+        </tbody>
+      </table>
+
+      <h2>3. Planned production-account information</h2>
+      <p>Once Supabase account features are activated, samme3le expects to collect or generate:</p>
+      <ul><li>Account identifier and email address</li><li>Account creation and last-sign-in timestamps</li><li>Terms and Privacy Policy versions accepted</li><li>Optional marketing consent and preference changes</li><li>Plan name, subscription status, renewal period, and payment-provider customer reference</li><li>Limited events such as demo completion, successful question-list load, session completion, ten-question milestone, seven-day return, and Pro-interest response</li><li>Account-deletion or privacy-request records</li></ul>
+      <p>The planned backend is not intended to receive raw payment-card numbers. A payment processor should handle card entry. Question text, answer text, audio, transcripts, Google Sheet URLs, precise location, advertising identifiers, and cross-site browsing data should not be collected by default.</p>
+
+      <h2>4. Purposes</h2>
+      <p>Information may be used to provide and secure accounts, authenticate users, remember preferences, administer Free and Pro access, process and document subscriptions, measure whether core workflows function, answer support or privacy requests, prevent abuse, comply with law, and communicate transactional service information. Promotional email requires a separate optional consent where required.</p>
+
+      <h2>5. Vendors</h2>
+      <p>The Service currently or potentially uses:</p>
+      <ul><li><strong>Hosting provider:</strong> to deliver static files and process ordinary server logs.</li><li><strong>Google:</strong> when you provide a link-accessible Google Sheet.</li><li><strong>Browser or operating-system speech services:</strong> for speech synthesis and recognition.</li><li><strong>Supabase:</strong> planned for authentication, Postgres account records, Row Level Security, and limited account events.</li><li><strong>Email provider:</strong> planned for magic links, security messages, service notices, and separately consented marketing.</li><li><strong>Payment processor:</strong> planned for subscription checkout, billing, tax-related transaction records, and billing-portal access.</li></ul>
+      <p>The final vendor names, processing purposes, and links to their policies will be confirmed before production collection begins.</p>
+
+      <h2>6. Sale, sharing, and advertising</h2>
+      <p>samme3le does not intend to sell personal information or share it for cross-context behavioral advertising. The prototype does not use advertising pixels. If this practice changes, this policy and any legally required opt-out controls will be updated before the change.</p>
+
+      <h2>7. Retention</h2>
+      <p>Browser data remains until you remove local access, clear site data, or the browser deletes it. Planned production retention targets are: account and consent records while the account is active plus a limited legal period; subscription and transaction records as required for accounting, disputes, and law; security logs approximately 30–90 days unless an incident requires longer retention; and product-usage events approximately 12 months. Final periods will be confirmed before production launch.</p>
+
+      <h2>8. Your choices and rights</h2>
+      <p>Depending on where you live and which laws apply, you may have rights to access, correct, delete, or obtain a copy of personal information; withdraw marketing consent; appeal a denied request; and opt out of certain sale, sharing, targeted advertising, or profiling. samme3le intends to honor Global Privacy Control signals if a legally relevant sale or sharing practice is ever introduced, but no such practice is planned.</p>
+      <p>The production account should provide self-service account deletion, marketing preference controls, and a documented privacy-request process. Identity verification may be required before fulfilling a request.</p>
+
+      <h2>9. Children</h2>
+      <p>The Service is not directed to children under 13 and the planned account service is restricted to users age 18 or older. We do not knowingly collect personal information from children through production accounts. If a child’s information is discovered, contact information will be provided for deletion requests before accounts launch.</p>
+
+      <h2>10. Security</h2>
+      <p>Planned safeguards include HTTPS, Supabase authentication, Row Level Security, least-privilege access, separate public and server secrets, rate limiting, secure authentication redirects, dependency and secret scanning, limited data collection, and an incident-response process. No security measure can guarantee absolute protection.</p>
+
+      <h2>11. International and regional use</h2>
+      <p>The prototype is intended for access from the United States. Internet routing and vendors may process data in other locations. A regional gate is not proof of citizenship or residence. International expansion would require an updated legal and privacy review.</p>
+
+      <h2>12. Changes</h2>
+      <p>This policy may be updated when Supabase accounts, email, subscriptions, analytics, or new features launch. Material changes will receive a new effective date and, when appropriate, account holders will be notified or asked to acknowledge the revised version.</p>
+
+      <h2>13. Contact</h2>
+      <p>Before production account collection begins, this section will identify the legal operator, mailing address, privacy email, support email, and methods for submitting and appealing privacy requests. Until those details are live, the current browser-only prototype should not be treated as a production subscriber database.</p>
+    </article>
+  </main>
+  <footer class="site-footer"><div class="site-shell footer-grid"><div><strong>samme3le</strong><p>Educational study software.</p></div><div><h3>Product</h3><a href="/">App</a><a href="/pricing/">Pricing</a></div><div><h3>Legal</h3><a href="/terms/">Terms</a><a href="/acceptable-use/">Acceptable use</a><a href="/medical-disclaimer/">Disclaimer</a></div><div><h3>Access</h3><a href="/accessibility/">Accessibility</a><a href="/contact/">Contact</a></div></div></footer>
+</body>
+</html>
