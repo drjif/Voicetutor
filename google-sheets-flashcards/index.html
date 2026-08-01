@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ff5a1f" />
+  <title>Turn Google Sheets Into Free Voice Flashcards | samme3le</title>
+  <meta name="description" content="Use a Google Sheet as a free spoken flashcard deck. Add Question and Answer columns, paste the link into samme3le, and study out loud." />
+  <link rel="canonical" href="https://tutor.gi-jad.com/google-sheets-flashcards/" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/marketing.css" />
+  <meta property="og:title" content="Turn Google Sheets Into Free Voice Flashcards" />
+  <meta property="og:description" content="A simple Question and Answer spreadsheet becomes a spoken study session." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://tutor.gi-jad.com/google-sheets-flashcards/" />
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-shell site-header">
+    <a class="brand" href="/" aria-label="samme3le home"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>samme3le</strong><small>recite to me</small></span></a>
+    <nav class="site-nav" aria-label="Main navigation"><a href="/voice-flashcards/">Voice flashcards</a><a href="/quiz-me-from-my-notes/">Quiz from notes</a><a href="/pricing/">Pricing</a><a class="nav-cta" href="/#your-questions">Use the free app</a></nav>
+  </header>
+
+  <main id="content" class="site-shell">
+    <section class="page-hero">
+      <div>
+        <p class="eyebrow">Google Sheets flashcards</p>
+        <h1>Your spreadsheet can quiz you out loud.</h1>
+        <p class="lede">Keep your questions in Google Sheets. Paste the link into samme3le, confirm the columns, and turn the rows into a free spoken review session.</p>
+        <div class="hero-actions"><a class="button primary" href="/#your-questions">Load my sheet free</a><a class="button secondary" href="#sheet-format">See the format</a></div>
+        <ul class="free-line"><li>Free core app</li><li>No card required</li><li>CSV option for private files</li></ul>
+      </div>
+      <aside class="hero-panel">
+        <h2>The simplest sheet</h2>
+        <div class="flow-item"><span class="flow-number">A</span><div><strong>Question</strong><small>What is the largest planet?</small></div></div>
+        <div class="flow-item"><span class="flow-number">B</span><div><strong>Answer</strong><small>Jupiter</small></div></div>
+        <div class="flow-item"><span class="flow-number">C</span><div><strong>Accepted alternatives</strong><small>Optional: Jupiter is the largest planet</small></div></div>
+      </aside>
+    </section>
+
+    <section id="sheet-format" class="content-section">
+      <div class="section-heading"><p class="eyebrow">Step 1</p><h2>Create three clear columns.</h2><p>The first row should contain column names. The app automatically looks for common labels, then lets you correct the mapping before studying.</p></div>
+      <div class="example-box">
+        <div class="example-side"><span>Question</span><p>What is the mechanism of infliximab?</p></div>
+        <div class="example-arrow" aria-hidden="true">→</div>
+        <div class="example-side"><span>Answer</span><p>It inhibits TNF-alpha.</p></div>
+      </div>
+      <div class="cards" style="margin-top:16px">
+        <article class="card"><h3>Question</h3><p>The prompt samme3le will read aloud. Keep it focused enough to have a clear answer.</p></article>
+        <article class="card"><h3>Answer</h3><p>The complete answer the app should reveal or compare with your spoken response.</p></article>
+        <article class="card"><h3>Accepted alternatives</h3><p>Optional synonyms or paraphrases separated by a vertical bar, semicolon, or line break.</p></article>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="section-heading"><p class="eyebrow">Step 2</p><h2>Choose link access or upload a CSV.</h2><p>Direct Google Sheet loading requires the selected sheet tab to be readable through a link. For private or sensitive study material, export a CSV and upload it locally instead.</p></div>
+      <div class="two-column">
+        <article class="card"><h3>Google Sheet link</h3><ol><li>Open the sheet.</li><li>Select Share.</li><li>Under General access, select Anyone with the link and Viewer.</li><li>Copy the address from the browser.</li><li>Paste it into samme3le and select Load sheet.</li></ol><p>Anyone who has that link may be able to access the sheet. Do not use this method for confidential content.</p></article>
+        <article class="card"><h3>CSV upload</h3><ol><li>In Google Sheets, open File.</li><li>Choose Download.</li><li>Select Comma-separated values (.csv).</li><li>Upload the file to samme3le.</li></ol><p>The current prototype reads the CSV in the browser rather than intentionally uploading the file to an application server.</p></article>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="section-heading"><p class="eyebrow">Step 3</p><h2>Pick a study mode and press start.</h2></div>
+      <div class="cards">
+        <article class="card"><h3>Answer out loud</h3><p>The microphone listens after each question. This works best in supported versions of Chrome or Edge and when technical vocabulary has accepted alternatives.</p></article>
+        <article class="card"><h3>Listen and review</h3><p>No microphone. The app asks, waits for the thinking time you choose, and reads the stored answer.</p></article>
+        <article class="card"><h3>Lock-screen review</h3><p>An experimental continuous spoken track for the remaining rows. Phone and browser background-audio rules still apply.</p></article>
+      </div>
+    </section>
+
+    <section class="content-section two-column">
+      <div class="prose"><h2>Tips for large spreadsheets</h2><ul><li>Put one testable idea in each row.</li><li>Remove blank rows and merged cells.</li><li>Use short headers in the first row.</li><li>Keep the correct tab selected when copying the Google Sheets URL.</li><li>Start at a later row when resuming a long session.</li></ul></div>
+      <div class="prose"><h2>Content you should not add</h2><ul><li>Patient names, dates of birth, medical record numbers, or other PHI</li><li>Confidential institutional data</li><li>Secure examination questions recalled from a test</li><li>Paid question-bank material you do not own or have permission to use</li><li>Information requiring a regulated secure storage environment</li></ul></div>
+    </section>
+
+    <section class="content-section">
+      <div class="section-heading"><p class="eyebrow">Troubleshooting</p><h2>Google Sheets flashcard FAQ</h2></div>
+      <div class="faq">
+        <details><summary>Why can’t samme3le read my sheet?</summary><p>Check that the link is valid, the correct tab is selected, and General access is set to Anyone with the link — Viewer. A school or work Google account may block public link sharing; CSV upload is the alternative.</p></details>
+        <details><summary>Does editing the sheet change the app?</summary><p>Reload the sheet in samme3le to pull the latest rows. The app does not continuously sync changes in the current prototype.</p></details>
+        <details><summary>Is using Google Sheets free?</summary><p>samme3le’s current core spreadsheet-to-voice workflow is free. Google’s own account and service terms still apply to your Sheet.</p></details>
+        <details><summary>Will Supabase store the spreadsheet?</summary><p>The planned Supabase backend is intended for authentication, consent records, subscription status, and limited usage events—not automatic storage of question-bank content. Any future change would be disclosed before collection.</p></details>
+      </div>
+    </section>
+
+    <section class="cta-band"><h2>Turn your next row into a spoken question.</h2><p>Bring a Google Sheet or CSV. The core samme3le study experience is free.</p><a class="button primary" href="/#your-questions">Use my spreadsheet</a></section>
+  </main>
+
+  <footer class="site-footer"><div class="site-shell footer-grid"><div><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>samme3le</strong><small>voice flashcards that quiz you out loud</small></span></a><p>Free educational study software. Not for patient care or emergency use.</p></div><div><h3>Use cases</h3><a href="/voice-flashcards/">Voice flashcards</a><a href="/quiz-me-from-my-notes/">Quiz me from my notes</a><a href="/medical-students/">Medical students</a></div><div><h3>Product</h3><a href="/">Open the app</a><a href="/pricing/">Free and Pro plans</a><a href="/accessibility/">Accessibility</a></div><div><h3>Legal</h3><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/acceptable-use/">Acceptable use</a><a href="/medical-disclaimer/">Educational disclaimer</a></div></div><div class="site-shell footer-bottom">© 2026 samme3le. Paid subscriptions are not yet active. Legal operator details will be completed before checkout launches.</div></footer>
+</body>
+</html>
