@@ -1,10 +1,13 @@
-const CACHE_NAME = 'samme3le-v8';
+const CACHE_NAME = 'samme3le-v9';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './features.css',
+  './homepage-marketing.css',
+  './marketing.css',
   './app.js',
+  './homepage-marketing.js',
   './beta.js',
   './dom.js',
   './power.js',
