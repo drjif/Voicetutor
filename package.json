@@ -1,10 +1,14 @@
 {
   "name": "samme3le",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test",
+    "check:js": "node --check app.js && node --check homepage-marketing.js && node --check session-next.js && node --check lockscreen.js && node --check power.js",
+    "check:site": "node scripts/check-site.mjs",
+    "check": "npm run test && npm run check:js && npm run check:site",
+    "set-domain": "node scripts/set-domain.mjs",
     "serve": "python3 -m http.server 4173"
   }
 }
