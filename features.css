@@ -23,6 +23,16 @@
   text-transform: uppercase;
 }
 
+.mode-card[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--surface-alt);
+}
+
+.mode-card[aria-disabled="true"] input {
+  cursor: not-allowed;
+}
+
 .lockscreen-mode-card:has(input:checked) {
   border-color: #151515;
   background: #f4f1ea;
