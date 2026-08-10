@@ -1,3 +1,4 @@
+import { loadDeck } from './deck.js';
 import { buildQuestionBank, columnName, detectColumns, parseDelimited, parseGoogleSheetUrl } from './sheet-data.js';
 import {
   PROGRESS_KEY,
@@ -33,6 +34,33 @@ function truncate(text, max) {
   return value.length > max ? `${value.slice(0, max - 1)}…` : value;
 }
 
+function currentDeckTitle() {
+  if (state.sourceKind === 'demo') return 'samme3le demo';
+  if (state.sourceKind === 'google-sheet') return 'Google Sheet questions';
+  if (state.sourceKind === 'csv') {
+    const uploadedName = String(elements.sheetUrl.value ?? '').replace(/^Uploaded:\s*/i, '').trim();
+    return uploadedName || 'Uploaded CSV';
+  }
+  return 'Imported questions';
+}
+
+function applyRecordsToDeck(records) {
+  if (!records.length) {
+    state.currentDeck = null;
+    state.questions = [];
+    return;
+  }
+
+  const deck = loadDeck({
+    title: currentDeckTitle(),
+    source: { type: state.sourceKind || 'unknown' },
+    cards: records
+  });
+
+  state.currentDeck = deck;
+  state.questions = deck.cards;
+}
+
 export function prepareRows(rows) {
   state.rawRows = rows;
   const detection = detectColumns(rows, elements.hasHeaders.checked);
@@ -58,13 +86,14 @@ export function applyColumnMapping() {
     return;
   }
 
-  state.questions = buildQuestionBank(state.rawRows, {
+  const records = buildQuestionBank(state.rawRows, {
     hasHeaders: elements.hasHeaders.checked,
     headerRowIndex: currentHeaderRowIndex,
     questionIndex,
     answerIndex,
     acceptedIndex
   });
+  applyRecordsToDeck(records);
 
   elements.startRow.innerHTML = '';
   elements.startRow.disabled = state.questions.length === 0;
@@ -134,6 +163,7 @@ export async function loadGoogleSheet() {
 
     if (!rows) throw lastError ?? new Error('No readable sheet endpoint was available');
     state.sourceType = 'personal';
+    state.sourceKind = 'google-sheet';
     prepareRows(rows);
     noteSourceLoaded('personal', state.questions.length);
   } catch (error) {
@@ -152,6 +182,7 @@ export async function loadDemo() {
   const response = await fetch('./data/sample-questions.csv');
   const text = await response.text();
   state.sourceType = 'demo';
+  state.sourceKind = 'demo';
   elements.sheetUrl.value = 'Built-in demo';
   prepareRows(parseDelimited(text));
   noteSourceLoaded('demo', state.questions.length);
@@ -168,6 +199,7 @@ export function handleCsvUpload(event) {
   const reader = new FileReader();
   reader.onload = () => {
     state.sourceType = 'personal';
+    state.sourceKind = 'csv';
     elements.sheetUrl.value = `Uploaded: ${file.name}`;
     prepareRows(parseDelimited(String(reader.result ?? '')));
     noteSourceLoaded('personal', state.questions.length);
