@@ -27,6 +27,14 @@ function hideReviewControls() {
   state.reviewChoice = null;
 }
 
+function sourceBadgeText(item) {
+  if (state.sourceKind === 'paste') return `Pasted question ${state.currentIndex + 1}`;
+  if (state.sourceKind === 'demo') return `Demo question ${state.currentIndex + 1}`;
+  if (state.sourceKind === 'csv') return `CSV row ${item.sourceRow}`;
+  if (state.sourceKind === 'google-sheet') return `Sheet row ${item.sourceRow}`;
+  return `Question ${state.currentIndex + 1}`;
+}
+
 export function renderCurrentQuestion() {
   const item = state.questions[state.currentIndex];
   if (!item) return;
@@ -38,7 +46,7 @@ export function renderCurrentQuestion() {
   elements.listeningIndicator.hidden = true;
   elements.transcript.textContent = '';
   elements.matchResult.textContent = '';
-  elements.sourceRowBadge.textContent = `${state.sourceType === 'demo' ? 'Demo' : 'Sheet'} row ${item.sourceRow}`;
+  elements.sourceRowBadge.textContent = sourceBadgeText(item);
   elements.progressText.textContent = `Question ${state.currentIndex + 1} of ${state.questions.length}`;
   elements.progressBar.style.width = `${((state.currentIndex + 1) / state.questions.length) * 100}%`;
   elements.startRow.value = String(state.currentIndex);

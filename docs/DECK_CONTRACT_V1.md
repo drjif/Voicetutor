@@ -12,12 +12,12 @@ The goal is to let new ingestion methods be added without changing speech synthe
   id: null,
   title: 'Cardiology Basics',
   source: {
-    type: 'google-sheet'
+    type: 'paste'
   },
   cards: [
     {
       id: 'card-1',
-      sourceRow: 2,
+      sourceRow: 1,
       question: 'What chamber pumps blood to the lungs?',
       answer: 'Right ventricle',
       acceptedAnswers: ['RV']
@@ -32,15 +32,16 @@ A loadable deck must contain at least one card. Every card must contain a non-em
 
 `acceptedAnswers` is optional and is normalized to an array. Duplicate alternatives and alternatives identical to the primary answer are removed.
 
-`sourceRow` is retained when an importer has meaningful row numbers. It may be `null` for sources that do not use rows.
+`sourceRow` is retained when an importer has meaningful row or line numbers. It may be `null` for sources that do not use positions.
 
 ## Current source types
 
 - `demo`
+- `paste`
 - `csv`
 - `google-sheet`
 
-Planned importers can add types such as `paste`, `excel`, `builtin`, or other explicit source names without changing the study engine.
+Planned importers can add types such as `excel`, `builtin`, or other explicit source names without changing the study engine.
 
 ## Loader rule
 
@@ -49,7 +50,7 @@ Importers must call `loadDeck()` from `deck.js` before assigning cards to sessio
 ```js
 const deck = loadDeck({
   title: 'Imported questions',
-  source: { type: 'csv' },
+  source: { type: 'paste' },
   cards: parsedCards
 });
 
@@ -67,9 +68,19 @@ Do not write a new importer that directly constructs `state.questions` from its 
 
 `loadDeck()` is strict: it normalizes, validates, and throws `DeckValidationError` if the deck cannot be safely handed to the study engine.
 
-## Backward compatibility
+## Current ingestion paths
 
-The existing Google Sheet and CSV path remains intact:
+```text
+Paste Q&A
+   ↓
+parsePastedQuestions()
+   ↓
+loadDeck()
+   ↓
+state.questions
+   ↓
+existing oral-recall engine
+```
 
 ```text
 Google Sheet / CSV
@@ -78,14 +89,14 @@ parseDelimited()
         ↓
 buildQuestionBank()
         ↓
-loadDeck()  ← Deck Contract v1 boundary
+loadDeck()
         ↓
 state.questions
         ↓
 existing oral-recall engine
 ```
 
-`sourceRow`, question order, primary answers, and accepted alternatives must remain unchanged across this boundary. Regression tests in `test/deck.test.js` enforce these invariants.
+Question order, source position, primary answers, and accepted alternatives must remain unchanged across this boundary. Regression tests in `test/deck.test.js` and `test/paste-data.test.js` enforce these invariants.
 
 ## Future ingestion rule
 

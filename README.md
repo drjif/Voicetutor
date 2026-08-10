@@ -6,13 +6,32 @@ The current prototype is a static, client-side web app. The core app is free and
 
 ## What the user does today
 
-1. Tries five built-in demo questions without signing up.
-2. Unlocks prototype access on the current device.
-3. Adds a Google Sheet or uploads a CSV containing questions and answers.
-4. Chooses **Answer out loud**, **Listen and review**, or **Lock-screen review**.
-5. Starts the study session.
+1. Tries five built-in demo questions without signing up, or pastes their own question-answer pairs directly with no account.
+2. samme3le parses pasted Q&A locally in the browser and loads it through Deck Contract v1.
+3. Google Sheet and CSV imports remain available behind the temporary device-local beta unlock.
+4. The user chooses **Answer out loud**, **Listen and review**, or **Lock-screen review**.
+5. The spoken study session starts using the same existing study engine.
 
-The current visible workflow remains unchanged while the ingestion layer is being prepared for lower-friction sources such as pasted Q&A, Excel files, and built-in decks.
+## Paste questions
+
+The fastest personal-study path is now direct paste. It does not require a public Google Sheet, a file upload, or an email unlock.
+
+Supported local formats include:
+
+```text
+Q: What hormone lowers blood sugar?
+A: Insulin
+ALT: insulin hormone | human insulin
+```
+
+```text
+What is ATP? | Adenosine triphosphate
+What is DNA? | Deoxyribonucleic acid
+```
+
+Two-column rows copied from a spreadsheet are also accepted when the columns are tab-separated. Blank-separated two-line question/answer blocks are supported as a conservative fallback.
+
+`paste-data.js` performs deterministic browser-local parsing. It does not call an LLM, API, or backend. Ambiguous prose is rejected rather than guessed into cards.
 
 ## Study modes
 
@@ -28,11 +47,11 @@ samme3le reads the question, waits for a configurable interval, reads the saved 
 
 An experimental continuous spoken track reads the remaining questions and answers without using the microphone or grading. Background playback depends on the browser and operating system.
 
-The answer checker is a prototype heuristic, not a validated grading system. Put common paraphrases in an `Accepted alternatives` column separated by `|`, `;`, or line breaks.
+The answer checker is a prototype heuristic, not a validated grading system. Common paraphrases can be included as accepted alternatives, but they are optional.
 
 ## Deck Contract v1
 
-All ingestion methods now terminate at one canonical deck boundary before the study engine receives any questions.
+All ingestion methods terminate at one canonical deck boundary before the study engine receives any questions.
 
 ```text
 Importer
@@ -44,19 +63,21 @@ Deck Contract v1
 existing study engine
 ```
 
-`deck.js` provides `normalizeDeck()`, `validateDeck()`, and the strict `loadDeck()` entry point. The currently working Google Sheet and CSV paths now pass through this boundary without changing the visible workflow.
+`deck.js` provides `normalizeDeck()`, `validateDeck()`, and the strict `loadDeck()` entry point. Paste, Google Sheet, CSV, and demo sources now pass through this boundary.
 
 This protects the speech, grading, session, progress, wake-lock, and lock-screen code while future ingestion methods are added.
 
-See `docs/DECK_CONTRACT_V1.md` and the regression tests in `test/deck.test.js`.
+See `docs/DECK_CONTRACT_V1.md`, `test/deck.test.js`, and `test/paste-data.test.js`.
 
 ## Question-list format
+
+The minimum deck needs only Question + Answer. Accepted alternatives are optional.
 
 | Question | Answer | Accepted alternatives |
 | --- | --- | --- |
 | What is the mechanism of infliximab? | It inhibits TNF-alpha. | anti-TNF monoclonal antibody\|TNF inhibitor |
 
-The app detects common header names and allows the user to remap columns.
+Google Sheet and CSV imports still detect common header names and allow manual remapping when needed.
 
 ## SEO and use-case pages
 
@@ -114,6 +135,8 @@ See `docs/SUPABASE_SETUP.md`.
 
 ## Use a Google Sheet
 
+Google Sheets remain an advanced import option rather than the fastest path.
+
 1. Open the sheet.
 2. Choose **Share**.
 3. Under **General access**, choose **Anyone with the link** and **Viewer**.
@@ -139,30 +162,26 @@ npm run check
 ## Architecture
 
 ```text
-Google Sheet / uploaded CSV
-          ↓
-Browser parser + column detection
-          ↓
-buildQuestionBank()
-          ↓
-Deck Contract v1
-          ↓
-Question-list session state
-          ↓
-Web Speech synthesis + recognition
-          ↓
-Local answer matcher
+Paste Q&A ──────────────┐
+Google Sheet ───────────┤
+Uploaded CSV ───────────┼→ Deck Contract v1 → session state
+Built-in demo ──────────┘                         ↓
+                                    Web Speech synthesis + recognition
+                                                   ↓
+                                        Local answer matcher
+```
 
-Future ingestion:
-Paste / Excel / built-in decks → Deck Contract v1 → same study engine
+Future ingestion sources such as Excel and built-in deck libraries should terminate at the same Deck Contract v1 boundary.
 
 Future account layer:
+
+```text
 Supabase Auth + Postgres RLS + server-managed subscription entitlement
 ```
 
 ## Privacy and limitations
 
-- CSV content remains client-side in the current prototype.
+- Pasted questions and uploaded CSV content remain client-side in the current prototype.
 - Browser speech recognition may use a browser or operating-system speech service.
 - Google Sheet loading requires link-accessible data.
 - The tool is educational and is not for patient care.

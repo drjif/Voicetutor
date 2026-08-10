@@ -1,10 +1,12 @@
 import { loadDeck } from './deck.js';
+import { parsePastedQuestions } from './paste-data.js';
 import { buildQuestionBank, columnName, detectColumns, parseDelimited, parseGoogleSheetUrl } from './sheet-data.js';
 import {
   PROGRESS_KEY,
   elements,
   safeJson,
   saveSettings,
+  setPasteStatus,
   setSheetStatus,
   state,
   updateControls
@@ -36,6 +38,7 @@ function truncate(text, max) {
 
 function currentDeckTitle() {
   if (state.sourceKind === 'demo') return 'samme3le demo';
+  if (state.sourceKind === 'paste') return 'Pasted questions';
   if (state.sourceKind === 'google-sheet') return 'Google Sheet questions';
   if (state.sourceKind === 'csv') {
     const uploadedName = String(elements.sheetUrl.value ?? '').replace(/^Uploaded:\s*/i, '').trim();
@@ -59,6 +62,29 @@ function applyRecordsToDeck(records) {
 
   state.currentDeck = deck;
   state.questions = deck.cards;
+  state.currentIndex = 0;
+}
+
+function startRowLabel(item, index) {
+  if (state.sourceKind === 'demo') return `Demo question ${index + 1} — ${truncate(item.question, 90)}`;
+  if (state.sourceKind === 'paste') return `Pasted question ${index + 1} — ${truncate(item.question, 90)}`;
+  if (state.sourceKind === 'csv') return `CSV row ${item.sourceRow} — ${truncate(item.question, 90)}`;
+  return `Sheet row ${item.sourceRow} — ${truncate(item.question, 90)}`;
+}
+
+function populateStartRows() {
+  elements.startRow.innerHTML = '';
+  elements.startRow.disabled = state.questions.length === 0;
+  state.questions.forEach((item, index) => {
+    const option = document.createElement('option');
+    option.value = String(index);
+    option.textContent = startRowLabel(item, index);
+    elements.startRow.append(option);
+  });
+}
+
+function sessionIsActive() {
+  return ['running', 'listening', 'waiting', 'paused'].includes(state.status);
 }
 
 export function prepareRows(rows) {
@@ -94,18 +120,11 @@ export function applyColumnMapping() {
     acceptedIndex
   });
   applyRecordsToDeck(records);
-
-  elements.startRow.innerHTML = '';
-  elements.startRow.disabled = state.questions.length === 0;
-  state.questions.forEach((item, index) => {
-    const option = document.createElement('option');
-    option.value = String(index);
-    option.textContent = `${state.sourceType === 'demo' ? 'Demo' : 'Sheet'} row ${item.sourceRow} — ${truncate(item.question, 90)}`;
-    elements.startRow.append(option);
-  });
+  populateStartRows();
 
   const saved = safeJson(localStorage.getItem(PROGRESS_KEY));
-  if (state.sourceType === 'personal' && saved?.sheetUrl === elements.sheetUrl.value && saved.sourceRow) {
+  const canResumeRows = state.sourceKind === 'google-sheet' || state.sourceKind === 'csv';
+  if (canResumeRows && state.sourceType === 'personal' && saved?.sheetUrl === elements.sheetUrl.value && saved.sourceRow) {
     const resumeIndex = state.questions.findIndex((item) => item.sourceRow === saved.sourceRow);
     if (resumeIndex >= 0) elements.startRow.value = String(resumeIndex);
   }
@@ -120,6 +139,36 @@ export function applyColumnMapping() {
     state.questions.length ? 'success' : 'error'
   );
   updateControls();
+}
+
+export function loadPastedQuestions() {
+  if (sessionIsActive()) {
+    setPasteStatus('Stop the current study session before replacing its questions.', 'warning');
+    return;
+  }
+
+  const parsed = parsePastedQuestions(elements.pasteQuestions.value);
+  if (!parsed.cards.length) {
+    setPasteStatus(parsed.message, 'error');
+    elements.pasteQuestions.focus();
+    return;
+  }
+
+  try {
+    state.sourceType = 'personal';
+    state.sourceKind = 'paste';
+    state.rawRows = [];
+    elements.mappingPanel.hidden = true;
+    applyRecordsToDeck(parsed.cards);
+    populateStartRows();
+    noteSourceLoaded('personal', state.questions.length);
+    setPasteStatus(`${parsed.message} Ready to study — no account or upload needed.`, 'success');
+    updateControls();
+    document.querySelector('#session-heading')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (error) {
+    console.error(error);
+    setPasteStatus(error.message || 'Those questions could not be loaded.', 'error');
+  }
 }
 
 async function fetchSheetText(urlString) {
@@ -209,6 +258,7 @@ export function handleCsvUpload(event) {
 }
 
 export function setupSheetEvents() {
+  elements.loadPaste.addEventListener('click', loadPastedQuestions);
   elements.loadSheet.addEventListener('click', loadGoogleSheet);
   elements.loadDemo.addEventListener('click', loadDemo);
   elements.csvUpload.addEventListener('change', handleCsvUpload);

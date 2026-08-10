@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samme3le-v11';
+const CACHE_NAME = 'samme3le-v12';
 const ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const ASSETS = [
   './beta.js',
   './dom.js',
   './deck.js',
+  './paste-data.js',
   './power.js',
   './lockscreen.js',
   './sheet-v2.js',

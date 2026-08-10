@@ -10,7 +10,7 @@ function setMetadata() {
   document.title = 'samme3le — Free Voice Flashcards That Quiz You Out Loud';
   const description = document.querySelector('meta[name="description"]');
   if (description) {
-    description.content = 'Turn your notes into free voice flashcards. Upload a Google Sheet or CSV, answer questions out loud, and let samme3le keep the study session moving.';
+    description.content = 'Paste questions or import a Google Sheet or CSV, answer out loud, and let samme3le turn your Q&A into a free spoken study session.';
   }
 
   if (!document.querySelector('link[rel="canonical"]')) {
@@ -59,13 +59,13 @@ function strengthenHero() {
   if (badge) badge.textContent = 'Free app';
 
   const heading = document.querySelector('#hero-heading');
-  if (heading) heading.textContent = 'Turn your notes into voice flashcards that quiz you out loud.';
+  if (heading) heading.textContent = 'Turn your questions into voice flashcards that quiz you out loud.';
 
   const subtitle = document.querySelector('.hero-subtitle');
-  if (subtitle) subtitle.textContent = 'Add a list of questions and answers. samme3le reads each question, listens to your answer, and keeps going automatically.';
+  if (subtitle) subtitle.textContent = 'Paste question-and-answer pairs and start studying without an account. samme3le reads each question, listens to your answer, and keeps going automatically.';
 
   const proofItems = document.querySelectorAll('.hero-proof li');
-  const proof = ['Free core app', 'No credit card', 'Optional Pro later'];
+  const proof = ['Free core app', 'No credit card', 'Paste with no signup'];
   proofItems.forEach((item, index) => {
     if (proof[index]) item.textContent = proof[index];
   });
@@ -81,9 +81,9 @@ function addFreePlanStrip() {
   section.innerHTML = `
     <div>
       <h2 id="free-plan-heading">The core study app is free.</h2>
-      <p>Use demo questions, import your own Google Sheet or CSV, and run spoken study sessions without a credit card. Pro will be an optional subscription for saved account features.</p>
+      <p>Paste your own Q&A with no signup, try demo questions, or use Google Sheet and CSV imports. Spoken study sessions run without a credit card. Pro will be an optional subscription for saved account features.</p>
     </div>
-    <a class="button primary" href="/pricing/">See Free vs Pro</a>
+    <a class="button primary" href="#your-questions">Paste questions now</a>
   `;
   hero.insertAdjacentElement('afterend', section);
 }

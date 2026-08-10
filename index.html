@@ -84,7 +84,7 @@
           <article class="simple-step">
             <span class="step-number">1</span>
             <h3>Add your questions</h3>
-            <p>Use a Google Sheet or CSV with a <strong>Question</strong> column and an <strong>Answer</strong> column.</p>
+            <p><strong>Paste them directly</strong>, or use a Google Sheet or CSV with a Question column and an Answer column.</p>
           </article>
 
           <article class="simple-step">
@@ -106,15 +106,51 @@
           <span class="step">1</span>
           <div>
             <h2 id="questions-heading">Use your own questions</h2>
-            <p>The prototype is free. Unlock uploads on this device, then add your question list.</p>
+            <p>Fastest: paste question-and-answer pairs below. No account, public link, or upload is required.</p>
           </div>
+        </div>
+
+        <article class="setup-panel paste-panel" aria-labelledby="paste-heading">
+          <div class="paste-panel-heading">
+            <div>
+              <span class="option-kicker">Fastest option · no signup</span>
+              <h3 id="paste-heading">Paste questions and start studying</h3>
+              <p class="panel-copy">Copy questions from ChatGPT, Claude, Gemini, your notes, or a spreadsheet. Everything is parsed in this browser.</p>
+            </div>
+            <span class="free-pill">Free</span>
+          </div>
+
+          <label class="field full-width">
+            <span>Paste your questions and answers</span>
+            <textarea id="pasteQuestions" class="paste-textarea" rows="10" spellcheck="false" placeholder="Q: What hormone lowers blood sugar?&#10;A: Insulin&#10;&#10;Q: What organ produces insulin?&#10;A: Pancreas"></textarea>
+          </label>
+
+          <div class="paste-actions">
+            <button id="loadPaste" class="button primary large-button" type="button">Use these questions</button>
+            <details class="paste-format-help">
+              <summary>Formats that work</summary>
+              <div class="paste-format-grid">
+                <code>Q: Question<br />A: Answer</code>
+                <code>Question | Answer</code>
+                <code>Question[TAB]Answer</code>
+                <code>Question<br />Answer<br /><br />Question<br />Answer</code>
+              </div>
+            </details>
+          </div>
+          <div id="pasteStatus" class="inline-status" data-type="neutral" aria-live="polite">Paste questions above to study without an account.</div>
+          <p class="helper safety-note"><strong>Do not paste patient information, private records, or paid question-bank content you do not own.</strong></p>
+        </article>
+
+        <div class="advanced-import-heading">
+          <span>Or use an existing file or Google Sheet</span>
+          <p>These prototype import options still use the temporary email unlock on this device.</p>
         </div>
 
         <div class="onboarding-grid">
           <article id="betaSignupPanel" class="setup-panel signup-panel">
-            <span class="option-kicker">First: unlock free access</span>
+            <span class="option-kicker">Unlock advanced imports</span>
             <h3>Enter your email</h3>
-            <p class="panel-copy">This temporary prototype saves your email only in this browser. A real account system will replace it later.</p>
+            <p class="panel-copy">Only Google Sheet and CSV import require this temporary prototype unlock. Pasting questions above does not.</p>
 
             <form id="betaSignupForm" novalidate>
               <label class="field">
@@ -127,22 +163,22 @@
                 <span>I understand this is a prototype and my access is saved only on this device.</span>
               </label>
 
-              <button class="button primary full-button" type="submit">Unlock my questions</button>
+              <button class="button primary full-button" type="submit">Unlock Sheet + CSV import</button>
             </form>
 
             <div id="betaSignupStatus" class="inline-status" data-type="neutral" aria-live="polite">Nothing is sent to a server in this prototype.</div>
           </article>
 
           <article id="betaMemberPanel" class="setup-panel member-panel" hidden>
-            <span class="option-kicker">Access unlocked</span>
-            <h3>You can add your questions</h3>
+            <span class="option-kicker">Advanced imports unlocked</span>
+            <h3>Google Sheet and CSV are ready</h3>
             <p>Unlocked on this device as <strong id="betaMemberEmail"></strong>.</p>
             <p class="helper">This is not yet a verified online account. Access is stored only in this browser.</p>
             <button id="signOutButton" class="button secondary" type="button">Remove access from this device</button>
           </article>
 
           <article class="setup-panel import-panel">
-            <span class="option-kicker">Next: add your list</span>
+            <span class="option-kicker">Advanced import</span>
             <h3>Google Sheet or CSV</h3>
             <p class="panel-copy">Your first row should have labels such as <strong>Question</strong>, <strong>Answer</strong>, and optionally <strong>Accepted alternatives</strong>.</p>
 
@@ -172,7 +208,7 @@
 
               <p class="helper">For a Google Sheet, set access to <strong>Anyone with the link — Viewer</strong>. CSV files stay in your browser.</p>
               <p class="helper safety-note"><strong>Do not add patient information, private records, or paid question-bank content you do not own.</strong></p>
-              <div id="sheetStatus" class="inline-status" data-type="neutral">No personal question list loaded.</div>
+              <div id="sheetStatus" class="inline-status" data-type="neutral">No Google Sheet or CSV loaded.</div>
 
               <div id="mappingPanel" class="mapping-panel" hidden>
                 <h3>Check your columns</h3>
@@ -293,7 +329,7 @@
         <div class="player-topline">
           <div>
             <span id="progressText">Question 1 of 1</span>
-            <span id="sourceRowBadge" class="badge">Question row 2</span>
+            <span id="sourceRowBadge" class="badge">Question 1</span>
           </div>
           <span id="statusBadge" class="status-badge" data-status="idle">Ready</span>
         </div>
@@ -359,7 +395,7 @@
         <strong>samme3le</strong>
       </div>
       <p><strong>Prototype:</strong> samme3le is an educational study tool. It is not medical advice and must not be used for patient care.</p>
-      <p>CSV content and prototype access stay in this browser. Google Sheet requests and speech recognition may be processed by Google or your browser provider. This version has no payment system and no production account backend.</p>
+      <p>Pasted questions and CSV content stay in this browser. Google Sheet requests and speech recognition may be processed by Google or your browser provider. This version has no payment system and no production account backend.</p>
     </footer>
   </div>
 
