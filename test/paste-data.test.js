@@ -25,6 +25,17 @@ A: Pancreas
   assert.equal(deck.cards.length, 2);
 });
 
+test('parses markdown-formatted Q and A labels', () => {
+  const result = parsePastedQuestions(`
+**Q:** What is the largest planet?
+**A:** Jupiter
+`);
+
+  assert.equal(result.cards.length, 1);
+  assert.equal(result.cards[0].question, 'What is the largest planet?');
+  assert.equal(result.cards[0].answer, 'Jupiter');
+});
+
 test('parses tab-separated rows copied from a spreadsheet and ignores a header', () => {
   const result = parsePastedQuestions([
     'Question\tAnswer\tAccepted alternatives',
@@ -60,6 +71,13 @@ Mercury
 
   assert.equal(result.cards.length, 2);
   assert.equal(result.format, 'question / answer blocks');
+});
+
+test('accepts a single two-line question and answer block', () => {
+  const result = parsePastedQuestions('What is the capital of France?\nParis');
+
+  assert.equal(result.cards.length, 1);
+  assert.equal(result.cards[0].answer, 'Paris');
 });
 
 test('rejects ambiguous prose instead of inventing question-answer pairs', () => {
