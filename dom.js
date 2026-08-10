@@ -23,6 +23,9 @@ export const elements = {
   signOutButton: document.querySelector('#signOutButton'),
   personalBankControls: document.querySelector('#personalBankControls'),
   personalBankLock: document.querySelector('#personalBankLock'),
+  pasteQuestions: document.querySelector('#pasteQuestions'),
+  loadPaste: document.querySelector('#loadPaste'),
+  pasteStatus: document.querySelector('#pasteStatus'),
   sheetUrl: document.querySelector('#sheetUrl'),
   loadSheet: document.querySelector('#loadSheet'),
   loadDemo: document.querySelector('#loadDemo'),
@@ -155,6 +158,7 @@ export function saveProgress() {
   if (!state.questions.length) return;
   localStorage.setItem(PROGRESS_KEY, JSON.stringify({
     sheetUrl: elements.sheetUrl.value,
+    sourceKind: state.sourceKind,
     sourceRow: state.questions[state.currentIndex]?.sourceRow ?? null
   }));
 }
@@ -162,6 +166,12 @@ export function saveProgress() {
 export function setSheetStatus(message, type = 'neutral') {
   elements.sheetStatus.textContent = message;
   elements.sheetStatus.dataset.type = type;
+}
+
+export function setPasteStatus(message, type = 'neutral') {
+  if (!elements.pasteStatus) return;
+  elements.pasteStatus.textContent = message;
+  elements.pasteStatus.dataset.type = type;
 }
 
 export function setSessionStatus(status, message) {
