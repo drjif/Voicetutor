@@ -60,6 +60,19 @@ What is DNA? | Deoxyribonucleic acid
   assert.equal(result.cards[0].answer, 'Adenosine triphosphate');
 });
 
+test('parses Markdown tables commonly returned by AI tools', () => {
+  const result = parsePastedQuestions(`
+| Question | Answer |
+| --- | --- |
+| What is ATP? | Adenosine triphosphate |
+| What is DNA? | Deoxyribonucleic acid |
+`);
+
+  assert.equal(result.cards.length, 2);
+  assert.equal(result.cards[0].question, 'What is ATP?');
+  assert.equal(result.cards[1].answer, 'Deoxyribonucleic acid');
+});
+
 test('parses blank-separated question and answer blocks', () => {
   const result = parsePastedQuestions(`
 What is the largest planet?
@@ -73,7 +86,21 @@ Mercury
   assert.equal(result.format, 'question / answer blocks');
 });
 
-test('accepts a single two-line question and answer block', () => {
+test('parses numbered question plus Answer label blocks', () => {
+  const result = parsePastedQuestions(`
+1. What is the largest planet?
+Answer: Jupiter
+
+2. What planet is closest to the Sun?
+Answer: Mercury
+`);
+
+  assert.equal(result.cards.length, 2);
+  assert.equal(result.cards[0].question, 'What is the largest planet?');
+  assert.equal(result.cards[0].answer, 'Jupiter');
+});
+
+test('accepts a single intentional two-line question and answer block', () => {
   const result = parsePastedQuestions('What is the capital of France?\nParis');
 
   assert.equal(result.cards.length, 1);
@@ -85,6 +112,12 @@ test('rejects ambiguous prose instead of inventing question-answer pairs', () =>
 
   assert.deepEqual(result.cards, []);
   assert.match(result.message, /could not reliably find/i);
+});
+
+test('rejects an ambiguous two-line prose block', () => {
+  const result = parsePastedQuestions('Insulin is produced by beta cells.\nIt lowers blood glucose.');
+
+  assert.deepEqual(result.cards, []);
 });
 
 test('empty input produces a clear error', () => {
