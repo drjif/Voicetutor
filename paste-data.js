@@ -109,7 +109,11 @@ function parseLabeled(text) {
   }
 
   flush();
-  return { cards, confidence: labelHits >= 2 ? 0.95 : 0, format: 'Q / A labels' };
+  return {
+    cards,
+    confidence: cards.length && labelHits >= 2 ? 0.95 : 0,
+    format: 'Q / A labels'
+  };
 }
 
 function headerLike(first, second) {
