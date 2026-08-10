@@ -1,16 +1,18 @@
 # samme3le
 
-**samme3le** means “recite to me.” It turns a Google Sheet or CSV list of questions and answers into a spoken study session.
+**samme3le** means “recite to me.” It turns a structured list of questions and answers into a spoken study session.
 
 The current prototype is a static, client-side web app. The core app is free and does not require payment information. A future optional Pro subscription is planned for production account features.
 
-## What the user does
+## What the user does today
 
 1. Tries five built-in demo questions without signing up.
 2. Unlocks prototype access on the current device.
 3. Adds a Google Sheet or uploads a CSV containing questions and answers.
 4. Chooses **Answer out loud**, **Listen and review**, or **Lock-screen review**.
 5. Starts the study session.
+
+The current visible workflow remains unchanged while the ingestion layer is being prepared for lower-friction sources such as pasted Q&A, Excel files, and built-in decks.
 
 ## Study modes
 
@@ -27,6 +29,26 @@ samme3le reads the question, waits for a configurable interval, reads the saved 
 An experimental continuous spoken track reads the remaining questions and answers without using the microphone or grading. Background playback depends on the browser and operating system.
 
 The answer checker is a prototype heuristic, not a validated grading system. Put common paraphrases in an `Accepted alternatives` column separated by `|`, `;`, or line breaks.
+
+## Deck Contract v1
+
+All ingestion methods now terminate at one canonical deck boundary before the study engine receives any questions.
+
+```text
+Importer
+   ↓
+normalize + validate
+   ↓
+Deck Contract v1
+   ↓
+existing study engine
+```
+
+`deck.js` provides `normalizeDeck()`, `validateDeck()`, and the strict `loadDeck()` entry point. The currently working Google Sheet and CSV paths now pass through this boundary without changing the visible workflow.
+
+This protects the speech, grading, session, progress, wake-lock, and lock-screen code while future ingestion methods are added.
+
+See `docs/DECK_CONTRACT_V1.md` and the regression tests in `test/deck.test.js`.
 
 ## Question-list format
 
@@ -119,13 +141,20 @@ npm run check
 ```text
 Google Sheet / uploaded CSV
           ↓
-Browser CSV parser
+Browser parser + column detection
           ↓
-Question-list state machine
+buildQuestionBank()
+          ↓
+Deck Contract v1
+          ↓
+Question-list session state
           ↓
 Web Speech synthesis + recognition
           ↓
 Local answer matcher
+
+Future ingestion:
+Paste / Excel / built-in decks → Deck Contract v1 → same study engine
 
 Future account layer:
 Supabase Auth + Postgres RLS + server-managed subscription entitlement

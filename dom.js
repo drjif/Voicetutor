@@ -81,6 +81,7 @@ export const elements = {
 
 export const state = {
   rawRows: [],
+  currentDeck: null,
   questions: [],
   currentIndex: 0,
   mode: 'active',
@@ -94,6 +95,7 @@ export const state = {
   restartCurrentQuestion: false,
   reviewChoice: null,
   sourceType: 'none',
+  sourceKind: 'none',
   completedQuestionCount: 0,
   tenQuestionMilestoneRecorded: false,
   wakeLock: null,
