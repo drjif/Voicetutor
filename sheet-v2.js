@@ -83,6 +83,10 @@ function populateStartRows() {
   });
 }
 
+function sessionIsActive() {
+  return ['running', 'listening', 'waiting', 'paused'].includes(state.status);
+}
+
 export function prepareRows(rows) {
   state.rawRows = rows;
   const detection = detectColumns(rows, elements.hasHeaders.checked);
@@ -138,6 +142,11 @@ export function applyColumnMapping() {
 }
 
 export function loadPastedQuestions() {
+  if (sessionIsActive()) {
+    setPasteStatus('Stop the current study session before replacing its questions.', 'warning');
+    return;
+  }
+
   const parsed = parsePastedQuestions(elements.pasteQuestions.value);
   if (!parsed.cards.length) {
     setPasteStatus(parsed.message, 'error');
