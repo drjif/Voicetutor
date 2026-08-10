@@ -1,4 +1,4 @@
-import { elements, setSessionStatus, setSheetStatus, state, updateControls } from './dom.js';
+import { elements, setPasteStatus, setSessionStatus, setSheetStatus, state, updateControls } from './dom.js';
 
 const ACCOUNT_KEY = 'samme3le.betaAccount.v1';
 const METRICS_KEY = 'samme3le.prototypeMetrics.v1';
@@ -45,6 +45,7 @@ export function recordMetric(name, details = {}) {
     name,
     at: new Date().toISOString(),
     sourceType: state.sourceType,
+    sourceKind: state.sourceKind,
     ...details
   });
   writeJson(METRICS_KEY, events.slice(-MAX_EVENTS));
@@ -73,9 +74,11 @@ function recordVisit() {
 function resetLoadedContent() {
   state.generation += 1;
   state.rawRows = [];
+  state.currentDeck = null;
   state.questions = [];
   state.currentIndex = 0;
   state.sourceType = 'none';
+  state.sourceKind = 'none';
   state.completedQuestionCount = 0;
   state.tenQuestionMilestoneRecorded = false;
   window.speechSynthesis?.cancel?.();
@@ -84,7 +87,8 @@ function resetLoadedContent() {
   elements.conversionCard.hidden = true;
   elements.startRow.innerHTML = '<option>Load questions first</option>';
   elements.startRow.disabled = true;
-  setSheetStatus('No personal question list loaded.', 'neutral');
+  setPasteStatus('Paste questions above to study without an account.', 'neutral');
+  setSheetStatus('No Google Sheet or CSV loaded.', 'neutral');
   setSessionStatus('idle', 'Ready');
   updateControls();
 }
@@ -105,7 +109,7 @@ function isValidEmail(value) {
 
 export function requireBetaAccess() {
   if (hasBetaAccess()) return true;
-  elements.betaSignupStatus.textContent = 'Unlock free prototype access before adding your own questions.';
+  elements.betaSignupStatus.textContent = 'Enter your email to unlock Google Sheet and CSV import. Pasting questions above does not require an account.';
   elements.betaSignupStatus.dataset.type = 'error';
   elements.betaSignupPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
   elements.betaEmail.focus();
