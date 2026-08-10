@@ -64,6 +64,18 @@ expect('robots.txt', robots, /Sitemap: https:\/\/tutor\.gi-jad\.com\/sitemap\.xm
 const shell = await read('homepage-marketing.js');
 expect('homepage-marketing.js', shell, /The core study app is free/i, 'missing free homepage message');
 expect('homepage-marketing.js', shell, /SoftwareApplication/i, 'missing software structured data');
+expect('homepage-marketing.js', shell, /How do you want to start\?/i, 'missing study-path chooser');
+expect('homepage-marketing.js', shell, /Choose a deck/i, 'missing ready-made deck path');
+expect('homepage-marketing.js', shell, /Paste questions/i, 'missing paste path');
+expect('homepage-marketing.js', shell, /Import existing questions/i, 'missing import path');
+expect('homepage-marketing.js', shell, /No paid AI required/i, 'missing zero-paid-AI positioning');
+expect('homepage-marketing.js', shell, /data-study-path-demo/i, 'missing demo path action');
+expect('homepage-marketing.js', shell, /href="#pasteQuestions"/i, 'missing direct paste path action');
+
+const serviceWorker = await read('service-worker.js');
+expect('service-worker.js', serviceWorker, /samme3le-v13/i, 'homepage redesign must refresh the PWA cache');
+expect('service-worker.js', serviceWorker, /homepage-marketing\.css/i, 'homepage stylesheet is not cached');
+expect('service-worker.js', serviceWorker, /homepage-marketing\.js/i, 'homepage behavior is not cached');
 
 if (errors.length) {
   console.error(`Site validation failed with ${errors.length} issue(s):`);
@@ -71,4 +83,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Validated ${seoPages.length} SEO pages, ${legalPages.length} legal pages, sitemap, robots, and homepage metadata.`);
+console.log(`Validated ${seoPages.length} SEO pages, ${legalPages.length} legal pages, sitemap, robots, homepage study paths, and PWA cache.`);
