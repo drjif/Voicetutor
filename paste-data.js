@@ -119,6 +119,16 @@ function headerLike(first, second) {
     && ['a', 'answer', 'correctanswer', 'response'].includes(a);
 }
 
+function markdownSeparator(parts) {
+  return parts.length >= 2 && parts.every((part) => /^:?-{3,}:?$/.test(part.trim()));
+}
+
+function splitDelimitedLine(raw, delimiter) {
+  let value = raw;
+  if (delimiter === '|') value = value.trim().replace(/^\|/, '').replace(/\|$/, '');
+  return value.split(delimiter).map((part) => part.trim());
+}
+
 function parseDelimitedLines(text) {
   const nonEmpty = meaningfulLines(text).filter((line) => line.text);
   const delimiters = ['\t', '|'];
@@ -132,7 +142,8 @@ function parseDelimitedLines(text) {
     nonEmpty.forEach((line) => {
       if (!line.raw.includes(delimiter)) return;
       candidateRows += 1;
-      const parts = line.raw.split(delimiter).map((part) => part.trim());
+      const parts = splitDelimitedLine(line.raw, delimiter);
+      if (markdownSeparator(parts)) return;
       if (parts.length < 2 || !parts[0] || !parts[1]) return;
       validRows += 1;
       parsed.push({ parts, line: line.line });
@@ -145,7 +156,7 @@ function parseDelimitedLines(text) {
       .map(({ parts, line }) => makeCard(parts[0], parts[1], parts.slice(2).join('|'), line));
 
     const ratio = candidateRows ? validRows / candidateRows : 0;
-    const confidence = cards.length && ratio >= 0.75 ? 0.9 : cards.length >= 2 ? 0.72 : 0;
+    const confidence = cards.length && ratio >= 0.6 ? 0.9 : cards.length >= 2 ? 0.72 : 0;
     if (confidence > best.confidence) {
       best = {
         cards,
@@ -156,6 +167,20 @@ function parseDelimitedLines(text) {
   }
 
   return best;
+}
+
+function questionText(value) {
+  return labeledMatch(value, 'question') ?? stripLeadingMarkdown(value);
+}
+
+function answerText(value) {
+  return labeledMatch(value, 'answer') ?? stripLeadingMarkdown(value);
+}
+
+function looksQuestionLike(value) {
+  const text = questionText(value).toLowerCase();
+  return /\?$/.test(text)
+    || /^(what|which|who|when|where|why|how|name|define|describe|list|identify|state|explain)\b/.test(text);
 }
 
 function parseBlankBlocks(text) {
@@ -171,14 +196,17 @@ function parseBlankBlocks(text) {
       sourceLine += block.length + 1;
       continue;
     }
-    const question = stripLeadingMarkdown(block[0]);
-    const answer = stripLeadingMarkdown(block[1]);
+    const question = questionText(block[0]);
+    const answer = answerText(block[1]);
     if (question && answer) cards.push(makeCard(question, answer, [], sourceLine));
     sourceLine += block.length + 1;
   }
 
   const allBlocksPaired = cards.length > 0 && cards.length === blocks.length;
-  const confidence = allBlocksPaired ? (cards.length >= 2 ? 0.68 : 0.52) : 0;
+  const singleLooksIntentional = cards.length === 1 && looksQuestionLike(blocks[0]?.[0] ?? '');
+  const confidence = allBlocksPaired
+    ? (cards.length >= 2 ? 0.68 : singleLooksIntentional ? 0.52 : 0)
+    : 0;
   return { cards, confidence, format: 'question / answer blocks' };
 }
 
@@ -190,8 +218,8 @@ function parseAlternatingLines(text) {
 
   const cards = [];
   for (let index = 0; index < lines.length; index += 2) {
-    const question = stripLeadingMarkdown(lines[index].text);
-    const answer = stripLeadingMarkdown(lines[index + 1].text);
+    const question = questionText(lines[index].text);
+    const answer = answerText(lines[index + 1].text);
     if (!question || !answer) return { cards: [], confidence: 0, format: null };
     cards.push(makeCard(question, answer, [], lines[index].line));
   }
