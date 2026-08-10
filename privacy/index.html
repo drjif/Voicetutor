@@ -20,15 +20,16 @@
       <p>This Privacy Policy explains how samme3le handles information when you use the website, Progressive Web App, voice-study features, and future account or subscription services.</p>
 
       <h2>1. Current prototype versus production accounts</h2>
-      <p>The current prototype does not have a production account backend or payment system. The email entered to unlock local prototype access, product settings, progress, and prototype metrics are stored in that browser’s local storage. They are not intentionally transmitted to a samme3le application database.</p>
+      <p>The current prototype does not have a production account backend or payment system. The email entered to unlock local prototype access, product settings, progress, and prototype metrics are stored in that browser’s local storage. They are not intentionally transmitted to a samme3le application database. Pasted question-and-answer text is parsed in browser memory and is not intentionally uploaded to a samme3le server.</p>
       <p>When production accounts launch, Supabase is planned to process authentication, subscriber identity, consent records, subscription status, and limited product-usage events. This page will be updated before that collection begins.</p>
 
       <h2>2. Information handled today</h2>
       <table class="privacy-table">
         <thead><tr><th>Information</th><th>How it is used</th><th>Where it is handled</th></tr></thead>
         <tbody>
-          <tr><td>Prototype email and access state</td><td>Unlocks personal question-list import on the same device.</td><td>Browser local storage only.</td></tr>
-          <tr><td>Settings and progress</td><td>Remembers the Sheet URL, mode, speed, timing, voice, matching preference, and current row.</td><td>Browser local storage only.</td></tr>
+          <tr><td>Prototype email and access state</td><td>Unlocks Google Sheet and CSV import on the same device.</td><td>Browser local storage only.</td></tr>
+          <tr><td>Settings and progress</td><td>Remembers the Sheet URL, mode, speed, timing, voice, matching preference, and current position.</td><td>Browser local storage only.</td></tr>
+          <tr><td>Pasted question-and-answer text</td><td>Parses structured Q&amp;A into a spoken study session.</td><td>Processed locally in browser memory; not intentionally uploaded to a samme3le server or stored in the prototype account database.</td></tr>
           <tr><td>CSV question lists</td><td>Creates the study session.</td><td>Read locally by the browser; not intentionally uploaded to a samme3le server.</td></tr>
           <tr><td>Google Sheet data</td><td>Creates the study session.</td><td>Requested directly from Google by the browser using the link you provide.</td></tr>
           <tr><td>Spoken answers</td><td>Converts speech to text for answer matching.</td><td>May be processed by the browser, operating system, or speech-service provider. samme3le does not intentionally store audio in the current prototype.</td></tr>
@@ -53,7 +54,7 @@
       <p>samme3le does not intend to sell personal information or share it for cross-context behavioral advertising. The prototype does not use advertising pixels. If this practice changes, this policy and any legally required opt-out controls will be updated before the change.</p>
 
       <h2>7. Retention</h2>
-      <p>Browser data remains until you remove local access, clear site data, or the browser deletes it. Planned production retention targets are: account and consent records while the account is active plus a limited legal period; subscription and transaction records as required for accounting, disputes, and law; security logs approximately 30–90 days unless an incident requires longer retention; and product-usage events approximately 12 months. Final periods will be confirmed before production launch.</p>
+      <p>Browser data remains until you remove local access, clear site data, or the browser deletes it. Pasted question-and-answer text is not intentionally persisted by the current paste feature after the page or in-memory session is discarded. Planned production retention targets are: account and consent records while the account is active plus a limited legal period; subscription and transaction records as required for accounting, disputes, and law; security logs approximately 30–90 days unless an incident requires longer retention; and product-usage events approximately 12 months. Final periods will be confirmed before production launch.</p>
 
       <h2>8. Your choices and rights</h2>
       <p>Depending on where you live and which laws apply, you may have rights to access, correct, delete, or obtain a copy of personal information; withdraw marketing consent; appeal a denied request; and opt out of certain sale, sharing, targeted advertising, or profiling. samme3le intends to honor Global Privacy Control signals if a legally relevant sale or sharing practice is ever introduced, but no such practice is planned.</p>
