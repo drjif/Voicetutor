@@ -37,13 +37,13 @@ function stripLeadingMarkdown(value) {
   return value
     .replace(/^\s*[-*+]\s+/, '')
     .replace(/^\s*\d+[.)]\s+/, '')
-    .replace(/^\s*\*{1,2}/, '')
-    .replace(/\*{1,2}\s*$/, '')
     .trim();
 }
 
 function labeledMatch(value, kind) {
-  const cleaned = stripLeadingMarkdown(value);
+  const cleaned = stripLeadingMarkdown(value)
+    .replace(/\*\*/g, '')
+    .replace(/__/g, '');
   const patterns = kind === 'question'
     ? [/^(?:q|question)\s*[:.\-]\s*(.+)$/i]
     : kind === 'answer'
@@ -177,7 +177,8 @@ function parseBlankBlocks(text) {
     sourceLine += block.length + 1;
   }
 
-  const confidence = cards.length >= 2 && cards.length === blocks.length ? 0.68 : 0;
+  const allBlocksPaired = cards.length > 0 && cards.length === blocks.length;
+  const confidence = allBlocksPaired ? (cards.length >= 2 ? 0.68 : 0.52) : 0;
   return { cards, confidence, format: 'question / answer blocks' };
 }
 
