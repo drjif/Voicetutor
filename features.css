@@ -76,9 +76,20 @@
 .paste-textarea {
   width: 100%;
   min-height: 220px;
+  padding: 14px 16px;
   resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
   font: inherit;
   line-height: 1.55;
+}
+
+.paste-textarea:focus-visible {
+  outline: 3px solid rgba(255, 90, 31, 0.3);
+  outline-offset: 2px;
+  border-color: var(--primary);
 }
 
 .paste-actions {
