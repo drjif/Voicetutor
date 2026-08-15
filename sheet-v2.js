@@ -1,4 +1,5 @@
 import { loadDeck } from './deck.js';
+import { parseStudyFile } from './file-import.js';
 import { parsePastedQuestions } from './paste-data.js';
 import { buildQuestionBank, columnName, detectColumns, parseDelimited, parseGoogleSheetUrl } from './sheet-data.js';
 import {
@@ -36,9 +37,30 @@ function truncate(text, max) {
   return value.length > max ? `${value.slice(0, max - 1)}…` : value;
 }
 
+function localFileElements() {
+  return {
+    input: document.querySelector('#studyFileUpload'),
+    status: document.querySelector('#localFileStatus'),
+    fileName: document.querySelector('#selectedFileName'),
+    mappingHost: document.querySelector('#localMappingHost')
+  };
+}
+
+function setLocalFileStatus(message, type = 'neutral') {
+  const status = localFileElements().status;
+  if (!status) return;
+  status.textContent = message;
+  status.dataset.type = type;
+}
+
+function isLocalSource() {
+  return ['xlsx', 'anki', 'anki-text', 'local-csv', 'local-tsv', 'local-txt', 'local-text'].includes(state.sourceKind);
+}
+
 function currentDeckTitle() {
   if (state.sourceKind === 'demo') return 'samme3le demo';
   if (state.sourceKind === 'paste') return 'Pasted questions';
+  if (isLocalSource() && state.sourceName) return state.sourceName;
   if (state.sourceKind === 'google-sheet') return 'Google Sheet questions';
   if (state.sourceKind === 'csv') {
     const uploadedName = String(elements.sheetUrl.value ?? '').replace(/^Uploaded:\s*/i, '').trim();
@@ -68,6 +90,10 @@ function applyRecordsToDeck(records) {
 function startRowLabel(item, index) {
   if (state.sourceKind === 'demo') return `Demo question ${index + 1} — ${truncate(item.question, 90)}`;
   if (state.sourceKind === 'paste') return `Pasted question ${index + 1} — ${truncate(item.question, 90)}`;
+  if (state.sourceKind === 'anki') return `Anki card ${index + 1} — ${truncate(item.question, 90)}`;
+  if (state.sourceKind === 'xlsx') return `Excel row ${item.sourceRow ?? index + 1} — ${truncate(item.question, 90)}`;
+  if (state.sourceKind === 'anki-text') return `Anki text row ${item.sourceRow ?? index + 1} — ${truncate(item.question, 90)}`;
+  if (state.sourceKind.startsWith('local-')) return `File row ${item.sourceRow ?? index + 1} — ${truncate(item.question, 90)}`;
   if (state.sourceKind === 'csv') return `CSV row ${item.sourceRow} — ${truncate(item.question, 90)}`;
   return `Sheet row ${item.sourceRow} — ${truncate(item.question, 90)}`;
 }
@@ -87,8 +113,14 @@ function sessionIsActive() {
   return ['running', 'listening', 'waiting', 'paused'].includes(state.status);
 }
 
-export function prepareRows(rows) {
+function setMappingHostVisible(visible) {
+  const host = localFileElements().mappingHost;
+  if (host) host.hidden = !visible;
+}
+
+export function prepareRows(rows, options = {}) {
   state.rawRows = rows;
+  if (typeof options.hasHeaders === 'boolean') elements.hasHeaders.checked = options.hasHeaders;
   const detection = detectColumns(rows, elements.hasHeaders.checked);
   currentHeaderRowIndex = detection.headerRowIndex;
 
@@ -98,6 +130,7 @@ export function prepareRows(rows) {
   elements.questionColumn.value = String(detection.questionIndex);
   elements.answerColumn.value = String(detection.answerIndex);
   elements.acceptedColumn.value = String(detection.acceptedIndex);
+  setMappingHostVisible(true);
   elements.mappingPanel.hidden = false;
   applyColumnMapping();
 }
@@ -108,7 +141,9 @@ export function applyColumnMapping() {
   const acceptedIndex = Number(elements.acceptedColumn.value);
 
   if (questionIndex === answerIndex) {
-    setSheetStatus('Question and answer must use different columns.', 'error');
+    const message = 'Question and answer must use different columns.';
+    if (isLocalSource()) setLocalFileStatus(message, 'error');
+    else setSheetStatus(message, 'error');
     return;
   }
 
@@ -132,12 +167,24 @@ export function applyColumnMapping() {
   elements.bankSummary.textContent = state.questions.length
     ? `${state.questions.length} usable question${state.questions.length === 1 ? '' : 's'} loaded from ${state.rawRows.length} rows.`
     : 'No usable question-answer rows were found.';
-  setSheetStatus(
-    state.questions.length
-      ? `${state.sourceType === 'demo' ? 'Demo' : 'Question bank'} loaded. Using ${elements.questionColumn.options[elements.questionColumn.selectedIndex]?.textContent} as the question and ${elements.answerColumn.options[elements.answerColumn.selectedIndex]?.textContent} as the answer.`
-      : 'Check the selected columns and row contents.',
-    state.questions.length ? 'success' : 'error'
-  );
+
+  const success = state.questions.length > 0;
+  if (isLocalSource()) {
+    const detail = state.sourceDetail ? `${state.sourceDetail} ` : '';
+    setLocalFileStatus(
+      success
+        ? `${detail}${state.questions.length} question${state.questions.length === 1 ? '' : 's'} ready. Check the detected columns below only if something looks wrong.`
+        : 'No usable question-answer rows were found. Check “First row has column names” and the selected question/answer fields.',
+      success ? 'success' : 'error'
+    );
+  } else {
+    setSheetStatus(
+      success
+        ? `${state.sourceType === 'demo' ? 'Demo' : 'Question bank'} loaded. Using ${elements.questionColumn.options[elements.questionColumn.selectedIndex]?.textContent} as the question and ${elements.answerColumn.options[elements.answerColumn.selectedIndex]?.textContent} as the answer.`
+        : 'Check the selected columns and row contents.',
+      success ? 'success' : 'error'
+    );
+  }
   updateControls();
 }
 
@@ -157,8 +204,11 @@ export function loadPastedQuestions() {
   try {
     state.sourceType = 'personal';
     state.sourceKind = 'paste';
+    state.sourceName = 'Pasted questions';
+    state.sourceDetail = '';
     state.rawRows = [];
     elements.mappingPanel.hidden = true;
+    setMappingHostVisible(false);
     applyRecordsToDeck(parsed.cards);
     populateStartRows();
     noteSourceLoaded('personal', state.questions.length);
@@ -168,6 +218,54 @@ export function loadPastedQuestions() {
   } catch (error) {
     console.error(error);
     setPasteStatus(error.message || 'Those questions could not be loaded.', 'error');
+  }
+}
+
+export async function handleStudyFileUpload(event) {
+  const input = event.target;
+  const [file] = input.files ?? [];
+  if (!file) return;
+
+  const ui = localFileElements();
+  if (sessionIsActive()) {
+    setLocalFileStatus('Stop the current study session before replacing its questions.', 'warning');
+    input.value = '';
+    return;
+  }
+
+  if (ui.fileName) ui.fileName.textContent = file.name;
+  setLocalFileStatus(`Reading ${file.name} locally…`, 'loading');
+  input.disabled = true;
+
+  try {
+    const parsed = await parseStudyFile(file);
+    state.sourceType = 'personal';
+    state.sourceKind = parsed.sourceKind;
+    state.sourceName = parsed.title || file.name;
+    state.sourceDetail = parsed.detail || '';
+    state.rawRows = [];
+
+    if (parsed.mode === 'cards') {
+      elements.mappingPanel.hidden = true;
+      setMappingHostVisible(false);
+      applyRecordsToDeck(parsed.cards);
+      populateStartRows();
+      setLocalFileStatus(`${parsed.detail} Ready to study — no account or server upload required.`, 'success');
+      updateControls();
+    } else {
+      prepareRows(parsed.rows, { hasHeaders: parsed.hasHeaders });
+    }
+
+    noteSourceLoaded('personal', state.questions.length);
+    document.querySelector('#session-heading')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (error) {
+    console.error(error);
+    state.currentDeck = null;
+    state.questions = [];
+    updateControls();
+    setLocalFileStatus(error.message || 'That file could not be read locally.', 'error');
+  } finally {
+    input.disabled = false;
   }
 }
 
@@ -213,12 +311,14 @@ export async function loadGoogleSheet() {
     if (!rows) throw lastError ?? new Error('No readable sheet endpoint was available');
     state.sourceType = 'personal';
     state.sourceKind = 'google-sheet';
+    state.sourceName = 'Google Sheet questions';
+    state.sourceDetail = '';
     prepareRows(rows);
     noteSourceLoaded('personal', state.questions.length);
   } catch (error) {
     console.error(error);
     setSheetStatus(
-      'Could not read the sheet. Set General access to “Anyone with the link — Viewer,” or export/upload a CSV file.',
+      'Could not read the sheet. Set General access to “Anyone with the link — Viewer,” or use the zero-signup local file importer above.',
       'error'
     );
   } finally {
@@ -232,6 +332,8 @@ export async function loadDemo() {
   const text = await response.text();
   state.sourceType = 'demo';
   state.sourceKind = 'demo';
+  state.sourceName = 'samme3le demo';
+  state.sourceDetail = '';
   elements.sheetUrl.value = 'Built-in demo';
   prepareRows(parseDelimited(text));
   noteSourceLoaded('demo', state.questions.length);
@@ -249,6 +351,8 @@ export function handleCsvUpload(event) {
   reader.onload = () => {
     state.sourceType = 'personal';
     state.sourceKind = 'csv';
+    state.sourceName = file.name;
+    state.sourceDetail = '';
     elements.sheetUrl.value = `Uploaded: ${file.name}`;
     prepareRows(parseDelimited(String(reader.result ?? '')));
     noteSourceLoaded('personal', state.questions.length);
@@ -262,6 +366,7 @@ export function setupSheetEvents() {
   elements.loadSheet.addEventListener('click', loadGoogleSheet);
   elements.loadDemo.addEventListener('click', loadDemo);
   elements.csvUpload.addEventListener('change', handleCsvUpload);
+  document.querySelector('#studyFileUpload')?.addEventListener('change', handleStudyFileUpload);
   elements.applyMapping.addEventListener('click', applyColumnMapping);
   elements.hasHeaders.addEventListener('change', () => state.rawRows.length && prepareRows(state.rawRows));
 }
