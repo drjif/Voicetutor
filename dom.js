@@ -99,6 +99,8 @@ export const state = {
   reviewChoice: null,
   sourceType: 'none',
   sourceKind: 'none',
+  sourceName: '',
+  sourceDetail: '',
   completedQuestionCount: 0,
   tenQuestionMilestoneRecorded: false,
   wakeLock: null,

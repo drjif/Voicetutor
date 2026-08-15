@@ -72,10 +72,23 @@ expect('homepage-marketing.js', shell, /No paid AI required/i, 'missing zero-pai
 expect('homepage-marketing.js', shell, /data-study-path-demo/i, 'missing demo path action');
 expect('homepage-marketing.js', shell, /href="#pasteQuestions"/i, 'missing direct paste path action');
 
+const fileUi = await read('file-import-ui.js');
+expect('file-import-ui.js', fileUi, /Import a deck or file/i, 'missing direct file import heading');
+expect('file-import-ui.js', fileUi, /Excel \.xlsx/i, 'missing Excel format');
+expect('file-import-ui.js', fileUi, /Anki \.apkg/i, 'missing Anki format');
+expect('file-import-ui.js', fileUi, /\.xlsx,\.apkg,\.csv,\.tsv,\.txt/i, 'file picker does not accept all Step 5 formats');
+expect('file-import-ui.js', fileUi, /processed locally/i, 'missing local-processing disclosure');
+
+const fileImport = await read('file-import.js');
+expect('file-import.js', fileImport, /parseAnkiPackage/i, 'Anki parser is not connected');
+expect('file-import.js', fileImport, /parseXlsxWorkbook/i, 'Excel parser is not connected');
+expect('file-import.js', fileImport, /parseDelimited/i, 'CSV\/TSV parser is not connected');
+
 const serviceWorker = await read('service-worker.js');
-expect('service-worker.js', serviceWorker, /samme3le-v13/i, 'homepage redesign must refresh the PWA cache');
-expect('service-worker.js', serviceWorker, /homepage-marketing\.css/i, 'homepage stylesheet is not cached');
-expect('service-worker.js', serviceWorker, /homepage-marketing\.js/i, 'homepage behavior is not cached');
+expect('service-worker.js', serviceWorker, /samme3le-v14/i, 'Step 5 must refresh the PWA cache');
+for (const asset of ['file-import-ui.js', 'file-import.js', 'xlsx-import.js', 'anki-import.js', 'zip-reader.js', 'sqlite-read.js']) {
+  expect('service-worker.js', serviceWorker, new RegExp(asset.replace('.', '\\.')), `missing ${asset} from PWA cache`);
+}
 
 if (errors.length) {
   console.error(`Site validation failed with ${errors.length} issue(s):`);
@@ -83,4 +96,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Validated ${seoPages.length} SEO pages, ${legalPages.length} legal pages, sitemap, robots, homepage study paths, and PWA cache.`);
+console.log(`Validated ${seoPages.length} SEO pages, ${legalPages.length} legal pages, homepage study paths, Step 5 local imports, and PWA cache.`);
