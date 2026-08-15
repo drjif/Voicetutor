@@ -6,6 +6,7 @@ const MAX_APKG_BYTES = 150 * 1024 * 1024;
 const MAX_CARDS = 25000;
 const SQLITE_MAGIC = 'SQLite format 3\u0000';
 const textDecoder = new TextDecoder('utf-8');
+const CLOZE_PATTERN = /\{\{c(\d+)::([\s\S]*?)(?:::(.*?))?\}\}/gi;
 
 function decodeEntities(value) {
   if (typeof document !== 'undefined') {
@@ -43,21 +44,30 @@ function exactKey(question, answer) {
   return `${question.toLocaleLowerCase()}\u0000${answer.toLocaleLowerCase()}`;
 }
 
+function clozeMatches(text) {
+  return [...String(text).matchAll(CLOZE_PATTERN)];
+}
+
 function clozeIndices(text) {
-  return [...String(text).matchAll(/\{\{c(\d+)::([\s\S]*?)(?:::(.*?))?\}\}/gi)]
+  return clozeMatches(text)
     .map((match) => Number(match[1]))
     .filter((value) => Number.isInteger(value) && value > 0);
 }
 
-function renderCloze(text, targetIndex, revealTarget) {
-  return String(text).replace(/\{\{c(\d+)::([\s\S]*?)(?:::(.*?))?\}\}/gi, (_, rawIndex, answer, hint) => {
+function renderClozeQuestion(text, targetIndex) {
+  return String(text).replace(CLOZE_PATTERN, (_, rawIndex, answer, hint) => {
     const index = Number(rawIndex);
-    if (index === targetIndex) {
-      if (revealTarget) return answer;
-      return hint ? `[${hint}]` : '[…]';
-    }
+    if (index === targetIndex) return hint ? `[${hint}]` : '[…]';
     return answer;
   });
+}
+
+function clozeAnswer(text, targetIndex) {
+  const answers = clozeMatches(text)
+    .filter((match) => Number(match[1]) === targetIndex)
+    .map((match) => cleanAnkiText(match[2]))
+    .filter(Boolean);
+  return [...new Set(answers)].join('; ');
 }
 
 function card(question, answer, sourceRow) {
@@ -78,9 +88,11 @@ export function cardsFromAnkiFields(fieldStrings) {
 
     if (clozes.length) {
       for (const clozeIndex of clozes) {
-        const question = renderCloze(first, clozeIndex, false);
-        const answer = renderCloze(first, clozeIndex, true);
-        const candidate = card(question, answer, noteIndex + 1);
+        const candidate = card(
+          renderClozeQuestion(first, clozeIndex),
+          clozeAnswer(first, clozeIndex),
+          noteIndex + 1
+        );
         if (!candidate) continue;
         const key = exactKey(candidate.question, candidate.answer);
         if (!seen.has(key)) {
