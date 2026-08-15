@@ -61,7 +61,7 @@ async function parseTextFile(file, extension) {
     if (pasted.cards.length) {
       return {
         mode: 'cards',
-        sourceKind: 'text',
+        sourceKind: 'local-text',
         title: file.name,
         cards: pasted.cards,
         detail: `Parsed ${pasted.cards.length} Q&A pair${pasted.cards.length === 1 ? '' : 's'} from text.`
@@ -74,7 +74,7 @@ async function parseTextFile(file, extension) {
   const hasHeaders = ankiText.hasHeaders || hasQuestionAnswerHeader(rows);
   return {
     mode: 'rows',
-    sourceKind: ankiText.isAnkiText ? 'anki-text' : extension,
+    sourceKind: ankiText.isAnkiText ? 'anki-text' : `local-${extension}`,
     title: file.name,
     rows,
     hasHeaders,
