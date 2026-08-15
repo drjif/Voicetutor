@@ -2,7 +2,7 @@
 
 Deck Contract v1 is the stable boundary between question ingestion and the existing samme3le study engine.
 
-The goal is to let new ingestion methods be added without changing speech synthesis, speech recognition, local grading, session controls, wake lock, lock-screen review, or progress behavior.
+The goal is to add ingestion methods without changing speech synthesis, speech recognition, local grading, session controls, wake lock, lock-screen review, or progress behavior.
 
 ## Canonical shape
 
@@ -11,9 +11,7 @@ The goal is to let new ingestion methods be added without changing speech synthe
   version: 1,
   id: null,
   title: 'Cardiology Basics',
-  source: {
-    type: 'paste'
-  },
+  source: { type: 'paste' },
   cards: [
     {
       id: 'card-1',
@@ -26,31 +24,33 @@ The goal is to let new ingestion methods be added without changing speech synthe
 }
 ```
 
-## Required fields
-
-A loadable deck must contain at least one card. Every card must contain a non-empty `question` and `answer`.
-
-`acceptedAnswers` is optional and is normalized to an array. Duplicate alternatives and alternatives identical to the primary answer are removed.
-
-`sourceRow` is retained when an importer has meaningful row or line numbers. It may be `null` for sources that do not use positions.
+A loadable deck must contain at least one card, and every card must contain non-empty `question` and `answer` fields. `acceptedAnswers` is optional. `sourceRow` may represent a spreadsheet row, text line, or source-note position.
 
 ## Current source types
 
+Current importers use explicit source types including:
+
 - `demo`
 - `paste`
-- `csv`
 - `google-sheet`
+- `csv` for the legacy gated CSV path
+- `local-csv`
+- `local-tsv`
+- `local-text`
+- `anki-text`
+- `xlsx`
+- `anki`
 
-Planned importers can add types such as `excel`, `builtin`, or other explicit source names without changing the study engine.
+Additional source types can be added without changing the study engine.
 
 ## Loader rule
 
-Importers must call `loadDeck()` from `deck.js` before assigning cards to session state.
+Every importer must call `loadDeck()` from `deck.js` before assigning cards to session state.
 
 ```js
 const deck = loadDeck({
   title: 'Imported questions',
-  source: { type: 'paste' },
+  source: { type: 'xlsx' },
   cards: parsedCards
 });
 
@@ -58,57 +58,28 @@ state.currentDeck = deck;
 state.questions = deck.cards;
 ```
 
-Do not write a new importer that directly constructs `state.questions` from its own private format.
+Do not write a new importer that bypasses this boundary.
 
 ## Validation behavior
 
-`normalizeDeck()` trims and canonicalizes input but does not silently remove incomplete cards.
+`normalizeDeck()` trims and canonicalizes input but does not silently remove incomplete cards. `validateDeck()` reports missing questions or answers as errors and exact duplicate Q&A pairs as warnings. `loadDeck()` is strict and throws `DeckValidationError` if a deck cannot safely reach the study engine.
 
-`validateDeck()` returns structured errors and warnings. Missing questions or answers are errors. Exact duplicate question-answer pairs remain valid but produce a warning.
-
-`loadDeck()` is strict: it normalizes, validates, and throws `DeckValidationError` if the deck cannot be safely handed to the study engine.
-
-## Current ingestion paths
+## Current ingestion architecture
 
 ```text
-Paste Q&A
-   ↓
-parsePastedQuestions()
-   ↓
-loadDeck()
-   ↓
-state.questions
-   ↓
-existing oral-recall engine
+Built-in demo ───────────┐
+Paste Q&A ───────────────┤
+Excel .xlsx ─────────────┤
+Anki .apkg ──────────────┤
+CSV / TSV / TXT ─────────┼→ normalize / validate → Deck Contract v1
+Anki text export ────────┤                         ↓
+Google Sheet ────────────┘                   state.questions
+                                                   ↓
+                                      existing oral-recall engine
 ```
 
-```text
-Google Sheet / CSV
-        ↓
-parseDelimited()
-        ↓
-buildQuestionBank()
-        ↓
-loadDeck()
-        ↓
-state.questions
-        ↓
-existing oral-recall engine
-```
+Row-based sources first pass through `buildQuestionBank()` after column detection. Direct-card sources such as pasted Q&A and Anki packages create ordinary card records and then pass them through `loadDeck()`.
 
-Question order, source position, primary answers, and accepted alternatives must remain unchanged across this boundary. Regression tests in `test/deck.test.js` and `test/paste-data.test.js` enforce these invariants.
+Question order, source position, primary answers, and accepted alternatives must remain stable across the contract. Regression tests under `test/` enforce the core invariants.
 
-## Future ingestion rule
-
-Every future source should terminate at the same boundary:
-
-```text
-Paste Q&A ─────────┐
-Excel ─────────────┤
-Built-in deck ─────┤
-Google Sheet ──────┼→ Deck Contract v1 → existing study engine
-CSV ───────────────┤
-Future AI import ──┘
-```
-
-This makes ingestion replaceable while the study engine remains stable.
+This makes ingestion replaceable while the spoken study engine remains stable.
