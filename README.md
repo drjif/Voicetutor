@@ -1,22 +1,26 @@
 # samme3le
 
-**samme3le** means “recite to me.” It turns a structured list of questions and answers into a spoken study session.
+**samme3le** means “recite to me.” It turns structured questions and answers into a spoken study session.
 
-The current prototype is a static, client-side web app. The core app is free and does not require payment information. A future optional Pro subscription is planned for production account features.
+The current prototype is a static, client-side web app. The core app is free and does not require payment information or a paid AI API. A future optional Pro subscription is planned for production account features.
 
-## What the user does today
+## Fast paths
 
-1. Tries five built-in demo questions without signing up, or pastes their own question-answer pairs directly with no account.
-2. samme3le parses pasted Q&A locally in the browser and loads it through Deck Contract v1.
-3. Google Sheet and CSV imports remain available behind the temporary device-local beta unlock.
-4. The user chooses **Answer out loud**, **Listen and review**, or **Lock-screen review**.
-5. The spoken study session starts using the same existing study engine.
+A new user can now:
+
+1. Try the built-in sample deck.
+2. Paste Q&A from ChatGPT, Claude, Gemini, a spreadsheet, or their own notes.
+3. Import a local Excel, Anki, CSV, TSV, or TXT file without signing up.
+4. Use the existing Google Sheet workflow when a remotely updated sheet is useful.
+5. Choose **Answer out loud**, **Listen and review**, or **Lock-screen review**.
+
+All of these sources terminate at Deck Contract v1 and use the same existing study engine.
 
 ## Paste questions
 
-The fastest personal-study path is now direct paste. It does not require a public Google Sheet, a file upload, or an email unlock.
+Direct paste is the fastest path for Q&A generated with a user's own AI subscription. It does not require a public Google Sheet, file upload, account, LLM call, or samme3le API key.
 
-Supported local formats include:
+Supported examples include:
 
 ```text
 Q: What hormone lowers blood sugar?
@@ -29,9 +33,29 @@ What is ATP? | Adenosine triphosphate
 What is DNA? | Deoxyribonucleic acid
 ```
 
-Two-column rows copied from a spreadsheet are also accepted when the columns are tab-separated. Blank-separated two-line question/answer blocks are supported as a conservative fallback.
+Two-column rows copied from a spreadsheet and common Markdown tables are also accepted. `paste-data.js` performs deterministic browser-local parsing and rejects ambiguous prose rather than inventing cards.
 
-`paste-data.js` performs deterministic browser-local parsing. It does not call an LLM, API, or backend. Ambiguous prose is rejected rather than guessed into cards.
+## Local file import
+
+The zero-signup local importer accepts:
+
+- Excel `.xlsx`
+- Anki deck `.apkg`
+- `.csv`
+- `.tsv`
+- `.txt`, including structured Q&A and Anki plain-text exports
+
+The file is read by JavaScript in the browser and is not intentionally uploaded to a samme3le application server. Excel parsing uses the workbook ZIP/XML structure locally. CSV/TSV/TXT use the existing deterministic row and paste parsers.
+
+### Anki compatibility
+
+`.apkg` packages are opened locally. samme3le extracts the embedded collection, reads note fields, and converts basic front/back notes plus cloze notes into ordinary Deck Contract cards.
+
+The importer intentionally does **not** reproduce Anki scheduling, review history, card-template rendering, reversed-card template logic, images, or audio. For basic notes, the first populated field is treated as the prompt and the next populated field as the answer. For cloze notes, the hidden term is used as the answer.
+
+Legacy `.apkg` collections are read directly from SQLite. Modern Anki packages that contain a zstd-compressed collection first try the browser's native decompressor; when unavailable, samme3le may load the pinned MIT-licensed `fzstd@0.1.1` browser decoder and still performs the actual deck decompression locally. If that decoder is unavailable, the app instructs the user to re-export from Anki with **Support older Anki versions** enabled.
+
+Whole-collection `.colpkg` import is not part of this version.
 
 ## Study modes
 
@@ -47,27 +71,24 @@ samme3le reads the question, waits for a configurable interval, reads the saved 
 
 An experimental continuous spoken track reads the remaining questions and answers without using the microphone or grading. Background playback depends on the browser and operating system.
 
-The answer checker is a prototype heuristic, not a validated grading system. Common paraphrases can be included as accepted alternatives, but they are optional.
+The answer checker is a prototype heuristic, not a validated grading system.
 
 ## Deck Contract v1
 
-All ingestion methods terminate at one canonical deck boundary before the study engine receives any questions.
+Every ingestion method terminates at the same canonical deck boundary:
 
 ```text
-Importer
-   ↓
-normalize + validate
-   ↓
-Deck Contract v1
-   ↓
-existing study engine
+Built-in deck ──────────┐
+Paste Q&A ──────────────┤
+Excel .xlsx ────────────┤
+Anki .apkg ─────────────┤
+CSV / TSV / TXT ────────┼→ Deck Contract v1 → existing spoken study engine
+Google Sheet ───────────┘
 ```
 
-`deck.js` provides `normalizeDeck()`, `validateDeck()`, and the strict `loadDeck()` entry point. Paste, Google Sheet, CSV, and demo sources now pass through this boundary.
+`deck.js` provides `normalizeDeck()`, `validateDeck()`, and the strict `loadDeck()` entry point. This keeps file parsing separate from speech synthesis, speech recognition, grading, session controls, wake lock, lock-screen review, and progress behavior.
 
-This protects the speech, grading, session, progress, wake-lock, and lock-screen code while future ingestion methods are added.
-
-See `docs/DECK_CONTRACT_V1.md`, `test/deck.test.js`, and `test/paste-data.test.js`.
+See `docs/DECK_CONTRACT_V1.md` and regression tests under `test/`.
 
 ## Question-list format
 
@@ -77,25 +98,11 @@ The minimum deck needs only Question + Answer. Accepted alternatives are optiona
 | --- | --- | --- |
 | What is the mechanism of infliximab? | It inhibits TNF-alpha. | anti-TNF monoclonal antibody\|TNF inhibitor |
 
-Google Sheet and CSV imports still detect common header names and allow manual remapping when needed.
+For row-based files, samme3le detects common headers and exposes the existing mapping controls only when the user needs to correct the guessed fields.
 
 ## SEO and use-case pages
 
-The repository includes crawlable static pages for:
-
-- `/voice-flashcards/`
-- `/quiz-me-from-my-notes/`
-- `/google-sheets-flashcards/`
-- `/active-recall-out-loud/`
-- `/medical-students/`
-- `/pricing/`
-
-Technical discovery files:
-
-- `sitemap.xml`
-- `robots.txt`
-- `marketing.css`
-- `scripts/check-site.mjs`
+The repository includes crawlable static pages for `/voice-flashcards/`, `/quiz-me-from-my-notes/`, `/google-sheets-flashcards/`, `/active-recall-out-loud/`, `/medical-students/`, and `/pricing/`, plus `sitemap.xml` and `robots.txt`.
 
 The current canonicals use `https://tutor.gi-jad.com`. After the permanent domain is purchased, run:
 
@@ -105,47 +112,24 @@ npm run set-domain -- https://samme3le.com
 
 Then configure DNS, HTTPS, URL-matched permanent redirects, Search Console, Bing Webmaster Tools, and submit the new sitemap.
 
-## Legal pages
+## Legal and account preparation
 
-Pre-launch legal drafts are available at:
+Pre-launch legal drafts live under `/terms/`, `/privacy/`, `/acceptable-use/`, `/medical-disclaimer/`, `/billing-and-cancellation/`, `/accessibility/`, and `/contact/`. They remain `noindex` until unresolved operator, address, support, pricing, refund, and counsel-review fields are completed.
 
-- `/terms/`
-- `/privacy/`
-- `/acceptable-use/`
-- `/medical-disclaimer/`
-- `/billing-and-cancellation/`
-- `/accessibility/`
-- `/contact/`
-
-They remain `noindex` and explicitly identify unresolved launch fields. Paid checkout must remain disabled until the legal operator, address, governing law, dispute terms, support contacts, pricing, refund rules, and counsel review are complete.
-
-See `docs/PAID_LAUNCH_CHECKLIST.md`.
-
-## Planned Supabase backend
-
-The proposed account schema is in:
-
-`supabase/migrations/202608010001_initial_accounts.sql`
-
-It is designed for Supabase Auth, versioned consent records, marketing preferences, Free/Pro entitlements, minimized usage events, and account-deletion requests. Row Level Security restricts users to their own records; subscription entitlements are server-managed.
-
-Question text, answers, CSV contents, Google Sheet URLs, spoken audio, transcripts, patient information, precise location, and payment-card numbers are not intended for default Supabase storage.
-
-See `docs/SUPABASE_SETUP.md`.
+The proposed Supabase account schema is in `supabase/migrations/202608010001_initial_accounts.sql`. The oral study engine and local-file parsing do not require Supabase.
 
 ## Use a Google Sheet
 
-Google Sheets remain an advanced import option rather than the fastest path.
+Google Sheets remain an optional advanced path:
 
-1. Open the sheet.
-2. Choose **Share**.
-3. Under **General access**, choose **Anyone with the link** and **Viewer**.
-4. Copy the URL from the browser address bar.
-5. Paste it into samme3le and select **Load sheet**.
+1. Open the sheet and choose **Share**.
+2. Under **General access**, choose **Anyone with the link** and **Viewer**.
+3. Copy the URL.
+4. Paste it into samme3le and select **Load sheet**.
 
-For private or sensitive material, export the tab as CSV and use **Upload CSV**. Do not enter protected health information, patient records, confidential examination content, or commercial question-bank content without authorization.
+For private material, prefer the local file importer. Do not enter protected health information, patient records, confidential examination content, or commercial question-bank content without authorization.
 
-## Run locally
+## Run and validate locally
 
 ```bash
 python3 -m http.server 4173
@@ -153,40 +137,23 @@ python3 -m http.server 4173
 
 Then open `http://localhost:4173` in a current browser.
 
-Run the full validation suite:
+Run the complete validation suite:
 
 ```bash
 npm run check
 ```
 
-## Architecture
-
-```text
-Paste Q&A ──────────────┐
-Google Sheet ───────────┤
-Uploaded CSV ───────────┼→ Deck Contract v1 → session state
-Built-in demo ──────────┘                         ↓
-                                    Web Speech synthesis + recognition
-                                                   ↓
-                                        Local answer matcher
-```
-
-Future ingestion sources such as Excel and built-in deck libraries should terminate at the same Deck Contract v1 boundary.
-
-Future account layer:
-
-```text
-Supabase Auth + Postgres RLS + server-managed subscription entitlement
-```
+A GitHub Actions workflow also runs the same check on pull requests and pushes to `main`.
 
 ## Privacy and limitations
 
-- Pasted questions and uploaded CSV content remain client-side in the current prototype.
-- Browser speech recognition may use a browser or operating-system speech service.
+- Pasted Q&A and local `.xlsx`, `.apkg`, `.csv`, `.tsv`, and `.txt` files are processed client-side by default.
+- Browser speech recognition may use a browser, operating-system, or speech-service provider.
 - Google Sheet loading requires link-accessible data.
+- Modern Anki zstd fallback may download decoder code from a third-party CDN; the importer does not intentionally send the deck bytes to that CDN.
 - The tool is educational and is not for patient care.
 - No paid subscription or production account backend is active today.
 
 ## License
 
-No open-source license has been granted at this stage. Standard copyright applies.
+No open-source license has been granted for samme3le at this stage. Standard copyright applies. Third-party components retain their own licenses.
