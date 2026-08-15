@@ -134,7 +134,26 @@ function deriveCandidates(answer, acceptedAnswers = []) {
   return candidates;
 }
 
+function exactComparable(value) {
+  return normalizeText(value)
+    .replace(/[-_/]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function scoreCandidate(transcript, candidate) {
+  // Spoken recognition commonly inserts spaces where a stored answer uses a
+  // hyphen (for example "anti TNF" vs "anti-TNF"). If the user explicitly
+  // stored that complete answer, separator punctuation must not demote it to
+  // a partial match.
+  if (candidate.kind === 'complete'
+      && exactComparable(transcript) === exactComparable(candidate.text)) {
+    return {
+      score: 1,
+      fuzzy: fuzzyCoverage(transcript, candidate.text)
+    };
+  }
+
   const baseScore = answerSimilarity(transcript, candidate.text);
   const fuzzy = fuzzyCoverage(transcript, candidate.text);
   let score = Math.max(baseScore, fuzzy.f1);
@@ -174,7 +193,14 @@ function gradeOne(transcript, answer, acceptedAnswers, strictness) {
 
   for (const candidate of candidates) {
     const result = scoreCandidate(transcript, candidate);
-    if (result.score > best.score) best = { ...result, candidate };
+    const bestIsComplete = best.candidate?.kind === 'complete';
+    const candidateIsComplete = candidate.kind === 'complete';
+    if (
+      result.score > best.score
+      || (result.score === best.score && candidateIsComplete && !bestIsComplete)
+    ) {
+      best = { ...result, candidate };
+    }
   }
 
   const thresholds = {
