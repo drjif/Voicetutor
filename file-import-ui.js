@@ -10,7 +10,10 @@ function updateExistingCopy() {
   if (pathText) {
     pathText.textContent = 'Bring Excel, Anki, CSV, TSV, or TXT files directly from your device. Google Sheets still works too.';
   }
-  if (pathButton) pathButton.textContent = 'Import a deck or file';
+  if (pathButton) {
+    pathButton.textContent = 'Import a deck or file';
+    pathButton.setAttribute('href', '#local-file-import');
+  }
 
   setText('#betaSignupPanel .option-kicker', 'Unlock Google Sheets');
   setText('#betaSignupPanel h3', 'Optional: enter your email');
