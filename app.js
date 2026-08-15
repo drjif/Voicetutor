@@ -8,6 +8,7 @@ import {
   updateControls
 } from './dom.js';
 import { setupBetaFunnel } from './beta.js';
+import { setupFileImportUI } from './file-import-ui.js';
 import { setupHomepageMarketing } from './homepage-marketing.js';
 import { handleWakeLockPreferenceChange, releaseSessionWakeLock, setupPowerManagement } from './power.js';
 import { setupSheetEvents } from './sheet-v2.js';
@@ -75,6 +76,7 @@ function setupInstallation() {
 
 function initialize() {
   setupHomepageMarketing();
+  setupFileImportUI();
   restoreSettings();
   setupBetaFunnel();
   setupSheetEvents();
