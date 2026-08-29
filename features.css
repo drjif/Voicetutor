@@ -214,6 +214,84 @@
   color: var(--muted);
 }
 
+.my-decks-panel {
+  margin: 22px 0;
+  background: var(--success-soft);
+  border-color: #a8dfbd;
+}
+
+.my-decks-heading {
+  margin-bottom: 16px;
+}
+
+.deck-list {
+  display: grid;
+  gap: 12px;
+}
+
+.deck-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #a8dfbd;
+  border-radius: 14px;
+  background: white;
+}
+
+.deck-card-copy h3 {
+  margin: 0 0 4px;
+  font-size: 1.12rem;
+}
+
+.deck-source-type,
+.deck-opened {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.deck-source-type {
+  font-weight: 800;
+}
+
+.deck-card-actions,
+.sheet-ready-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sheet-ready-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid #a8dfbd;
+  border-radius: 14px;
+  background: var(--success-soft);
+}
+
+#sheetReadyCount {
+  margin: 0;
+  color: var(--success);
+  font-size: 1.05rem;
+  font-weight: 850;
+}
+
+.save-deck-form {
+  margin-top: 4px;
+}
+
+.deck-rename-form {
+  display: grid;
+  gap: 10px;
+}
+
+#my-decks-heading,
+#google-sheet-import {
+  scroll-margin-top: 24px;
+}
+
 .wake-lock-control {
   display: grid;
   gap: 10px;

@@ -2,6 +2,11 @@ export const STORAGE_KEY = 'samme3le.settings.v1';
 export const PROGRESS_KEY = 'samme3le.progress.v1';
 const LEGACY_STORAGE_KEY = 'voicetutor.settings.v1';
 const LEGACY_PROGRESS_KEY = 'voicetutor.progress.v1';
+let progressListener = null;
+
+export function onProgressSaved(listener) {
+  progressListener = listener;
+}
 
 function migrateLegacyStorage() {
   if (localStorage.getItem(STORAGE_KEY) === null && localStorage.getItem(LEGACY_STORAGE_KEY) !== null) {
@@ -13,16 +18,14 @@ function migrateLegacyStorage() {
 }
 
 export const elements = {
-  betaSignupForm: document.querySelector('#betaSignupForm'),
-  betaSignupPanel: document.querySelector('#betaSignupPanel'),
-  betaEmail: document.querySelector('#betaEmail'),
-  betaConsent: document.querySelector('#betaConsent'),
-  betaSignupStatus: document.querySelector('#betaSignupStatus'),
-  betaMemberPanel: document.querySelector('#betaMemberPanel'),
-  betaMemberEmail: document.querySelector('#betaMemberEmail'),
+  signInForm: document.querySelector('#signInForm'),
+  signInPanel: document.querySelector('#signInPanel'),
+  accountEmail: document.querySelector('#accountEmail'),
+  accountStatus: document.querySelector('#accountStatus'),
+  accountSignedInPanel: document.querySelector('#accountSignedInPanel'),
+  accountEmailLabel: document.querySelector('#accountEmailLabel'),
   signOutButton: document.querySelector('#signOutButton'),
   personalBankControls: document.querySelector('#personalBankControls'),
-  personalBankLock: document.querySelector('#personalBankLock'),
   pasteQuestions: document.querySelector('#pasteQuestions'),
   loadPaste: document.querySelector('#loadPaste'),
   pasteStatus: document.querySelector('#pasteStatus'),
@@ -101,6 +104,9 @@ export const state = {
   sourceKind: 'none',
   sourceName: '',
   sourceDetail: '',
+  googleSheetIdentity: null,
+  savedSourceId: null,
+  resumeSourceRow: null,
   completedQuestionCount: 0,
   tenQuestionMilestoneRecorded: false,
   wakeLock: null,
@@ -163,6 +169,11 @@ export function saveProgress() {
     sourceKind: state.sourceKind,
     sourceRow: state.questions[state.currentIndex]?.sourceRow ?? null
   }));
+  try {
+    progressListener?.();
+  } catch (error) {
+    console.warn('Cloud progress listener failed', error);
+  }
 }
 
 export function setSheetStatus(message, type = 'neutral') {

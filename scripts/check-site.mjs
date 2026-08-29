@@ -85,9 +85,34 @@ expect('file-import.js', fileImport, /parseXlsxWorkbook/i, 'Excel parser is not 
 expect('file-import.js', fileImport, /parseDelimited/i, 'CSV\/TSV parser is not connected');
 
 const serviceWorker = await read('service-worker.js');
-expect('service-worker.js', serviceWorker, /samme3le-v14/i, 'Step 5 must refresh the PWA cache');
-for (const asset of ['file-import-ui.js', 'file-import.js', 'xlsx-import.js', 'anki-import.js', 'zip-reader.js', 'sqlite-read.js']) {
+expect('service-worker.js', serviceWorker, /samme3le-v15/i, 'Account Sync v1 must refresh the PWA cache');
+for (const asset of ['file-import-ui.js', 'file-import.js', 'xlsx-import.js', 'anki-import.js', 'zip-reader.js', 'sqlite-read.js', 'supabase-config.js', 'auth-state.js', 'auth.js', 'saved-sources.js', 'account-ui.js']) {
   expect('service-worker.js', serviceWorker, new RegExp(asset.replace('.', '\\.')), `missing ${asset} from PWA cache`);
+}
+
+const homepage = await read('index.html');
+expect('index.html', homepage, /My decks/i, 'missing My decks account area');
+expect('index.html', homepage, /Save to my account/i, 'missing save-to-account action');
+expect('index.html', homepage, /Start studying/i, 'missing start-studying action after a sheet loads');
+expect('index.html', homepage, /Optional: send me product updates/i, 'marketing consent must remain optional and separate');
+expect('index.html', homepage, /accountHeaderButton/, 'account chrome missing from the app shell');
+
+const accountUi = await read('account-ui.js');
+expect('account-ui.js', accountUi, /Sign in to use this deck on your other devices/i, 'missing anonymous save prompt');
+
+const privacy = await read('privacy/index.html');
+expect('privacy/index.html', privacy, /authentication information and saved Google Sheet identifiers/i, 'privacy policy must disclose Supabase account storage');
+expect('privacy/index.html', privacy, /does not intentionally store spoken answers, audio, or transcripts/i, 'privacy policy must disclose that speech is not stored');
+expect('privacy/index.html', privacy, /Local imported deck contents remain in this browser/i, 'privacy policy must not claim all data stays local after accounts');
+
+const config = await read('supabase-config.js');
+expect('supabase-config.js', config, /NEVER add a service-role key/i, 'missing service-role warning in public config');
+expect('supabase-config.js', config, /https:\/\/tutor\.gi-jad\.com/, 'auth site URL must remain the current production hostname');
+
+const secretPattern = /service_role|DATABASE_PASSWORD|JWT_SECRET|postgres(ql)?:\/\/[^:\s]+:[^@\s]+@/i;
+for (const relativePath of ['supabase-config.js', 'auth.js', 'saved-sources.js', 'account-ui.js', 'index.html', 'app.js']) {
+  const source = await read(relativePath);
+  if (secretPattern.test(source)) errors.push(`${relativePath}: appears to contain a committed secret`);
 }
 
 if (errors.length) {
@@ -96,4 +121,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Validated ${seoPages.length} SEO pages, ${legalPages.length} legal pages, homepage study paths, Step 5 local imports, and PWA cache.`);
+console.log(`Validated ${seoPages.length} SEO pages, ${legalPages.length} legal pages, homepage study paths, Step 5 local imports, Account Sync v1, and PWA cache.`);

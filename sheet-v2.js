@@ -1,7 +1,7 @@
 import { loadDeck } from './deck.js';
 import { parseStudyFile } from './file-import.js';
 import { parsePastedQuestions } from './paste-data.js';
-import { buildQuestionBank, columnName, detectColumns, parseDelimited, parseGoogleSheetUrl } from './sheet-data.js';
+import { buildQuestionBank, columnName, detectColumns, extractGoogleSheetIdentity, parseDelimited, parseGoogleSheetUrl, reconstructGoogleSheetUrls } from './sheet-data.js';
 import {
   PROGRESS_KEY,
   elements,
@@ -12,9 +12,17 @@ import {
   state,
   updateControls
 } from './dom.js';
-import { noteSourceLoaded, requireBetaAccess } from './beta.js';
+import { noteSourceLoaded } from './beta.js';
 
 let currentHeaderRowIndex = 0;
+let sheetReadyHandler = {
+  show() {},
+  hide() {}
+};
+
+export function setSheetReadyHandler(handler) {
+  sheetReadyHandler = handler || { show() {}, hide() {} };
+}
 
 function populateColumnSelect(select, headers, includeNone = false) {
   select.innerHTML = '';
@@ -159,10 +167,16 @@ export function applyColumnMapping() {
 
   const saved = safeJson(localStorage.getItem(PROGRESS_KEY));
   const canResumeRows = state.sourceKind === 'google-sheet' || state.sourceKind === 'csv';
-  if (canResumeRows && state.sourceType === 'personal' && saved?.sheetUrl === elements.sheetUrl.value && saved.sourceRow) {
-    const resumeIndex = state.questions.findIndex((item) => item.sourceRow === saved.sourceRow);
-    if (resumeIndex >= 0) elements.startRow.value = String(resumeIndex);
+  const resumeRow = state.resumeSourceRow
+    || (canResumeRows && state.sourceType === 'personal' && saved?.sheetUrl === elements.sheetUrl.value ? saved.sourceRow : null);
+  if (canResumeRows && resumeRow) {
+    const resumeIndex = state.questions.findIndex((item) => item.sourceRow === resumeRow);
+    if (resumeIndex >= 0) {
+      elements.startRow.value = String(resumeIndex);
+      state.currentIndex = resumeIndex;
+    }
   }
+  state.resumeSourceRow = null;
 
   elements.bankSummary.textContent = state.questions.length
     ? `${state.questions.length} usable question${state.questions.length === 1 ? '' : 's'} loaded from ${state.rawRows.length} rows.`
@@ -175,6 +189,13 @@ export function applyColumnMapping() {
       success
         ? `${detail}${state.questions.length} question${state.questions.length === 1 ? '' : 's'} ready. Check the detected columns below only if something looks wrong.`
         : 'No usable question-answer rows were found. Check “First row has column names” and the selected question/answer fields.',
+      success ? 'success' : 'error'
+    );
+  } else if (state.sourceKind === 'google-sheet') {
+    setSheetStatus(
+      success
+        ? `${state.questions.length} question${state.questions.length === 1 ? '' : 's'} ready`
+        : 'Check the selected columns and row contents.',
       success ? 'success' : 'error'
     );
   } else {
@@ -212,6 +233,7 @@ export function loadPastedQuestions() {
     applyRecordsToDeck(parsed.cards);
     populateStartRows();
     noteSourceLoaded('personal', state.questions.length);
+    sheetReadyHandler.hide();
     setPasteStatus(`${parsed.message} Ready to study — no account or upload needed.`, 'success');
     updateControls();
     document.querySelector('#session-heading')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -257,6 +279,7 @@ export async function handleStudyFileUpload(event) {
     }
 
     noteSourceLoaded('personal', state.questions.length);
+    sheetReadyHandler.hide();
     document.querySelector('#session-heading')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (error) {
     console.error(error);
@@ -281,14 +304,9 @@ async function fetchSheetText(urlString) {
   return rows;
 }
 
-export async function loadGoogleSheet() {
-  if (!requireBetaAccess()) return;
-  const parsed = parseGoogleSheetUrl(elements.sheetUrl.value);
-  if (!parsed) {
-    setSheetStatus('Paste a valid Google Sheets URL or direct CSV URL.', 'error');
-    return;
-  }
-
+export async function loadGoogleSheetFromParsed(parsed, options = {}) {
+  const identity = extractGoogleSheetIdentity(parsed);
+  const displayName = options.displayName || (identity ? 'Google Sheet questions' : 'Imported questions');
   saveSettings();
   setSheetStatus('Loading sheet…', 'loading');
   elements.loadSheet.disabled = true;
@@ -310,20 +328,65 @@ export async function loadGoogleSheet() {
 
     if (!rows) throw lastError ?? new Error('No readable sheet endpoint was available');
     state.sourceType = 'personal';
-    state.sourceKind = 'google-sheet';
-    state.sourceName = 'Google Sheet questions';
+    state.sourceKind = identity ? 'google-sheet' : 'csv';
+    state.sourceName = displayName;
     state.sourceDetail = '';
+    state.savedSourceId = options.savedSourceId ?? null;
+    state.googleSheetIdentity = identity;
+    if (options.lastSourceRow) state.resumeSourceRow = options.lastSourceRow;
     prepareRows(rows);
     noteSourceLoaded('personal', state.questions.length);
+    if (identity && state.questions.length) {
+      setSheetStatus(`${state.questions.length} question${state.questions.length === 1 ? '' : 's'} ready`, 'success');
+      sheetReadyHandler.show(state.questions.length, identity);
+    } else {
+      sheetReadyHandler.hide();
+    }
+    return { identity, questionCount: state.questions.length };
   } catch (error) {
     console.error(error);
+    const publicAccessHint = /html|http 4/i.test(String(error.message || ''));
     setSheetStatus(
-      'Could not read the sheet. Set General access to “Anyone with the link — Viewer,” or use the zero-signup local file importer above.',
+      publicAccessHint
+        ? 'This Google Sheet is no longer publicly readable. Set General access to “Anyone with the link — Viewer,” or keep studying any deck already loaded.'
+        : 'Could not read the sheet. Set General access to “Anyone with the link — Viewer,” or use the zero-signup local file importer above.',
       'error'
     );
+    throw error;
   } finally {
     elements.loadSheet.disabled = false;
   }
+}
+
+export async function loadGoogleSheet() {
+  if (sessionIsActive()) {
+    setSheetStatus('Stop the current study session before replacing its questions.', 'warning');
+    return;
+  }
+  const parsed = parseGoogleSheetUrl(elements.sheetUrl.value);
+  if (!parsed) {
+    setSheetStatus('Paste a valid Google Sheets URL or direct CSV URL.', 'error');
+    return;
+  }
+  try {
+    await loadGoogleSheetFromParsed(parsed);
+  } catch {
+    // Status is already shown. Keep the local session intact.
+  }
+}
+
+export async function loadSavedGoogleSheet(source) {
+  if (sessionIsActive()) {
+    throw new Error('Stop the current study session before replacing its questions.');
+  }
+  const urls = reconstructGoogleSheetUrls(source.spreadsheet_id || source.spreadsheetId, source.sheet_gid || source.sheetGid);
+  if (!urls) throw new Error('That saved sheet reference is incomplete.');
+  elements.sheetUrl.value = `https://docs.google.com/spreadsheets/d/${urls.spreadsheetId}/edit?gid=${urls.gid}`;
+  await loadGoogleSheetFromParsed(urls, {
+    displayName: source.display_name || source.displayName || 'Google Sheet',
+    savedSourceId: source.id ?? null,
+    lastSourceRow: source.last_source_row ?? source.lastSourceRow ?? null
+  });
 }
 
 export async function loadDemo() {
@@ -334,17 +397,15 @@ export async function loadDemo() {
   state.sourceKind = 'demo';
   state.sourceName = 'samme3le demo';
   state.sourceDetail = '';
+  state.savedSourceId = null;
   elements.sheetUrl.value = 'Built-in demo';
   prepareRows(parseDelimited(text));
   noteSourceLoaded('demo', state.questions.length);
+  sheetReadyHandler.hide();
   document.querySelector('#session-heading')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 export function handleCsvUpload(event) {
-  if (!requireBetaAccess()) {
-    event.target.value = '';
-    return;
-  }
   const [file] = event.target.files;
   if (!file) return;
   const reader = new FileReader();
@@ -353,9 +414,11 @@ export function handleCsvUpload(event) {
     state.sourceKind = 'csv';
     state.sourceName = file.name;
     state.sourceDetail = '';
+    state.savedSourceId = null;
     elements.sheetUrl.value = `Uploaded: ${file.name}`;
     prepareRows(parseDelimited(String(reader.result ?? '')));
     noteSourceLoaded('personal', state.questions.length);
+    sheetReadyHandler.hide();
   };
   reader.onerror = () => setSheetStatus('Unable to read that CSV file.', 'error');
   reader.readAsText(file);

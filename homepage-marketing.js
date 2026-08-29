@@ -48,6 +48,7 @@ function addNavigation() {
   nav.setAttribute('aria-label', 'Learn about samme3le');
   nav.innerHTML = `
     <a href="#start-studying">Start</a>
+    <a href="#my-decks-heading">My decks</a>
     <a href="/voice-flashcards/">Voice flashcards</a>
     <a href="/medical-students/">Medical students</a>
     <a href="/pricing/">Pricing</a>

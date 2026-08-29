@@ -1,11 +1,10 @@
-import { elements, setPasteStatus, setSessionStatus, setSheetStatus, state, updateControls } from './dom.js';
+import { elements, state } from './dom.js';
 
-const ACCOUNT_KEY = 'samme3le.betaAccount.v1';
 const METRICS_KEY = 'samme3le.prototypeMetrics.v1';
 const VISIT_KEY = 'samme3le.prototypeVisit.v1';
 const SESSION_VISIT_KEY = 'samme3le.visitRecorded';
+const LEGACY_ACCOUNT_KEYS = ['samme3le.betaAccount.v1', 'gijadTutor.betaAccount.v1'];
 const LEGACY_KEYS = [
-  ['gijadTutor.betaAccount.v1', ACCOUNT_KEY],
   ['gijadTutor.prototypeMetrics.v1', METRICS_KEY],
   ['gijadTutor.prototypeVisit.v1', VISIT_KEY]
 ];
@@ -29,14 +28,6 @@ function readJson(key, fallback) {
 
 function writeJson(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
-}
-
-export function getBetaAccount() {
-  return readJson(ACCOUNT_KEY, null);
-}
-
-export function hasBetaAccess() {
-  return Boolean(getBetaAccount()?.email);
 }
 
 export function recordMetric(name, details = {}) {
@@ -71,89 +62,10 @@ function recordVisit() {
   recordMetric('visit');
 }
 
-function resetLoadedContent() {
-  state.generation += 1;
-  state.rawRows = [];
-  state.currentDeck = null;
-  state.questions = [];
-  state.currentIndex = 0;
-  state.sourceType = 'none';
-  state.sourceKind = 'none';
-  state.completedQuestionCount = 0;
-  state.tenQuestionMilestoneRecorded = false;
-  window.speechSynthesis?.cancel?.();
-  elements.mappingPanel.hidden = true;
-  elements.sessionPanel.hidden = true;
-  elements.conversionCard.hidden = true;
-  elements.startRow.innerHTML = '<option>Load questions first</option>';
-  elements.startRow.disabled = true;
-  setPasteStatus('Paste questions above to study without an account.', 'neutral');
-  setSheetStatus('No Google Sheet or CSV loaded.', 'neutral');
-  setSessionStatus('idle', 'Ready');
-  updateControls();
-}
-
-function renderAccessState() {
-  const account = getBetaAccount();
-  const active = Boolean(account?.email);
-  elements.betaSignupPanel.hidden = active;
-  elements.betaMemberPanel.hidden = !active;
-  elements.personalBankControls.disabled = !active;
-  elements.personalBankLock.hidden = active;
-  if (active) elements.betaMemberEmail.textContent = account.email;
-}
-
-function isValidEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-export function requireBetaAccess() {
-  if (hasBetaAccess()) return true;
-  elements.betaSignupStatus.textContent = 'Enter your email to unlock Google Sheet and CSV import. Pasting questions above does not require an account.';
-  elements.betaSignupStatus.dataset.type = 'error';
-  elements.betaSignupPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  elements.betaEmail.focus();
-  return false;
-}
-
 export function setupBetaFunnel() {
   migrateLegacyStorage();
+  LEGACY_ACCOUNT_KEYS.forEach((key) => localStorage.removeItem(key));
   recordVisit();
-  renderAccessState();
-
-  elements.betaSignupForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const email = elements.betaEmail.value.trim().toLowerCase();
-    if (!isValidEmail(email)) {
-      elements.betaSignupStatus.textContent = 'Enter a valid email address.';
-      elements.betaSignupStatus.dataset.type = 'error';
-      elements.betaEmail.focus();
-      return;
-    }
-    if (!elements.betaConsent.checked) {
-      elements.betaSignupStatus.textContent = 'Confirm that you understand access is saved only on this device.';
-      elements.betaSignupStatus.dataset.type = 'error';
-      elements.betaConsent.focus();
-      return;
-    }
-
-    writeJson(ACCOUNT_KEY, {
-      email,
-      createdAt: new Date().toISOString(),
-      accountType: 'samme3le-local-prototype'
-    });
-    recordMetric('beta_account_created');
-    renderAccessState();
-    elements.betaSignupForm.reset();
-    elements.personalBankControls.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  });
-
-  elements.signOutButton.addEventListener('click', () => {
-    localStorage.removeItem(ACCOUNT_KEY);
-    recordMetric('local_beta_access_removed');
-    resetLoadedContent();
-    renderAccessState();
-  });
 
   elements.wouldPayButton.addEventListener('click', () => {
     recordMetric('would_pay_for_pro');

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samme3le-v14';
+const CACHE_NAME = 'samme3le-v15';
 const ASSETS = [
   './',
   './index.html',
@@ -26,6 +26,11 @@ const ASSETS = [
   './voice.js',
   './grading.js',
   './lib.js',
+  './supabase-config.js',
+  './auth-state.js',
+  './auth.js',
+  './saved-sources.js',
+  './account-ui.js',
   './manifest.webmanifest',
   './icon.svg',
   './data/sample-questions.csv'

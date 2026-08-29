@@ -116,7 +116,19 @@ Then configure DNS, HTTPS, URL-matched permanent redirects, Search Console, Bing
 
 Pre-launch legal drafts live under `/terms/`, `/privacy/`, `/acceptable-use/`, `/medical-disclaimer/`, `/billing-and-cancellation/`, `/accessibility/`, and `/contact/`. They remain `noindex` until unresolved operator, address, support, pricing, refund, and counsel-review fields are completed.
 
-The proposed Supabase account schema is in `supabase/migrations/202608010001_initial_accounts.sql`. The oral study engine and local-file parsing do not require Supabase.
+## Accounts and My decks
+
+Studying does not require an account. Optional passwordless email sign-in is for persistence:
+
+1. Load a public Google Sheet as before.
+2. If you want it on another phone or computer, sign in and choose **Save to my account**.
+3. Later, open **My decks**, choose the saved sheet, and continue into the same oral study engine.
+
+Account Sync v1 stores only authentication information and Google Sheet identifiers in Supabase. Excel, Anki, CSV, TSV, TXT, and pasted decks remain browser-local.
+
+The current production hostname is `https://tutor.gi-jad.com`. Authentication redirects must keep using that host until the permanent domain cutover.
+
+The proposed account schema is in `supabase/migrations/202608010001_initial_accounts.sql`. Saved Google Sheet references are in `supabase/migrations/202608270001_saved_sources.sql`. The oral study engine and local-file parsing do not require an account.
 
 ## Use a Google Sheet
 
@@ -147,12 +159,13 @@ A GitHub Actions workflow also runs the same check on pull requests and pushes t
 
 ## Privacy and limitations
 
-- Pasted Q&A and local `.xlsx`, `.apkg`, `.csv`, `.tsv`, and `.txt` files are processed client-side by default.
-- Browser speech recognition may use a browser, operating-system, or speech-service provider.
+- Pasted Q&A and local `.xlsx`, `.apkg`, `.csv`, `.tsv`, and `.txt` files are processed client-side in Account Sync v1.
+- If you sign in, Supabase stores authentication information and saved Google Sheet identifiers. Raw Sheet URLs and question text are not stored.
+- Browser speech recognition may use a browser, operating-system, or speech-service provider. samme3le does not intentionally store spoken answers, audio, or transcripts.
 - Google Sheet loading requires link-accessible data.
 - Modern Anki zstd fallback may download decoder code from a third-party CDN; the importer does not intentionally send the deck bytes to that CDN.
 - The tool is educational and is not for patient care.
-- No paid subscription or production account backend is active today.
+- No paid subscription is active today.
 
 ## License
 
