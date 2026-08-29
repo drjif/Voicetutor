@@ -85,7 +85,7 @@ expect('file-import.js', fileImport, /parseXlsxWorkbook/i, 'Excel parser is not 
 expect('file-import.js', fileImport, /parseDelimited/i, 'CSV\/TSV parser is not connected');
 
 const serviceWorker = await read('service-worker.js');
-expect('service-worker.js', serviceWorker, /samme3le-v15/i, 'Account Sync v1 must refresh the PWA cache');
+expect('service-worker.js', serviceWorker, /samme3le-v16/i, 'Account Sync v1 must refresh the PWA cache');
 for (const asset of ['file-import-ui.js', 'file-import.js', 'xlsx-import.js', 'anki-import.js', 'zip-reader.js', 'sqlite-read.js', 'supabase-config.js', 'auth-state.js', 'auth.js', 'saved-sources.js', 'account-ui.js']) {
   expect('service-worker.js', serviceWorker, new RegExp(asset.replace('.', '\\.')), `missing ${asset} from PWA cache`);
 }
@@ -108,6 +108,7 @@ expect('privacy/index.html', privacy, /Local imported deck contents remain in th
 const config = await read('supabase-config.js');
 expect('supabase-config.js', config, /NEVER add a service-role key/i, 'missing service-role warning in public config');
 expect('supabase-config.js', config, /https:\/\/tutor\.gi-jad\.com/, 'auth site URL must remain the current production hostname');
+expect('supabase-config.js', config, /yleyerkmqeozlfuaqbmj\.supabase\.co/, 'frontend must use the samme3le project URL');
 
 const secretPattern = /service_role|DATABASE_PASSWORD|JWT_SECRET|postgres(ql)?:\/\/[^:\s]+:[^@\s]+@/i;
 for (const relativePath of ['supabase-config.js', 'auth.js', 'saved-sources.js', 'account-ui.js', 'index.html', 'app.js']) {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'samme3le-v15';
+const CACHE_NAME = 'samme3le-v16';
 const ASSETS = [
   './',
   './index.html',

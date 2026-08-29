@@ -4,6 +4,8 @@ This repository contains:
 
 - `supabase/migrations/202608010001_initial_accounts.sql` — profiles, consent, marketing preference, entitlements, usage events, and deletion requests.
 - `supabase/migrations/202608270001_saved_sources.sql` — Account Sync v1 Google Sheet references only.
+- `supabase/migrations/202608290001_revoke_definer_execute.sql` — revoke public EXECUTE on trigger-only SECURITY DEFINER helpers.
+- `supabase/migrations/202608290002_grant_authenticated_dml.sql` — PostgREST DML grants (RLS still filters rows).
 
 Do not treat public account signup as production-ready until the legal operator identity, privacy contacts, retention schedule, custom SMTP, and authentication redirect allowlist are finalized.
 
