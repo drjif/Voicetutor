@@ -28,7 +28,7 @@ function moveMappingOutsideGate(panel) {
   host.id = 'localMappingHost';
   host.className = 'local-mapping-host';
   host.hidden = true;
-  host.innerHTML = '<div class="mapping-helper"><strong>Check the import</strong><span>samme3le guesses the question and answer fields. Change them only if needed.</span></div>';
+  host.innerHTML = '<div class="mapping-helper"><strong>Check the import</strong><span>same3le guesses the question and answer fields. Change them only if needed.</span></div>';
 
   if (hasHeaders) host.append(hasHeaders);
   if (mapping) host.append(mapping);
@@ -39,7 +39,7 @@ function updateFooter() {
   const footerParagraphs = document.querySelectorAll('footer > p');
   const privacyLine = footerParagraphs[1];
   if (privacyLine) {
-    privacyLine.textContent = 'Pasted questions and local Excel, Anki, CSV, TSV, and TXT files are processed in your browser. If you sign in, Supabase stores authentication information and saved Google Sheet identifiers. samme3le does not intentionally store spoken answers, audio, or transcripts. This version has no payment system.';
+    privacyLine.textContent = 'Pasted questions and local Excel, Anki, CSV, TSV, and TXT files are processed in your browser. If you sign in, Supabase stores authentication information and saved Google Sheet identifiers. same3le does not intentionally store spoken answers, audio, or transcripts. This version has no payment system.';
   }
 }
 
@@ -57,7 +57,7 @@ export function setupFileImportUI() {
       <div>
         <span class="option-kicker">No signup · processed locally</span>
         <h3 id="local-file-heading">Import a deck or file</h3>
-        <p class="panel-copy">Choose the file you already study from. samme3le reads it in your browser and sends the questions into the same oral study engine.</p>
+        <p class="panel-copy">Choose the file you already study from. same3le reads it in your browser and sends the questions into the same oral study engine.</p>
       </div>
       <span class="free-pill">Free</span>
     </div>
@@ -78,7 +78,7 @@ export function setupFileImportUI() {
       <span id="selectedFileName" class="selected-file-name">No file selected.</span>
     </div>
 
-    <div id="localFileStatus" class="inline-status" data-type="neutral" aria-live="polite">Your local file is not intentionally uploaded to a samme3le server.</div>
+    <div id="localFileStatus" class="inline-status" data-type="neutral" aria-live="polite">Your local file is not intentionally uploaded to a same3le server.</div>
     <p class="helper"><strong>Anki:</strong> basic front/back notes and cloze notes are converted to oral-study cards. Anki scheduling, review history, card templates, images, and audio are not reproduced.</p>
     <p class="helper safety-note"><strong>Do not import patient information, private records, or paid question-bank content you do not have permission to use.</strong></p>
   `;

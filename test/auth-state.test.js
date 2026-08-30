@@ -94,7 +94,7 @@ test('auth redirect stays on the current production hostname', () => {
   assert.equal(isSupabaseConfigured('https://example.supabase.co', 'short'), false);
 });
 
-test('frontend is configured for the samme3le project with an anon key', () => {
+test('frontend is configured for the same3le project with an anon key', () => {
   assert.equal(isSupabaseConfigured(), true);
   assert.equal(SUPABASE_URL, 'https://yleyerkmqeozlfuaqbmj.supabase.co');
   const payload = JSON.parse(Buffer.from(SUPABASE_ANON_KEY.split('.')[1], 'base64url').toString('utf8'));

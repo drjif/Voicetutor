@@ -99,7 +99,7 @@ export function setLockScreenMetadata(item, index, total) {
   if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || !item) return;
   navigator.mediaSession.metadata = new MediaMetadata({
     title: item.question,
-    artist: 'samme3le — Lock-screen review',
+    artist: 'same3le — Lock-screen review',
     album: `Question ${index + 1} of ${total}`,
     artwork: [
       {

@@ -1,5 +1,5 @@
-export const STORAGE_KEY = 'samme3le.settings.v1';
-export const PROGRESS_KEY = 'samme3le.progress.v1';
+export const STORAGE_KEY = 'same3le.settings.v1';
+export const PROGRESS_KEY = 'same3le.progress.v1';
 const LEGACY_STORAGE_KEY = 'voicetutor.settings.v1';
 const LEGACY_PROGRESS_KEY = 'voicetutor.progress.v1';
 let progressListener = null;
