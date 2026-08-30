@@ -104,7 +104,7 @@ For row-based files, same3le detects common headers and exposes the existing map
 
 The repository includes crawlable static pages for `/voice-flashcards/`, `/quiz-me-from-my-notes/`, `/google-sheets-flashcards/`, `/active-recall-out-loud/`, `/medical-students/`, and `/pricing/`, plus `sitemap.xml` and `robots.txt`.
 
-The current canonicals use `https://tutor.gi-jad.com`. After the permanent domain is purchased, run:
+The current canonicals use `https://same3le.com`. After the permanent domain is purchased, run:
 
 ```bash
 npm run set-domain -- https://same3le.com
@@ -126,7 +126,7 @@ Studying does not require an account. Optional passwordless email sign-in is for
 
 Account Sync v1 stores only authentication information and Google Sheet identifiers in Supabase. Excel, Anki, CSV, TSV, TXT, and pasted decks remain browser-local.
 
-The current production hostname is `https://tutor.gi-jad.com`. Authentication redirects must keep using that host until the permanent domain cutover.
+The current production hostname is `https://same3le.com`. Authentication redirects must keep using that host until the permanent domain cutover.
 
 The proposed account schema is in `supabase/migrations/202608010001_initial_accounts.sql`. Saved Google Sheet references are in `supabase/migrations/202608270001_saved_sources.sql`. The oral study engine and local-file parsing do not require an account.
 

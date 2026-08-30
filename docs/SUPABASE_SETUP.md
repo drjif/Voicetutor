@@ -27,9 +27,9 @@ It should not receive question text, answer text, CSV/Excel/Anki contents, raw G
 ## Authentication
 
 1. Use the existing **same3le** project in the **GIJAD Free** organization. Do not apply these migrations to a different project.
-2. Keep the current production site URL `https://tutor.gi-jad.com`. Do not switch to `same3le.com` yet.
+2. Keep the current production site URL `https://same3le.com`. Do not switch to `same3le.com` yet.
 3. Add redirect URLs:
-   - `https://tutor.gi-jad.com/`
+   - `https://same3le.com/`
    - `http://localhost:4173/` for local testing
 4. Enable email OTP / magic link. Do not require a password for Account Sync v1.
 5. Configure custom SMTP before public signup. Supabase's development email service is not a production mailing system.

@@ -16,7 +16,7 @@ function setMetadata() {
   if (!document.querySelector('link[rel="canonical"]')) {
     const canonical = document.createElement('link');
     canonical.rel = 'canonical';
-    canonical.href = 'https://tutor.gi-jad.com/';
+    canonical.href = 'https://same3le.com/';
     document.head.append(canonical);
   }
 
@@ -31,7 +31,7 @@ function setMetadata() {
       applicationCategory: 'EducationalApplication',
       operatingSystem: 'Web browser',
       description: 'A free voice flashcard app that reads questions aloud and can listen to spoken answers.',
-      url: 'https://tutor.gi-jad.com/',
+      url: 'https://same3le.com/',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
     });
     document.head.append(schema);
