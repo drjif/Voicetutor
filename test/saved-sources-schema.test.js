@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const initial = readFileSync(join(root, 'supabase/migrations/202608010001_initial_accounts.sql'), 'utf8');
 const savedSources = readFileSync(join(root, 'supabase/migrations/202608270001_saved_sources.sql'), 'utf8');
+const revokeDefiner = readFileSync(join(root, 'supabase/migrations/202608290001_revoke_definer_execute.sql'), 'utf8');
+const dmlGrants = readFileSync(join(root, 'supabase/migrations/202608290002_grant_authenticated_dml.sql'), 'utf8');
 
 test('saved_sources depends on the existing updated-at helper instead of duplicating it', () => {
   assert.match(initial, /create or replace function public\.set_updated_at\(\)/i);
@@ -40,6 +42,27 @@ test('saved_sources enables RLS with owner-only select insert update delete poli
   assert.doesNotMatch(savedSources, /using \(true\)/);
 });
 
+test('definer helpers are not executable by anon or authenticated', () => {
+  assert.match(revokeDefiner, /revoke execute on function public\.handle_new_user\(\) from public, anon, authenticated/i);
+});
+
+test('authenticated receives saved_sources DML grants while anon stays select-only', () => {
+  assert.match(dmlGrants, /grant select, insert, update, delete on table public\.saved_sources to authenticated/i);
+  assert.match(dmlGrants, /grant select on table public\.saved_sources to anon/i);
+  assert.doesNotMatch(dmlGrants, /grant (select, )?(insert|update|delete).*on table public\.saved_sources to anon/i);
+  assert.match(dmlGrants, /grant select on table public\.subscription_entitlements to authenticated/i);
+  assert.doesNotMatch(
+    dmlGrants,
+    /grant select, insert on table public\.subscription_entitlements to authenticated/i
+  );
+});
+
+function decodeJwtPayload(token) {
+  const parts = String(token).split('.');
+  if (parts.length !== 3) return null;
+  return JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
+}
+
 test('frontend config and source files do not commit secrets', () => {
   const files = [
     'supabase-config.js',
@@ -49,9 +72,16 @@ test('frontend config and source files do not commit secrets', () => {
     'app.js',
     'index.html'
   ];
-  const secretPattern = /service_role\s*[:=]|service_role_key|eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+|postgres(ql)?:\/\/[^:]+:[^@]+@|DATABASE_PASSWORD\s*[:=]|JWT_SECRET\s*[:=]/i;
+  const secretPattern = /service_role\s*[:=]|service_role_key|"role"\s*:\s*"service_role"|postgres(ql)?:\/\/[^:]+:[^@]+@|DATABASE_PASSWORD\s*[:=]|JWT_SECRET\s*[:=]/i;
+  const jwtPattern = /eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g;
   for (const relativePath of files) {
     const source = readFileSync(join(root, relativePath), 'utf8');
     assert.equal(secretPattern.test(source), false, `${relativePath} appears to contain a secret`);
+    const tokens = source.match(jwtPattern) ?? [];
+    for (const token of tokens) {
+      assert.equal(relativePath, 'supabase-config.js', `${relativePath} must not contain a JWT`);
+      const payload = decodeJwtPayload(token);
+      assert.equal(payload?.role, 'anon', 'supabase-config.js may only embed the anon JWT');
+    }
   }
 });

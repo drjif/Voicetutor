@@ -3,9 +3,11 @@
 -- These statements are a manual/security checklist, not an app migration.
 
 -- 1. Signed-out / anonymous role cannot read saved sources.
+-- After grant_authenticated_dml, anon has SELECT but no anon RLS policy,
+-- so this returns 0 rows (not another user's data). Without SELECT, 42501.
 set local role anon;
 select public.saved_sources.id from public.saved_sources;
--- Expect: 0 rows or a permission error. Never another user's rows.
+-- Expect: 0 rows. Never another user's rows.
 
 -- 2. Authenticated User A can insert and read User A rows.
 -- Replace the JWT/uid with User A's session before running.

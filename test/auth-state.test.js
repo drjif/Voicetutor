@@ -9,7 +9,13 @@ import {
   isValidEmail,
   requiredLegalAccepted
 } from '../auth-state.js';
-import { getAuthRedirectUrl, isSupabaseConfigured } from '../supabase-config.js';
+import {
+  AUTH_SITE_URL,
+  SUPABASE_ANON_KEY,
+  SUPABASE_URL,
+  getAuthRedirectUrl,
+  isSupabaseConfigured
+} from '../supabase-config.js';
 
 test('unsigned users see sign-in, not My decks or save-to-account', () => {
   const view = accountViewModel({ status: AUTH_STATUS.signedOut, configured: true });
@@ -81,8 +87,17 @@ test('last-opened labels stay human-readable without exposing URLs', () => {
 });
 
 test('auth redirect stays on the current production hostname', () => {
+  assert.equal(AUTH_SITE_URL, 'https://tutor.gi-jad.com');
   assert.equal(getAuthRedirectUrl({ origin: 'https://tutor.gi-jad.com' }), 'https://tutor.gi-jad.com/');
   assert.equal(getAuthRedirectUrl({ origin: 'http://localhost:4173' }), 'http://localhost:4173/');
   assert.equal(isSupabaseConfigured('', ''), false);
   assert.equal(isSupabaseConfigured('https://example.supabase.co', 'short'), false);
+});
+
+test('frontend is configured for the samme3le project with an anon key', () => {
+  assert.equal(isSupabaseConfigured(), true);
+  assert.equal(SUPABASE_URL, 'https://yleyerkmqeozlfuaqbmj.supabase.co');
+  const payload = JSON.parse(Buffer.from(SUPABASE_ANON_KEY.split('.')[1], 'base64url').toString('utf8'));
+  assert.equal(payload.role, 'anon');
+  assert.equal(payload.ref, 'yleyerkmqeozlfuaqbmj');
 });
