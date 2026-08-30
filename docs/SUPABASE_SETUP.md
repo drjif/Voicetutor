@@ -1,10 +1,13 @@
 # samme3le Supabase setup
 
-This repository now contains a proposed production-account schema in:
+This repository contains:
 
-`supabase/migrations/202608010001_initial_accounts.sql`
+- `supabase/migrations/202608010001_initial_accounts.sql` — profiles, consent, marketing preference, entitlements, usage events, and deletion requests.
+- `supabase/migrations/202608270001_saved_sources.sql` — Account Sync v1 Google Sheet references only.
+- `supabase/migrations/202608290001_revoke_definer_execute.sql` — revoke public EXECUTE on trigger-only SECURITY DEFINER helpers.
+- `supabase/migrations/202608290002_grant_authenticated_dml.sql` — PostgREST DML grants (RLS still filters rows).
 
-Do not connect production users until the legal operator identity, privacy contacts, retention schedule, permanent domain, email delivery, and subscription terms are finalized.
+Do not treat public account signup as production-ready until the legal operator identity, privacy contacts, retention schedule, custom SMTP, and authentication redirect allowlist are finalized.
 
 ## Intended scope
 
@@ -16,24 +19,28 @@ Supabase should store only:
 - separate marketing preference;
 - Free/Pro entitlement status;
 - minimized product events;
-- account-deletion requests.
+- account-deletion requests;
+- saved Google Sheet identifiers (`spreadsheet_id`, `sheet_gid`), a display name, and lightweight last-opened / last-source-row progress.
 
-It should not receive question text, answer text, CSV contents, Google Sheet URLs, spoken audio, transcripts, patient information, advertising identifiers, precise location, or raw payment-card data by default.
+It should not receive question text, answer text, CSV/Excel/Anki contents, raw Google Sheet URLs, spoken audio, transcripts, patient information, advertising identifiers, precise location, or raw payment-card data by default.
 
 ## Authentication
 
-1. Create a Supabase project.
-2. Configure the final `https://samme3le.com` site URL and approved redirect URLs.
-3. Enable email magic links or email OTP.
-4. Configure custom SMTP before a public beta. Supabase's development email service is not a production mailing system.
-5. Customize authentication and security templates with the same3le brand and support contacts.
-6. Do not expose a secret/service-role key in browser code.
+1. Use the existing **samme3le** project in the **GIJAD Free** organization. Do not apply these migrations to a different project.
+2. Keep the current production site URL `https://tutor.gi-jad.com`. Do not switch to `samme3le.com` yet.
+3. Add redirect URLs:
+   - `https://tutor.gi-jad.com/`
+   - `http://localhost:4173/` for local testing
+4. Enable email OTP / magic link. Do not require a password for Account Sync v1.
+5. Configure custom SMTP before public signup. Supabase's development email service is not a production mailing system.
+6. Customize authentication templates with the samme3le brand and support contacts.
+7. Do not expose a secret/service-role key in browser code.
 
-Frontend environment values may include only the project URL and Supabase publishable/anonymous key. Server-only secrets belong in the hosting platform's encrypted environment settings.
+Frontend environment values may include only the project URL and Supabase publishable/anonymous key. Put those in `supabase-config.js`. Server-only secrets belong in the hosting platform's encrypted environment settings, never GitHub.
 
 ## Database and RLS
 
-Apply the migration and verify that Row Level Security is enabled on every public table. The intended access model is:
+Apply the initial accounts migration first, then `202608270001_saved_sources.sql`. Do not duplicate `saved_sources`. Verify that Row Level Security is enabled on every public table. The intended access model is:
 
 - users may read and update their own profile;
 - users may append and read their own consent history;
@@ -41,9 +48,13 @@ Apply the migration and verify that Row Level Security is enabled on every publi
 - users may read, but not directly modify, their own subscription entitlement;
 - users may insert and read their own minimized usage events;
 - users may create and view their own deletion request;
+- users may select, insert, update, and delete only their own `saved_sources`;
+- signed-out clients must not read `saved_sources`;
 - server-side webhook code manages subscription status.
 
-Test every policy while signed out, signed in as User A, and signed in as User B. User A must never be able to select or modify User B's rows.
+Test every policy while signed out, signed in as User A, and signed in as User B. User A must never be able to select or modify User B's rows. After applying migrations, run Supabase security advisors and fix relevant findings.
+
+A replayable SQL checklist is in `supabase/tests/saved_sources_rls.sql`.
 
 ## Subscription architecture
 

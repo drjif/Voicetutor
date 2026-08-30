@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 import {
   buildQuestionBank,
   detectColumns,
+  extractGoogleSheetIdentity,
   parseDelimited,
-  parseGoogleSheetUrl
+  parseGoogleSheetUrl,
+  reconstructGoogleSheetUrls
 } from '../sheet-data.js';
 
 test('Google Sheet links provide export and gviz fallback URLs', () => {
@@ -12,6 +14,14 @@ test('Google Sheet links provide export and gviz fallback URLs', () => {
   assert.equal(parsed.gid, '456');
   assert.match(parsed.exportCsvUrl, /export\?format=csv&gid=456$/);
   assert.match(parsed.csvUrl, /gviz\/tq\?tqx=out:csv&gid=456$/);
+});
+
+test('extracts saveable identifiers and reconstructs the request without storing the original URL', () => {
+  const identity = extractGoogleSheetIdentity('https://docs.google.com/spreadsheets/d/abc_123/edit?gid=456#gid=456');
+  assert.deepEqual(identity, { sourceType: 'google-sheet', spreadsheetId: 'abc_123', sheetGid: '456' });
+  const urls = reconstructGoogleSheetUrls(identity.spreadsheetId, identity.sheetGid);
+  assert.equal(urls.exportCsvUrl, 'https://docs.google.com/spreadsheets/d/abc_123/export?format=csv&gid=456');
+  assert.equal(extractGoogleSheetIdentity('https://example.com/private.csv'), null);
 });
 
 test('parser supports CR-only rows and preserves internal blank rows', () => {

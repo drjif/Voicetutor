@@ -21,6 +21,27 @@ export function parseGoogleSheetUrl(input) {
   };
 }
 
+export function extractGoogleSheetIdentity(input) {
+  const parsed = typeof input === 'string' ? parseGoogleSheetUrl(input) : input;
+  if (!parsed?.spreadsheetId) return null;
+  const sheetGid = String(parsed.gid ?? parsed.sheetGid ?? parsed.sheet_gid ?? '0');
+  if (!/^[A-Za-z0-9_-]+$/.test(parsed.spreadsheetId) || !/^[0-9]+$/.test(sheetGid)) return null;
+  return {
+    sourceType: 'google-sheet',
+    spreadsheetId: parsed.spreadsheetId,
+    sheetGid
+  };
+}
+
+export function reconstructGoogleSheetUrls(spreadsheetId, sheetGid = '0') {
+  const identity = extractGoogleSheetIdentity({
+    spreadsheetId,
+    gid: sheetGid
+  });
+  if (!identity) return null;
+  return parseGoogleSheetUrl(`https://docs.google.com/spreadsheets/d/${identity.spreadsheetId}/edit?gid=${identity.sheetGid}`);
+}
+
 function detectDelimiter(text) {
   const counts = new Map([[',', 0], ['\t', 0], [';', 0]]);
   let inQuotes = false;

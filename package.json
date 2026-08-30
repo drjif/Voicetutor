@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "check:js": "node --check app.js && node --check homepage-marketing.js && node --check file-import-ui.js && node --check file-import.js && node --check xlsx-import.js && node --check anki-import.js && node --check zip-reader.js && node --check sqlite-read.js && node --check beta.js && node --check dom.js && node --check deck.js && node --check paste-data.js && node --check sheet-v2.js && node --check session-next.js && node --check voice.js && node --check lockscreen.js && node --check power.js",
+    "check:js": "node --check app.js && node --check homepage-marketing.js && node --check file-import-ui.js && node --check file-import.js && node --check xlsx-import.js && node --check anki-import.js && node --check zip-reader.js && node --check sqlite-read.js && node --check beta.js && node --check dom.js && node --check deck.js && node --check paste-data.js && node --check sheet-v2.js && node --check session-next.js && node --check voice.js && node --check lockscreen.js && node --check power.js && node --check supabase-config.js && node --check auth-state.js && node --check auth.js && node --check saved-sources.js && node --check account-ui.js",
     "check:site": "node scripts/check-site.mjs",
     "check": "npm run test && npm run check:js && npm run check:site",
     "set-domain": "node scripts/set-domain.mjs",

@@ -8,24 +8,15 @@ function updateExistingCopy() {
   const pathCard = pathButton?.closest('.study-path-card');
   const pathText = pathCard?.querySelector('p');
   if (pathText) {
-    pathText.textContent = 'Bring Excel, Anki, CSV, TSV, or TXT files directly from your device. Google Sheets still works too.';
+    pathText.textContent = 'Bring Excel, Anki, CSV, TSV, or TXT files directly from your device. Google Sheets still work without an account.';
   }
   if (pathButton) {
     pathButton.textContent = 'Import a deck or file';
     pathButton.setAttribute('href', '#local-file-import');
   }
 
-  setText('#betaSignupPanel .option-kicker', 'Unlock Google Sheets');
-  setText('#betaSignupPanel h3', 'Optional: enter your email');
-  setText('#betaSignupPanel .panel-copy', 'Local file import and paste work without an account. This temporary unlock is only for the existing Google Sheet and legacy CSV flow.');
-  setText('#betaSignupForm button[type="submit"]', 'Unlock Google Sheet import');
-  setText('#betaMemberPanel .option-kicker', 'Google Sheet import unlocked');
-  setText('#betaMemberPanel h3', 'Google Sheet and legacy CSV are ready');
   setText('.import-panel .option-kicker', 'Optional link import');
-  setText('.import-panel h3', 'Google Sheet or legacy CSV');
-
-  const lock = document.querySelector('#personalBankLock');
-  if (lock) lock.textContent = 'Enter your email on the left to unlock the existing Google Sheet and legacy CSV flow.';
+  setText('.import-panel h3', 'Google Sheet or CSV');
 }
 
 function moveMappingOutsideGate(panel) {
@@ -48,7 +39,7 @@ function updateFooter() {
   const footerParagraphs = document.querySelectorAll('footer > p');
   const privacyLine = footerParagraphs[1];
   if (privacyLine) {
-    privacyLine.textContent = 'Pasted questions and local Excel, Anki, CSV, TSV, and TXT files are processed in your browser. Google Sheet requests and speech recognition may be processed by Google or your browser provider. This version has no payment system and no production account backend.';
+    privacyLine.textContent = 'Pasted questions and local Excel, Anki, CSV, TSV, and TXT files are processed in your browser. If you sign in, Supabase stores authentication information and saved Google Sheet identifiers. samme3le does not intentionally store spoken answers, audio, or transcripts. This version has no payment system.';
   }
 }
 
@@ -95,7 +86,7 @@ export function setupFileImportUI() {
   advancedHeading.insertAdjacentElement('beforebegin', panel);
   advancedHeading.id = 'google-sheet-import';
   advancedHeading.querySelector('span').textContent = 'Or connect a Google Sheet';
-  advancedHeading.querySelector('p').textContent = 'The existing link-based workflow remains available for users who want a remotely updated sheet.';
+  advancedHeading.querySelector('p').textContent = 'Google Sheets work without an account. Sign in only if you want the same sheet waiting under My decks on another device.';
 
   moveMappingOutsideGate(panel);
   updateExistingCopy();
