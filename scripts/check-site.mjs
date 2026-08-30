@@ -85,7 +85,7 @@ expect('file-import.js', fileImport, /parseXlsxWorkbook/i, 'Excel parser is not 
 expect('file-import.js', fileImport, /parseDelimited/i, 'CSV\/TSV parser is not connected');
 
 const serviceWorker = await read('service-worker.js');
-expect('service-worker.js', serviceWorker, /samme3le-v15/i, 'Account Sync v1 must refresh the PWA cache');
+expect('service-worker.js', serviceWorker, /same3le-v15/i, 'Account Sync v1 must refresh the PWA cache');
 for (const asset of ['file-import-ui.js', 'file-import.js', 'xlsx-import.js', 'anki-import.js', 'zip-reader.js', 'sqlite-read.js', 'supabase-config.js', 'auth-state.js', 'auth.js', 'saved-sources.js', 'account-ui.js']) {
   expect('service-worker.js', serviceWorker, new RegExp(asset.replace('.', '\\.')), `missing ${asset} from PWA cache`);
 }

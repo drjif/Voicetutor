@@ -1,4 +1,4 @@
--- samme3le production account foundation
+-- same3le production account foundation
 -- Apply only after the legal operator, privacy contacts, retention schedule,
 -- Supabase project URLs, and payment provider are finalized.
 

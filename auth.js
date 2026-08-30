@@ -14,7 +14,7 @@ import {
   isSupabaseConfigured
 } from './supabase-config.js';
 
-const PENDING_CONSENT_KEY = 'samme3le.pendingConsent.v1';
+const PENDING_CONSENT_KEY = 'same3le.pendingConsent.v1';
 const SUPABASE_ESM = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/+esm';
 const SUPABASE_CLIENT_OPTIONS = {
   auth: {
@@ -22,7 +22,7 @@ const SUPABASE_CLIENT_OPTIONS = {
     autoRefreshToken: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
-    storageKey: 'samme3le.supabase.auth.v1'
+    storageKey: 'same3le.supabase.auth.v1'
   }
 };
 

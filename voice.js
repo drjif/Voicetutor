@@ -158,7 +158,7 @@ function recognitionErrorMessage(error) {
   }
   if (error === 'service-not-allowed') {
     return isIOSDevice()
-      ? 'Speech recognition is unavailable in this iPhone browser context. Open samme3le in Safari, make sure Siri is enabled, and try again.'
+      ? 'Speech recognition is unavailable in this iPhone browser context. Open same3le in Safari, make sure Siri is enabled, and try again.'
       : 'The browser did not allow its speech-recognition service. Try current Chrome or Edge.';
   }
   if (error === 'audio-capture') {

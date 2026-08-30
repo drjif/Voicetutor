@@ -66,7 +66,7 @@ function isLocalSource() {
 }
 
 function currentDeckTitle() {
-  if (state.sourceKind === 'demo') return 'samme3le demo';
+  if (state.sourceKind === 'demo') return 'same3le demo';
   if (state.sourceKind === 'paste') return 'Pasted questions';
   if (isLocalSource() && state.sourceName) return state.sourceName;
   if (state.sourceKind === 'google-sheet') return 'Google Sheet questions';
@@ -395,7 +395,7 @@ export async function loadDemo() {
   const text = await response.text();
   state.sourceType = 'demo';
   state.sourceKind = 'demo';
-  state.sourceName = 'samme3le demo';
+  state.sourceName = 'same3le demo';
   state.sourceDetail = '';
   state.savedSourceId = null;
   elements.sheetUrl.value = 'Built-in demo';

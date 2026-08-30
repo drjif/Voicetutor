@@ -7,7 +7,7 @@ const root = process.cwd();
 const input = process.argv[2];
 
 if (!input) {
-  console.error('Usage: node scripts/set-domain.mjs https://samme3le.com');
+  console.error('Usage: node scripts/set-domain.mjs https://same3le.com');
   process.exit(1);
 }
 

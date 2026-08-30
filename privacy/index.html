@@ -3,25 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Privacy Policy | samme3le</title>
-  <meta name="description" content="How samme3le handles browser data, local study files, speech services, optional Supabase accounts, saved Google Sheet identifiers, and privacy requests." />
+  <title>Privacy Policy | same3le</title>
+  <meta name="description" content="How same3le handles browser data, local study files, speech services, optional Supabase accounts, saved Google Sheet identifiers, and privacy requests." />
   <meta name="robots" content="noindex,follow" />
   <link rel="icon" href="/icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/marketing.css" />
 </head>
 <body>
   <a class="skip-link" href="#content">Skip to content</a>
-  <header class="site-shell site-header"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>samme3le</strong><small>recite to me</small></span></a><nav class="site-nav"><a href="/terms/">Terms</a><a href="/pricing/">Pricing</a><a class="nav-cta" href="/">Open the app</a></nav></header>
+  <header class="site-shell site-header"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>same3le</strong><small>recite to me</small></span></a><nav class="site-nav"><a href="/terms/">Terms</a><a href="/pricing/">Pricing</a><a class="nav-cta" href="/">Open the app</a></nav></header>
   <main id="content" class="site-shell content-section">
     <div class="notice-box"><strong>Privacy draft for Account Sync v1.</strong> Optional sign-in stores authentication information and saved Google Sheet identifiers in Supabase. Local imported deck contents remain browser-local in this version. Paid checkout is not active. The legal operator identity, mailing address, privacy email, vendor configuration, and request workflow still need to be finalized before public account signup is treated as production-ready.</div>
     <article class="prose">
       <h1>Privacy Policy</h1>
       <p><strong>Effective date:</strong> August 15, 2026</p>
-      <p>This Privacy Policy explains how samme3le handles information when you use the website, Progressive Web App, local import tools, voice-study features, and future account or subscription services.</p>
+      <p>This Privacy Policy explains how same3le handles information when you use the website, Progressive Web App, local import tools, voice-study features, and future account or subscription services.</p>
 
       <h2>1. Current prototype versus production accounts</h2>
       <p>You can study without creating an account. Paste, local Excel, Anki, CSV, TSV, TXT, demo, and ordinary studying remain available while signed out.</p>
-      <p>If you sign in, Supabase stores authentication information (such as your user id and email) and any Google Sheet identifiers you choose to save. Local imported deck contents remain in this browser in Account Sync v1 and are not uploaded to a samme3le application database. samme3le does not intentionally store spoken answers, audio, or transcripts.</p>
+      <p>If you sign in, Supabase stores authentication information (such as your user id and email) and any Google Sheet identifiers you choose to save. Local imported deck contents remain in this browser in Account Sync v1 and are not uploaded to a same3le application database. same3le does not intentionally store spoken answers, audio, or transcripts.</p>
       <p>Paid subscriptions are not active. Legal operator identity, monitored privacy contacts, custom SMTP, and related launch items still need to be completed before public account signup is treated as production-ready.</p>
 
       <h2>2. Information handled today</h2>
@@ -32,20 +32,20 @@
           <tr><td>Saved Google Sheet identifiers</td><td>Remembers a display name, spreadsheet id, sheet tab id, last-opened time, and last source row.</td><td>Supabase Postgres with Row Level Security. Raw Sheet URLs and question text are not stored.</td></tr>
           <tr><td>Required legal acceptance and optional marketing preference</td><td>Records that you accepted the Terms, Privacy Policy, and Acceptable Use Policy. Marketing consent is separate and optional.</td><td>Supabase, if you create an account.</td></tr>
           <tr><td>Settings and local progress</td><td>Remembers mode, speed, timing, voice, matching preference, and current position on this device.</td><td>Browser local storage.</td></tr>
-          <tr><td>Pasted question-and-answer text</td><td>Parses structured Q&amp;A into a spoken study session.</td><td>Processed locally in browser memory; not uploaded to a samme3le account database in v1.</td></tr>
-          <tr><td>Local Excel, Anki, CSV, TSV, and TXT files</td><td>Extracts structured questions and answers for the study session.</td><td>Read and parsed in the browser. File contents are not uploaded to a samme3le application server in v1.</td></tr>
+          <tr><td>Pasted question-and-answer text</td><td>Parses structured Q&amp;A into a spoken study session.</td><td>Processed locally in browser memory; not uploaded to a same3le account database in v1.</td></tr>
+          <tr><td>Local Excel, Anki, CSV, TSV, and TXT files</td><td>Extracts structured questions and answers for the study session.</td><td>Read and parsed in the browser. File contents are not uploaded to a same3le application server in v1.</td></tr>
           <tr><td>Google Sheet data</td><td>Creates the study session.</td><td>Requested directly from Google by the browser. If you save the sheet, only identifiers needed to request it again are stored by Supabase.</td></tr>
-          <tr><td>Spoken answers</td><td>Converts speech to text for answer matching.</td><td>May be processed by the browser, operating system, or speech-service provider. samme3le does not intentionally store audio or transcripts.</td></tr>
+          <tr><td>Spoken answers</td><td>Converts speech to text for answer matching.</td><td>May be processed by the browser, operating system, or speech-service provider. same3le does not intentionally store audio or transcripts.</td></tr>
           <tr><td>Technical request information</td><td>Delivers and protects the website and third-party code dependencies.</td><td>The hosting provider, Supabase, and when required for modern Anki decompression the decoder CDN, may receive ordinary request information such as IP address, user agent, timestamps, and requested asset.</td></tr>
         </tbody>
       </table>
 
       <h2>3. Local Anki processing</h2>
-      <p>When an Anki <code>.apkg</code> file contains a legacy SQLite collection, samme3le reads that collection locally. Some modern Anki packages contain a zstd-compressed collection. The importer first attempts to use a browser-native decompressor. If that is unavailable, the browser may download a pinned open-source zstd decoder module from a third-party CDN. The deck file itself is not intentionally sent to that decoder CDN; the downloaded code runs against the deck in the browser. If the decoder cannot be loaded, the user is instructed to export an older-compatible Anki package instead.</p>
-      <p>The current Anki importer does not intentionally persist Anki scheduling data, review history, images, audio, or card-template state in a samme3le database. It extracts text needed to create oral-study questions.</p>
+      <p>When an Anki <code>.apkg</code> file contains a legacy SQLite collection, same3le reads that collection locally. Some modern Anki packages contain a zstd-compressed collection. The importer first attempts to use a browser-native decompressor. If that is unavailable, the browser may download a pinned open-source zstd decoder module from a third-party CDN. The deck file itself is not intentionally sent to that decoder CDN; the downloaded code runs against the deck in the browser. If the decoder cannot be loaded, the user is instructed to export an older-compatible Anki package instead.</p>
+      <p>The current Anki importer does not intentionally persist Anki scheduling data, review history, images, audio, or card-template state in a same3le database. It extracts text needed to create oral-study questions.</p>
 
       <h2>4. Planned production-account information</h2>
-      <p>Once additional account features are activated, samme3le expects to collect or generate:</p>
+      <p>Once additional account features are activated, same3le expects to collect or generate:</p>
       <ul><li>Account identifier and email address</li><li>Account creation and last-sign-in timestamps</li><li>Terms and Privacy Policy versions accepted</li><li>Optional marketing consent and preference changes</li><li>Saved Google Sheet identifiers and lightweight last-opened progress</li><li>Plan name, subscription status, renewal period, and payment-provider customer reference when payments launch</li><li>Limited events such as demo completion, successful question-list load, session completion, ten-question milestone, seven-day return, and Pro-interest response</li><li>Account-deletion or privacy-request records</li></ul>
       <p>The planned backend is not intended to receive raw payment-card numbers. A payment processor should handle card entry. Question text, answer text, local file contents, audio, transcripts, raw Google Sheet URLs, precise location, advertising identifiers, and cross-site browsing data should not be collected by default.</p>
 
@@ -58,13 +58,13 @@
       <p>The final vendor names, processing purposes, and links to their policies will be confirmed before production collection begins.</p>
 
       <h2>7. Sale, sharing, and advertising</h2>
-      <p>samme3le does not intend to sell personal information or share it for cross-context behavioral advertising. The prototype does not use advertising pixels. If this practice changes, this policy and any legally required opt-out controls will be updated before the change.</p>
+      <p>same3le does not intend to sell personal information or share it for cross-context behavioral advertising. The prototype does not use advertising pixels. If this practice changes, this policy and any legally required opt-out controls will be updated before the change.</p>
 
       <h2>8. Retention</h2>
       <p>Browser settings and prototype access data remain until you remove local access, clear site data, or the browser deletes them. Pasted Q&amp;A and local-file contents are not intentionally persisted by the current import feature after the page or in-memory session is discarded. Planned production retention targets are: account and consent records while the account is active plus a limited legal period; subscription and transaction records as required for accounting, disputes, and law; security logs approximately 30–90 days unless an incident requires longer retention; and product-usage events approximately 12 months. Final periods will be confirmed before production launch.</p>
 
       <h2>9. Your choices and rights</h2>
-      <p>Depending on where you live and which laws apply, you may have rights to access, correct, delete, or obtain a copy of personal information; withdraw marketing consent; appeal a denied request; and opt out of certain sale, sharing, targeted advertising, or profiling. samme3le intends to honor Global Privacy Control signals if a legally relevant sale or sharing practice is ever introduced, but no such practice is planned.</p>
+      <p>Depending on where you live and which laws apply, you may have rights to access, correct, delete, or obtain a copy of personal information; withdraw marketing consent; appeal a denied request; and opt out of certain sale, sharing, targeted advertising, or profiling. same3le intends to honor Global Privacy Control signals if a legally relevant sale or sharing practice is ever introduced, but no such practice is planned.</p>
       <p>The production account should provide self-service account deletion, marketing preference controls, and a documented privacy-request process. Identity verification may be required before fulfilling a request.</p>
 
       <h2>10. Children</h2>
@@ -83,6 +83,6 @@
       <p>Before production account collection begins, this section will identify the legal operator, mailing address, privacy email, support email, and methods for submitting and appealing privacy requests. Until those details are live, the current browser-first prototype should not be treated as a production subscriber database.</p>
     </article>
   </main>
-  <footer class="site-footer"><div class="site-shell footer-grid"><div><strong>samme3le</strong><p>Educational study software.</p></div><div><h3>Product</h3><a href="/">App</a><a href="/pricing/">Pricing</a></div><div><h3>Legal</h3><a href="/terms/">Terms</a><a href="/acceptable-use/">Acceptable use</a><a href="/medical-disclaimer/">Disclaimer</a></div><div><h3>Access</h3><a href="/accessibility/">Accessibility</a><a href="/contact/">Contact</a></div></div></footer>
+  <footer class="site-footer"><div class="site-shell footer-grid"><div><strong>same3le</strong><p>Educational study software.</p></div><div><h3>Product</h3><a href="/">App</a><a href="/pricing/">Pricing</a></div><div><h3>Legal</h3><a href="/terms/">Terms</a><a href="/acceptable-use/">Acceptable use</a><a href="/medical-disclaimer/">Disclaimer</a></div><div><h3>Access</h3><a href="/accessibility/">Accessibility</a><a href="/contact/">Contact</a></div></div></footer>
 </body>
 </html>

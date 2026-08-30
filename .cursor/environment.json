@@ -1,11 +1,11 @@
 {
-  "name": "samme3le (VoiceTutor)",
+  "name": "same3le (VoiceTutor)",
   "install": "node --version && python3 --version",
   "terminals": [
     {
       "name": "web",
       "command": "python3 -m http.server 4173",
-      "description": "Serves the static samme3le app at http://localhost:4173. Open the app or SEO/legal pages here."
+      "description": "Serves the static same3le app at http://localhost:4173. Open the app or SEO/legal pages here."
     }
   ],
   "ports": [

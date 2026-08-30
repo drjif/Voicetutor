@@ -1,9 +1,9 @@
 import { elements, state } from './dom.js';
 
-const METRICS_KEY = 'samme3le.prototypeMetrics.v1';
-const VISIT_KEY = 'samme3le.prototypeVisit.v1';
-const SESSION_VISIT_KEY = 'samme3le.visitRecorded';
-const LEGACY_ACCOUNT_KEYS = ['samme3le.betaAccount.v1', 'gijadTutor.betaAccount.v1'];
+const METRICS_KEY = 'same3le.prototypeMetrics.v1';
+const VISIT_KEY = 'same3le.prototypeVisit.v1';
+const SESSION_VISIT_KEY = 'same3le.visitRecorded';
+const LEGACY_ACCOUNT_KEYS = ['same3le.betaAccount.v1', 'gijadTutor.betaAccount.v1'];
 const LEGACY_KEYS = [
   ['gijadTutor.prototypeMetrics.v1', METRICS_KEY],
   ['gijadTutor.prototypeVisit.v1', VISIT_KEY]
@@ -83,8 +83,8 @@ export function setupBetaFunnel() {
     elements.conversionStatus.dataset.type = 'neutral';
   });
 
-  window.samme3lePrototypeMetrics = () => readJson(METRICS_KEY, []);
-  window.gijadTutorPrototypeMetrics = window.samme3lePrototypeMetrics;
+  window.same3lePrototypeMetrics = () => readJson(METRICS_KEY, []);
+  window.gijadTutorPrototypeMetrics = window.same3lePrototypeMetrics;
 }
 
 export function noteSourceLoaded(sourceType, questionCount) {

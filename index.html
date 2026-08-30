@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#ff5a1f" />
-  <meta name="description" content="samme3le turns a list of questions and answers into a spoken tutor that quizzes you out loud." />
-  <title>samme3le — Turn your notes into a spoken tutor</title>
+  <meta name="description" content="same3le turns a list of questions and answers into a spoken tutor that quizzes you out loud." />
+  <title>same3le — Turn your notes into a spoken tutor</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="./styles.css" />
@@ -16,10 +16,10 @@
 
   <div class="page-shell">
     <header class="topbar">
-      <a class="brand" href="./" aria-label="samme3le home">
+      <a class="brand" href="./" aria-label="same3le home">
         <span class="brand-mark" aria-hidden="true">3</span>
         <span class="brand-copy">
-          <strong>samme3le</strong>
+          <strong>same3le</strong>
           <small>recite to me</small>
         </span>
       </a>
@@ -38,7 +38,7 @@
         <div class="hero-copy">
           <p class="eyebrow">Study out loud. Remember more.</p>
           <h1 id="hero-heading">Turn your notes into a tutor that quizzes you.</h1>
-          <p class="hero-subtitle">Give samme3le a list of questions and answers. It reads one question. You answer out loud. Then it checks your answer and keeps going.</p>
+          <p class="hero-subtitle">Give same3le a list of questions and answers. It reads one question. You answer out loud. Then it checks your answer and keeps going.</p>
 
           <div class="hero-actions">
             <button id="loadDemo" class="button primary large-button" type="button">Try 5 questions now</button>
@@ -52,14 +52,14 @@
           </ul>
         </div>
 
-        <div class="hero-demo" aria-label="Example samme3le study flow">
+        <div class="hero-demo" aria-label="Example same3le study flow">
           <div class="demo-topline">
             <span class="live-dot" aria-hidden="true"></span>
             <strong>What using it feels like</strong>
           </div>
 
           <div class="conversation-card tutor-message">
-            <span>samme3le asks</span>
+            <span>same3le asks</span>
             <p>What does the heart pump?</p>
           </div>
 
@@ -91,7 +91,7 @@
           <article class="simple-step">
             <span class="step-number">2</span>
             <h3>Press start</h3>
-            <p>samme3le reads one question to you out loud.</p>
+            <p>same3le reads one question to you out loud.</p>
           </article>
 
           <article class="simple-step">
@@ -147,7 +147,7 @@
             <div>
               <span class="option-kicker">Signed in</span>
               <h3 id="my-decks-heading">My decks</h3>
-              <p class="panel-copy">Saved Google Sheets reopen here on this phone or another device. Deck contents stay in the sheet; samme3le stores only the identifiers needed to request it again.</p>
+              <p class="panel-copy">Saved Google Sheets reopen here on this phone or another device. Deck contents stay in the sheet; same3le stores only the identifiers needed to request it again.</p>
             </div>
           </div>
           <div id="myDecksList" class="deck-list"></div>
@@ -182,7 +182,7 @@
               </label>
               <label class="checkbox-row consent-row">
                 <input id="usAccessConfirmed" type="checkbox" />
-                <span>I am accessing samme3le from the United States.</span>
+                <span>I am accessing same3le from the United States.</span>
               </label>
               <label class="checkbox-row consent-row">
                 <input id="marketingConsent" type="checkbox" />
@@ -293,7 +293,7 @@
         <div class="section-heading">
           <span class="step">2</span>
           <div>
-            <h2 id="session-heading">Choose how samme3le should quiz you</h2>
+            <h2 id="session-heading">Choose how same3le should quiz you</h2>
             <p>Pick one mode, then press start.</p>
           </div>
         </div>
@@ -305,7 +305,7 @@
             <span class="mode-icon" aria-hidden="true">🎙</span>
             <span class="mode-copy">
               <strong>Answer out loud</strong>
-              <small>samme3le reads a question, listens to you, and checks your answer.</small>
+              <small>same3le reads a question, listens to you, and checks your answer.</small>
             </span>
           </label>
 
@@ -314,7 +314,7 @@
             <span class="mode-icon" aria-hidden="true">▶</span>
             <span class="mode-copy">
               <strong>Listen and review</strong>
-              <small>samme3le reads the question, waits, and then reads the answer.</small>
+              <small>same3le reads the question, waits, and then reads the answer.</small>
             </span>
           </label>
 
@@ -375,7 +375,7 @@
         </details>
 
         <button id="startButton" class="button primary start-button" disabled>Start quizzing me</button>
-        <p id="startNote" class="start-note">Microphone access is requested only for “Answer out loud.” Do not use samme3le while driving or during patient care.</p>
+        <p id="startNote" class="start-note">Microphone access is requested only for “Answer out loud.” Do not use same3le while driving or during patient care.</p>
       </section>
 
       <section id="sessionPanel" class="card player-card" hidden aria-live="polite">
@@ -390,12 +390,12 @@
         <div class="progress-track" aria-hidden="true"><div id="progressBar"></div></div>
 
         <article class="question-card">
-          <span class="card-label">samme3le asks</span>
+          <span class="card-label">same3le asks</span>
           <p id="currentQuestion">Your question will appear here.</p>
         </article>
 
         <article id="transcriptCard" class="response-card" hidden>
-          <span class="card-label">What samme3le heard</span>
+          <span class="card-label">What same3le heard</span>
           <p id="transcript"></p>
           <small id="matchResult"></small>
         </article>
@@ -432,7 +432,7 @@
 
       <section id="conversionCard" class="card conversion-card" hidden aria-labelledby="conversion-heading">
         <span class="option-kicker">Help build the next version</span>
-        <h2 id="conversion-heading">Would you pay for samme3le Pro?</h2>
+        <h2 id="conversion-heading">Would you pay for same3le Pro?</h2>
         <p>Pro could add study history, weak-topic review, and more saved source types. Saving a Google Sheet to My decks is already available after you sign in.</p>
         <div class="conversion-actions">
           <button id="wouldPayButton" class="button primary" type="button">Yes, I would pay</button>
@@ -445,10 +445,10 @@
     <footer>
       <div class="footer-brand">
         <span class="brand-mark small-mark" aria-hidden="true">3</span>
-        <strong>samme3le</strong>
+        <strong>same3le</strong>
       </div>
-      <p><strong>Prototype:</strong> samme3le is an educational study tool. It is not medical advice and must not be used for patient care.</p>
-      <p>Pasted questions and local Excel, Anki, CSV, TSV, and TXT files stay in this browser. If you sign in, Supabase stores authentication information and saved Google Sheet identifiers. samme3le does not intentionally store spoken answers, audio, or transcripts. This version has no payment system.</p>
+      <p><strong>Prototype:</strong> same3le is an educational study tool. It is not medical advice and must not be used for patient care.</p>
+      <p>Pasted questions and local Excel, Anki, CSV, TSV, and TXT files stay in this browser. If you sign in, Supabase stores authentication information and saved Google Sheet identifiers. same3le does not intentionally store spoken answers, audio, or transcripts. This version has no payment system.</p>
     </footer>
   </div>
 

@@ -62,7 +62,7 @@ Paid subscriptions must remain disabled until every blocking item below is compl
 
 ## Domain and search
 
-- [ ] Purchase and secure `samme3le.com`.
+- [ ] Purchase and secure `same3le.com`.
 - [ ] Point the final domain to production hosting.
 - [ ] Replace current `tutor.gi-jad.com` canonicals and sitemap URLs.
 - [ ] Redirect every old URL to its matching new URL with permanent redirects.
