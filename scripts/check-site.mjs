@@ -39,7 +39,7 @@ for (const relativePath of seoPages) {
   const source = await read(relativePath);
   expect(relativePath, source, /<title>[^<]{20,}<\/title>/i, 'missing useful title');
   expect(relativePath, source, /<meta name="description" content="[^"]{80,}"/i, 'missing substantial meta description');
-  expect(relativePath, source, /<link rel="canonical" href="https:\/\/tutor\.gi-jad\.com\//i, 'missing current production canonical');
+  expect(relativePath, source, /<link rel="canonical" href="https:\/\/same3le\.com\//i, 'missing current production canonical');
   expect(relativePath, source, /<h1[^>]*>[\s\S]+?<\/h1>/i, 'missing H1');
   expect(relativePath, source, /free/i, 'does not clearly mention free access');
   expect(relativePath, source, /href="\/marketing\.css"/i, 'missing shared stylesheet');
@@ -55,11 +55,11 @@ for (const relativePath of legalPages) {
 const sitemap = await read('sitemap.xml');
 for (const relativePath of seoPages) {
   const route = relativePath.replace(/index\.html$/, '');
-  expect('sitemap.xml', sitemap, new RegExp(`<loc>https://tutor\\.gi-jad\\.com/${route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}</loc>`), `missing ${route} URL`);
+  expect('sitemap.xml', sitemap, new RegExp(`<loc>https://same3le\\.com/${route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}</loc>`), `missing ${route} URL`);
 }
 
 const robots = await read('robots.txt');
-expect('robots.txt', robots, /Sitemap: https:\/\/tutor\.gi-jad\.com\/sitemap\.xml/i, 'missing sitemap declaration');
+expect('robots.txt', robots, /Sitemap: https:\/\/same3le\.com\/sitemap\.xml/i, 'missing sitemap declaration');
 
 const shell = await read('homepage-marketing.js');
 expect('homepage-marketing.js', shell, /The core study app is free/i, 'missing free homepage message');
@@ -107,7 +107,7 @@ expect('privacy/index.html', privacy, /Local imported deck contents remain in th
 
 const config = await read('supabase-config.js');
 expect('supabase-config.js', config, /NEVER add a service-role key/i, 'missing service-role warning in public config');
-expect('supabase-config.js', config, /https:\/\/tutor\.gi-jad\.com/, 'auth site URL must remain the current production hostname');
+expect('supabase-config.js', config, /https:\/\/same3le\.com/, 'auth site URL must use the current production hostname');
 expect('supabase-config.js', config, /yleyerkmqeozlfuaqbmj\.supabase\.co/, 'frontend must use the same3le project URL');
 
 const secretPattern = /service_role|DATABASE_PASSWORD|JWT_SECRET|postgres(ql)?:\/\/[^:\s]+:[^@\s]+@/i;

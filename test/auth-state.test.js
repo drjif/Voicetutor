@@ -87,8 +87,8 @@ test('last-opened labels stay human-readable without exposing URLs', () => {
 });
 
 test('auth redirect stays on the current production hostname', () => {
-  assert.equal(AUTH_SITE_URL, 'https://tutor.gi-jad.com');
-  assert.equal(getAuthRedirectUrl({ origin: 'https://tutor.gi-jad.com' }), 'https://tutor.gi-jad.com/');
+  assert.equal(AUTH_SITE_URL, 'https://same3le.com');
+  assert.equal(getAuthRedirectUrl({ origin: 'https://same3le.com' }), 'https://same3le.com/');
   assert.equal(getAuthRedirectUrl({ origin: 'http://localhost:4173' }), 'http://localhost:4173/');
   assert.equal(isSupabaseConfigured('', ''), false);
   assert.equal(isSupabaseConfigured('https://example.supabase.co', 'short'), false);

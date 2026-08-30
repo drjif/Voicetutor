@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://tutor.gi-jad.com/sitemap.xml
+Sitemap: https://same3le.com/sitemap.xml
