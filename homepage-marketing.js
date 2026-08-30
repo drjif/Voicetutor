@@ -7,10 +7,10 @@ function ensureStylesheet() {
 }
 
 function setMetadata() {
-  document.title = 'samme3le — Free Voice Flashcards That Quiz You Out Loud';
+  document.title = 'same3le — Free Voice Flashcards That Quiz You Out Loud';
   const description = document.querySelector('meta[name="description"]');
   if (description) {
-    description.content = 'Study out loud for free. Choose a ready-made deck, paste Q&A from ChatGPT, Claude, or Gemini, or import your existing questions into samme3le.';
+    description.content = 'Study out loud for free. Choose a ready-made deck, paste Q&A from ChatGPT, Claude, or Gemini, or import your existing questions into same3le.';
   }
 
   if (!document.querySelector('link[rel="canonical"]')) {
@@ -20,14 +20,14 @@ function setMetadata() {
     document.head.append(canonical);
   }
 
-  if (!document.querySelector('#samme3leSoftwareSchema')) {
+  if (!document.querySelector('#same3leSoftwareSchema')) {
     const schema = document.createElement('script');
-    schema.id = 'samme3leSoftwareSchema';
+    schema.id = 'same3leSoftwareSchema';
     schema.type = 'application/ld+json';
     schema.textContent = JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
-      name: 'samme3le',
+      name: 'same3le',
       applicationCategory: 'EducationalApplication',
       operatingSystem: 'Web browser',
       description: 'A free voice flashcard app that reads questions aloud and can listen to spoken answers.',
@@ -45,7 +45,7 @@ function addNavigation() {
 
   const nav = document.createElement('nav');
   nav.className = 'marketing-nav';
-  nav.setAttribute('aria-label', 'Learn about samme3le');
+  nav.setAttribute('aria-label', 'Learn about same3le');
   nav.innerHTML = `
     <a href="#start-studying">Start</a>
     <a href="#my-decks-heading">My decks</a>
@@ -68,7 +68,7 @@ function strengthenHero() {
 
   const subtitle = document.querySelector('.hero-subtitle');
   if (subtitle) {
-    subtitle.textContent = 'Choose a ready-made deck, paste questions from your favorite AI, or import questions you already have. samme3le asks. You answer.';
+    subtitle.textContent = 'Choose a ready-made deck, paste questions from your favorite AI, or import questions you already have. same3le asks. You answer.';
   }
 
   const demoButton = document.querySelector('#loadDemo');
@@ -136,7 +136,7 @@ function addStudyPaths() {
 
     <div class="own-ai-note">
       <strong>Already pay for an AI assistant?</strong>
-      <span>Let it create the questions. Copy the Q&A into samme3le. Your AI makes the deck; samme3le handles the spoken practice.</span>
+      <span>Let it create the questions. Copy the Q&A into same3le. Your AI makes the deck; same3le handles the spoken practice.</span>
     </div>
   `;
 
@@ -169,7 +169,7 @@ function updateHowItWorks() {
   const content = [
     ['Bring questions your way', 'Choose the sample deck, paste Q&A from your AI, or import questions you already have.'],
     ['Choose how to study', 'Use Answer out loud for active recall, or switch to one of the listening modes.'],
-    ['Start speaking', 'samme3le asks each question, listens when supported, checks the answer locally, and keeps going.']
+    ['Start speaking', 'same3le asks each question, listens when supported, checks the answer locally, and keeps going.']
   ];
 
   steps.forEach((step, index) => {
@@ -205,7 +205,7 @@ function addFooterNavigation() {
 
   const useCases = document.createElement('nav');
   useCases.className = 'homepage-use-cases';
-  useCases.setAttribute('aria-label', 'samme3le use cases');
+  useCases.setAttribute('aria-label', 'same3le use cases');
   useCases.innerHTML = `
     <a href="/voice-flashcards/">Voice flashcards</a>
     <a href="/quiz-me-from-my-notes/">Quiz me from my notes</a>

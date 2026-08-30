@@ -1,4 +1,4 @@
--- samme3le Account Sync v1
+-- same3le Account Sync v1
 -- Stores only reusable remote source references and lightweight progress metadata.
 -- It intentionally does NOT store question text, answer text, uploaded files,
 -- spoken audio, or transcripts.

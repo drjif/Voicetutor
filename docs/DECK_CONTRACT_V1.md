@@ -1,6 +1,6 @@
 # Deck Contract v1
 
-Deck Contract v1 is the stable boundary between question ingestion and the existing samme3le study engine.
+Deck Contract v1 is the stable boundary between question ingestion and the existing same3le study engine.
 
 The goal is to add ingestion methods without changing speech synthesis, speech recognition, local grading, session controls, wake lock, lock-screen review, or progress behavior.
 

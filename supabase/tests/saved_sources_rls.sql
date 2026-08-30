@@ -1,5 +1,5 @@
 -- Replayable Account Sync v1 RLS checks for public.saved_sources.
--- Run only against the verified samme3le project in GIJAD Free.
+-- Run only against the verified same3le project in GIJAD Free.
 -- These statements are a manual/security checklist, not an app migration.
 
 -- 1. Signed-out / anonymous role cannot read saved sources.

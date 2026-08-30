@@ -22,10 +22,10 @@ function updateModePresentation() {
 
   if (mode === 'active') {
     elements.startButton.textContent = 'Start quizzing me';
-    elements.startNote.textContent = 'Microphone access is requested only for “Answer out loud.” Keep Screen Awake reduces interruptions. Do not use samme3le while driving or during patient care.';
+    elements.startNote.textContent = 'Microphone access is requested only for “Answer out loud.” Keep Screen Awake reduces interruptions. Do not use same3le while driving or during patient care.';
   } else if (mode === 'passive') {
     elements.startButton.textContent = 'Start listening';
-    elements.startNote.textContent = 'samme3le will read each question, wait, and then read the answer. No microphone is used.';
+    elements.startNote.textContent = 'same3le will read each question, wait, and then read the answer. No microphone is used.';
     releaseSessionWakeLock();
   } else {
     elements.startButton.textContent = 'Start lock-screen review';

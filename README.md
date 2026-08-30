@@ -1,6 +1,6 @@
-# samme3le
+# same3le
 
-**samme3le** means “recite to me.” It turns structured questions and answers into a spoken study session.
+**same3le** means “recite to me.” It turns structured questions and answers into a spoken study session.
 
 The current prototype is a static, client-side web app. The core app is free and does not require payment information or a paid AI API. A future optional Pro subscription is planned for production account features.
 
@@ -18,7 +18,7 @@ All of these sources terminate at Deck Contract v1 and use the same existing stu
 
 ## Paste questions
 
-Direct paste is the fastest path for Q&A generated with a user's own AI subscription. It does not require a public Google Sheet, file upload, account, LLM call, or samme3le API key.
+Direct paste is the fastest path for Q&A generated with a user's own AI subscription. It does not require a public Google Sheet, file upload, account, LLM call, or same3le API key.
 
 Supported examples include:
 
@@ -45,15 +45,15 @@ The zero-signup local importer accepts:
 - `.tsv`
 - `.txt`, including structured Q&A and Anki plain-text exports
 
-The file is read by JavaScript in the browser and is not intentionally uploaded to a samme3le application server. Excel parsing uses the workbook ZIP/XML structure locally. CSV/TSV/TXT use the existing deterministic row and paste parsers.
+The file is read by JavaScript in the browser and is not intentionally uploaded to a same3le application server. Excel parsing uses the workbook ZIP/XML structure locally. CSV/TSV/TXT use the existing deterministic row and paste parsers.
 
 ### Anki compatibility
 
-`.apkg` packages are opened locally. samme3le extracts the embedded collection, reads note fields, and converts basic front/back notes plus cloze notes into ordinary Deck Contract cards.
+`.apkg` packages are opened locally. same3le extracts the embedded collection, reads note fields, and converts basic front/back notes plus cloze notes into ordinary Deck Contract cards.
 
 The importer intentionally does **not** reproduce Anki scheduling, review history, card-template rendering, reversed-card template logic, images, or audio. For basic notes, the first populated field is treated as the prompt and the next populated field as the answer. For cloze notes, the hidden term is used as the answer.
 
-Legacy `.apkg` collections are read directly from SQLite. Modern Anki packages that contain a zstd-compressed collection first try the browser's native decompressor; when unavailable, samme3le may load the pinned MIT-licensed `fzstd@0.1.1` browser decoder and still performs the actual deck decompression locally. If that decoder is unavailable, the app instructs the user to re-export from Anki with **Support older Anki versions** enabled.
+Legacy `.apkg` collections are read directly from SQLite. Modern Anki packages that contain a zstd-compressed collection first try the browser's native decompressor; when unavailable, same3le may load the pinned MIT-licensed `fzstd@0.1.1` browser decoder and still performs the actual deck decompression locally. If that decoder is unavailable, the app instructs the user to re-export from Anki with **Support older Anki versions** enabled.
 
 Whole-collection `.colpkg` import is not part of this version.
 
@@ -61,11 +61,11 @@ Whole-collection `.colpkg` import is not part of this version.
 
 ### Answer out loud
 
-samme3le reads the question, the browser listens to the spoken answer, and a local matcher compares the transcript with the stored answer and accepted alternatives. The user can retry or override recognition errors. In supported browsers, Screen Wake Lock can keep the display awake during the session.
+same3le reads the question, the browser listens to the spoken answer, and a local matcher compares the transcript with the stored answer and accepted alternatives. The user can retry or override recognition errors. In supported browsers, Screen Wake Lock can keep the display awake during the session.
 
 ### Listen and review
 
-samme3le reads the question, waits for a configurable interval, reads the saved answer, and advances.
+same3le reads the question, waits for a configurable interval, reads the saved answer, and advances.
 
 ### Lock-screen review
 
@@ -98,7 +98,7 @@ The minimum deck needs only Question + Answer. Accepted alternatives are optiona
 | --- | --- | --- |
 | What is the mechanism of infliximab? | It inhibits TNF-alpha. | anti-TNF monoclonal antibody\|TNF inhibitor |
 
-For row-based files, samme3le detects common headers and exposes the existing mapping controls only when the user needs to correct the guessed fields.
+For row-based files, same3le detects common headers and exposes the existing mapping controls only when the user needs to correct the guessed fields.
 
 ## SEO and use-case pages
 
@@ -107,7 +107,7 @@ The repository includes crawlable static pages for `/voice-flashcards/`, `/quiz-
 The current canonicals use `https://tutor.gi-jad.com`. After the permanent domain is purchased, run:
 
 ```bash
-npm run set-domain -- https://samme3le.com
+npm run set-domain -- https://same3le.com
 ```
 
 Then configure DNS, HTTPS, URL-matched permanent redirects, Search Console, Bing Webmaster Tools, and submit the new sitemap.
@@ -137,7 +137,7 @@ Google Sheets remain an optional advanced path:
 1. Open the sheet and choose **Share**.
 2. Under **General access**, choose **Anyone with the link** and **Viewer**.
 3. Copy the URL.
-4. Paste it into samme3le and select **Load sheet**.
+4. Paste it into same3le and select **Load sheet**.
 
 For private material, prefer the local file importer. Do not enter protected health information, patient records, confidential examination content, or commercial question-bank content without authorization.
 
@@ -161,7 +161,7 @@ A GitHub Actions workflow also runs the same check on pull requests and pushes t
 
 - Pasted Q&A and local `.xlsx`, `.apkg`, `.csv`, `.tsv`, and `.txt` files are processed client-side in Account Sync v1.
 - If you sign in, Supabase stores authentication information and saved Google Sheet identifiers. Raw Sheet URLs and question text are not stored.
-- Browser speech recognition may use a browser, operating-system, or speech-service provider. samme3le does not intentionally store spoken answers, audio, or transcripts.
+- Browser speech recognition may use a browser, operating-system, or speech-service provider. same3le does not intentionally store spoken answers, audio, or transcripts.
 - Google Sheet loading requires link-accessible data.
 - Modern Anki zstd fallback may download decoder code from a third-party CDN; the importer does not intentionally send the deck bytes to that CDN.
 - The tool is educational and is not for patient care.
@@ -169,4 +169,4 @@ A GitHub Actions workflow also runs the same check on pull requests and pushes t
 
 ## License
 
-No open-source license has been granted for samme3le at this stage. Standard copyright applies. Third-party components retain their own licenses.
+No open-source license has been granted for same3le at this stage. Standard copyright applies. Third-party components retain their own licenses.
