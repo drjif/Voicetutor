@@ -68,8 +68,8 @@ button, input { font: inherit; }
 .brand-copy { display: grid; line-height: 1; }
 .brand-copy strong { font-size: 1.23rem; letter-spacing: -0.04em; }
 .brand-copy small { margin-top: 5px; color: var(--muted); font-size: 0.72rem; font-weight: 700; }
-.site-nav { display: flex; align-items: center; gap: 18px; }
-.site-nav a { color: var(--muted); font-size: 0.9rem; font-weight: 750; text-decoration: none; }
+.site-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px 14px; }
+.site-nav a { color: var(--muted); font-size: 0.82rem; font-weight: 750; text-decoration: none; }
 .site-nav a:hover { color: var(--ink); }
 .nav-cta {
   padding: 10px 14px;
@@ -184,6 +184,7 @@ button, input { font: inherit; }
 .footer-grid a { display: block; margin: 6px 0; text-decoration: none; }
 .footer-grid a:hover { color: var(--ink); }
 .footer-bottom { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.78rem; line-height: 1.5; }
+.date-modified { margin: 0 0 18px; color: var(--muted); font-size: 0.88rem; }
 
 @media (max-width: 850px) {
   .site-header { align-items: flex-start; }

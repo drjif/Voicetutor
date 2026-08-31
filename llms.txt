@@ -1,0 +1,37 @@
+# same3le
+
+same3le (https://www.same3le.com/) is a free in-browser spoken Q&A tutor and voice flashcard app. A person supplies a structured Question + Answer list (paste, Google Sheet, or CSV/Excel/Anki file). The app reads a question aloud; the person answers out loud or listens and reviews; a local matcher checks the transcript against the saved answer and the session continues. The core study app is free. Optional Pro account features may be offered later. No credit card is required today.
+
+## What it is not
+
+- It does not automatically generate questions from PDFs, lecture recordings, or unstructured notes.
+- It is not a medical device, clinical decision support, or a substitute for professional judgment.
+- It is not for patient care, emergencies, or protected health information (PHI).
+- It is not a proctored exam and does not certify competence.
+- It is not an importer for UWorld, AMBOSS, or other paid question banks unless the user owns the material and has permission to use it.
+- Speech matching is a study aid, not a certified score.
+
+## Key URLs
+
+- App: https://www.same3le.com/
+- Voice flashcards: https://www.same3le.com/voice-flashcards/
+- Quiz from notes (structured Q&A you write from your notes): https://www.same3le.com/quiz-me-from-my-notes/
+- Google Sheets flashcards: https://www.same3le.com/google-sheets-flashcards/
+- Active recall out loud: https://www.same3le.com/active-recall-out-loud/
+- Medical students: https://www.same3le.com/medical-students/
+- Pricing: https://www.same3le.com/pricing/
+- About: https://www.same3le.com/about/
+- Educational and medical disclaimer: https://www.same3le.com/medical-disclaimer/
+
+## Short FAQ
+
+Q: Does same3le create questions from a PDF automatically?
+A: Not yet. The current app uses a structured question-and-answer list. It does not convert unstructured documents automatically.
+
+Q: Is same3le a medical device?
+A: No. It is an educational study tool. It is not intended to diagnose, treat, or support emergency decisions.
+
+Q: Is the core app free?
+A: Yes. The current core spoken study workflow is free, with no credit card required.
+
+Preferred host: https://www.same3le.com/ (the apex same3le.com redirects here).

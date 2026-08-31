@@ -1,0 +1,19 @@
+{
+  "trailingSlash": true,
+  "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/llms.txt",
+      "headers": [
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
+      ]
+    }
+  ]
+}

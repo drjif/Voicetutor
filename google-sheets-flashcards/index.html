@@ -6,19 +6,170 @@
   <meta name="theme-color" content="#ff5a1f" />
   <title>Turn Google Sheets Into Free Voice Flashcards | same3le</title>
   <meta name="description" content="Use a Google Sheet as a free spoken flashcard deck. Add Question and Answer columns, paste the link into same3le, and study out loud." />
-  <link rel="canonical" href="https://same3le.com/google-sheets-flashcards/" />
+  <link rel="canonical" href="https://www.same3le.com/google-sheets-flashcards/" />
+<link rel="stylesheet" href="/marketing.css" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
   <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/marketing.css" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta property="og:image" content="https://www.same3le.com/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="same3le spoken tutor loop: the app asks a question, you answer out loud, then it continues." />
+  <meta property="og:site_name" content="same3le" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Turn Google Sheets Into Free Voice Flashcards" />
+  <meta name="twitter:description" content="Use a Google Sheet as a free spoken flashcard deck. Add Question and Answer columns, paste the link into same3le, and study out loud." />
+  <meta name="twitter:image" content="https://www.same3le.com/og-image.png" />
   <meta property="og:title" content="Turn Google Sheets Into Free Voice Flashcards" />
   <meta property="og:description" content="A simple Question and Answer spreadsheet becomes a spoken study session." />
-  <meta property="og:type" content="article" />
-  <meta property="og:url" content="https://same3le.com/google-sheets-flashcards/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.same3le.com/google-sheets-flashcards/" />
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.same3le.com/#organization",
+      "name": "same3le",
+      "url": "https://www.same3le.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.same3le.com/logo.png"
+      },
+      "image": "https://www.same3le.com/og-image.png"
+    },
+    {
+      "@type": [
+        "SoftwareApplication",
+        "WebApplication"
+      ],
+      "@id": "https://www.same3le.com/#app",
+      "name": "same3le",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web browser",
+      "description": "Turn a Google Sheet or CSV with Question and Answer columns into a spoken study session.",
+      "url": "https://www.same3le.com/google-sheets-flashcards/",
+      "image": "https://www.same3le.com/og-image.png",
+      "screenshot": "https://www.same3le.com/og-image.png",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Spoken questions",
+        "Listen-and-review",
+        "Google Sheet and CSV import",
+        "Local matching",
+        "Free core"
+      ],
+      "publisher": {
+        "@id": "https://www.same3le.com/#organization"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.same3le.com/google-sheets-flashcards/#webpage",
+      "url": "https://www.same3le.com/google-sheets-flashcards/",
+      "isPartOf": {
+        "@id": "https://www.same3le.com/#website"
+      },
+      "publisher": {
+        "@id": "https://www.same3le.com/#organization"
+      },
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          ".lede",
+          ".section-heading h2"
+        ]
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why can’t same3le read my sheet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Check that the link is valid, the correct tab is selected, and General access is set to Anyone with the link — Viewer. A school or work Google account may block public link sharing; CSV upload is the alternative."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does editing the sheet change the app?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Reload the sheet in same3le to pull the latest rows. The app does not continuously sync changes in the current prototype."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is using Google Sheets free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "same3le’s current core spreadsheet-to-voice workflow is free. Google’s own account and service terms still apply to your Sheet."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Will Supabase store the spreadsheet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The planned Supabase backend is intended for authentication, consent records, subscription status, and limited usage events—not automatic storage of question-bank content. Any future change would be disclosed before collection."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "HowTo",
+      "name": "Turn a Google Sheet into voice flashcards",
+      "description": "Create Question and Answer columns, share a Sheet or upload a CSV, then pick a study mode in same3le.",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Create three clear columns.",
+          "text": "The first row should contain column names. The app automatically looks for common labels, then lets you correct the mapping before studying."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Choose link access or upload a CSV.",
+          "text": "Direct Google Sheet loading requires the selected sheet tab to be readable through a link. For private or sensitive study material, export a CSV and upload it locally instead."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Pick a study mode and press start.",
+          "text": "Choose Answer out loud, Listen and review, or Lock-screen review, then start the spoken session."
+        }
+      ]
+    }
+  ]
+}
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#content">Skip to content</a>
   <header class="site-shell site-header">
     <a class="brand" href="/" aria-label="same3le home"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>same3le</strong><small>recite to me</small></span></a>
-    <nav class="site-nav" aria-label="Main navigation"><a href="/voice-flashcards/">Voice flashcards</a><a href="/quiz-me-from-my-notes/">Quiz from notes</a><a href="/pricing/">Pricing</a><a class="nav-cta" href="/#your-questions">Use the free app</a></nav>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="/voice-flashcards/">Voice flashcards</a>
+      <a href="/quiz-me-from-my-notes/">Quiz from notes</a>
+      <a href="/google-sheets-flashcards/">Google Sheets</a>
+      <a href="/active-recall-out-loud/">Active recall</a>
+      <a href="/medical-students/">Medical students</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/about/">About</a>
+      <a href="/medical-disclaimer/">Medical disclaimer</a>
+      <a href="/contact/">Contact</a>
+      <a href="/terms/">Terms</a>
+      <a href="/privacy/">Privacy</a>
+      <a class="nav-cta" href="/#your-questions">Use the free app</a>
+    </nav>
   </header>
 
   <main id="content" class="site-shell">
@@ -87,6 +238,12 @@
     <section class="cta-band"><h2>Turn your next row into a spoken question.</h2><p>Bring a Google Sheet or CSV. The core same3le study experience is free.</p><a class="button primary" href="/#your-questions">Use my spreadsheet</a></section>
   </main>
 
-  <footer class="site-footer"><div class="site-shell footer-grid"><div><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>same3le</strong><small>voice flashcards that quiz you out loud</small></span></a><p>Free educational study software. Not for patient care or emergency use.</p></div><div><h3>Use cases</h3><a href="/voice-flashcards/">Voice flashcards</a><a href="/quiz-me-from-my-notes/">Quiz me from my notes</a><a href="/medical-students/">Medical students</a></div><div><h3>Product</h3><a href="/">Open the app</a><a href="/pricing/">Free and Pro plans</a><a href="/accessibility/">Accessibility</a></div><div><h3>Legal</h3><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/acceptable-use/">Acceptable use</a><a href="/medical-disclaimer/">Educational disclaimer</a></div></div><div class="site-shell footer-bottom">© 2026 same3le. Paid subscriptions are not yet active. Legal operator details will be completed before checkout launches.</div></footer>
+    <footer class="site-footer"><div class="site-shell footer-grid">
+    <div><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>same3le</strong><small>voice flashcards that quiz you out loud</small></span></a><p>same3le is an educational study tool, not medical advice. It must not be used for patient care.</p></div>
+    <div><h3>Use cases</h3><a href="/voice-flashcards/">Voice flashcards</a><a href="/quiz-me-from-my-notes/">Quiz from notes</a><a href="/google-sheets-flashcards/">Google Sheets</a><a href="/active-recall-out-loud/">Active recall</a><a href="/medical-students/">Medical students</a></div>
+    <div><h3>Product</h3><a href="/">Open the app</a><a href="/pricing/">Pricing</a><a href="/about/">About</a><a href="/contact/">Contact</a></div>
+    <div><h3>Legal</h3><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/acceptable-use/">Acceptable use</a><a href="/medical-disclaimer/">Medical disclaimer</a></div>
+  </div>
+  <div class="site-shell footer-bottom">© 2026 same3le. Educational study software. Paid subscriptions are not yet active. Legal operator details will be completed before checkout launches.</div></footer>
 </body>
 </html>

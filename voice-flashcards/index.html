@@ -6,31 +6,145 @@
   <meta name="theme-color" content="#ff5a1f" />
   <title>Free Voice Flashcards That Quiz You Out Loud | same3le</title>
   <meta name="description" content="Create free voice flashcards from a Google Sheet or CSV. same3le reads each question aloud, listens to your answer, and keeps your study session moving." />
-  <link rel="canonical" href="https://same3le.com/voice-flashcards/" />
+  <link rel="canonical" href="https://www.same3le.com/voice-flashcards/" />
+<link rel="stylesheet" href="/marketing.css" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
   <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/marketing.css" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta property="og:image" content="https://www.same3le.com/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="same3le spoken tutor loop: the app asks a question, you answer out loud, then it continues." />
+  <meta property="og:site_name" content="same3le" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Free Voice Flashcards That Quiz You Out Loud" />
+  <meta name="twitter:description" content="Create free voice flashcards from a Google Sheet or CSV. same3le reads each question aloud, listens to your answer, and keeps your study session moving." />
+  <meta name="twitter:image" content="https://www.same3le.com/og-image.png" />
   <meta property="og:title" content="Free Voice Flashcards That Quiz You Out Loud" />
   <meta property="og:description" content="Add questions, answer out loud, and review hands-free with same3le." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://same3le.com/voice-flashcards/" />
+  <meta property="og:url" content="https://www.same3le.com/voice-flashcards/" />
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "same3le",
-    "applicationCategory": "EducationalApplication",
-    "operatingSystem": "Web browser",
-    "description": "A free voice flashcard app that reads questions aloud and can listen to spoken answers.",
-    "url": "https://same3le.com/voice-flashcards/",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
-  }
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.same3le.com/#organization",
+      "name": "same3le",
+      "url": "https://www.same3le.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.same3le.com/logo.png"
+      },
+      "image": "https://www.same3le.com/og-image.png"
+    },
+    {
+      "@type": [
+        "SoftwareApplication",
+        "WebApplication"
+      ],
+      "@id": "https://www.same3le.com/#app",
+      "name": "same3le",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web browser",
+      "description": "A free voice flashcard app that reads questions aloud and can listen to spoken answers.",
+      "url": "https://www.same3le.com/voice-flashcards/",
+      "image": "https://www.same3le.com/og-image.png",
+      "screenshot": "https://www.same3le.com/og-image.png",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Spoken questions",
+        "Listen-and-review",
+        "Google Sheet and CSV import",
+        "Local matching",
+        "Free core"
+      ],
+      "publisher": {
+        "@id": "https://www.same3le.com/#organization"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.same3le.com/voice-flashcards/#webpage",
+      "url": "https://www.same3le.com/voice-flashcards/",
+      "isPartOf": {
+        "@id": "https://www.same3le.com/#website"
+      },
+      "publisher": {
+        "@id": "https://www.same3le.com/#organization"
+      },
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          ".lede",
+          ".section-heading h2"
+        ]
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is same3le free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The current app and core voice-flashcard workflow are free, with no credit card required. A separate optional Pro plan may be offered later."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does same3le create questions from a PDF automatically?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Not yet. The current app uses a structured question-and-answer list from Google Sheets or CSV. It does not claim to convert every document automatically."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does it save my spoken audio?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The current prototype does not intentionally record or store audio. Browser speech recognition may be processed by the browser or operating-system provider."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use it on my phone?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. It runs in a modern browser and can be installed as a Progressive Web App. Speech recognition and locked-screen behavior vary by device."
+          }
+        }
+      ]
+    }
+  ]
+}
   </script>
 </head>
 <body>
   <a class="skip-link" href="#content">Skip to content</a>
   <header class="site-shell site-header">
     <a class="brand" href="/" aria-label="same3le home"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>same3le</strong><small>recite to me</small></span></a>
-    <nav class="site-nav" aria-label="Main navigation"><a href="/voice-flashcards/">Voice flashcards</a><a href="/medical-students/">Medical students</a><a href="/pricing/">Pricing</a><a class="nav-cta" href="/#your-questions">Use the free app</a></nav>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="/voice-flashcards/">Voice flashcards</a>
+      <a href="/quiz-me-from-my-notes/">Quiz from notes</a>
+      <a href="/google-sheets-flashcards/">Google Sheets</a>
+      <a href="/active-recall-out-loud/">Active recall</a>
+      <a href="/medical-students/">Medical students</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/about/">About</a>
+      <a href="/medical-disclaimer/">Medical disclaimer</a>
+      <a href="/contact/">Contact</a>
+      <a href="/terms/">Terms</a>
+      <a href="/privacy/">Privacy</a>
+      <a class="nav-cta" href="/#your-questions">Use the free app</a>
+    </nav>
   </header>
 
   <main id="content" class="site-shell">
@@ -86,6 +200,12 @@
     <section class="cta-band"><h2>Make your first voice flashcards free.</h2><p>Bring a Question column and an Answer column. same3le handles the spoken study loop.</p><a class="button primary" href="/#your-questions">Use my questions</a></section>
   </main>
 
-  <footer class="site-footer"><div class="site-shell footer-grid"><div><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>same3le</strong><small>voice flashcards that quiz you out loud</small></span></a><p>Free educational study software. Not for patient care or emergency use.</p></div><div><h3>Use cases</h3><a href="/quiz-me-from-my-notes/">Quiz me from my notes</a><a href="/google-sheets-flashcards/">Google Sheets flashcards</a><a href="/active-recall-out-loud/">Active recall out loud</a></div><div><h3>Product</h3><a href="/">Open the app</a><a href="/pricing/">Free and Pro plans</a><a href="/accessibility/">Accessibility</a></div><div><h3>Legal</h3><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/acceptable-use/">Acceptable use</a><a href="/medical-disclaimer/">Educational disclaimer</a></div></div><div class="site-shell footer-bottom">© 2026 same3le. Paid subscriptions are not yet active. Legal operator details will be completed before checkout launches.</div></footer>
+    <footer class="site-footer"><div class="site-shell footer-grid">
+    <div><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>same3le</strong><small>voice flashcards that quiz you out loud</small></span></a><p>same3le is an educational study tool, not medical advice. It must not be used for patient care.</p></div>
+    <div><h3>Use cases</h3><a href="/voice-flashcards/">Voice flashcards</a><a href="/quiz-me-from-my-notes/">Quiz from notes</a><a href="/google-sheets-flashcards/">Google Sheets</a><a href="/active-recall-out-loud/">Active recall</a><a href="/medical-students/">Medical students</a></div>
+    <div><h3>Product</h3><a href="/">Open the app</a><a href="/pricing/">Pricing</a><a href="/about/">About</a><a href="/contact/">Contact</a></div>
+    <div><h3>Legal</h3><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/acceptable-use/">Acceptable use</a><a href="/medical-disclaimer/">Medical disclaimer</a></div>
+  </div>
+  <div class="site-shell footer-bottom">© 2026 same3le. Educational study software. Paid subscriptions are not yet active. Legal operator details will be completed before checkout launches.</div></footer>
 </body>
 </html>

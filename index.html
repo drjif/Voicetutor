@@ -4,12 +4,73 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#ff5a1f" />
-  <meta name="description" content="same3le turns a list of questions and answers into a spoken tutor that quizzes you out loud." />
-  <title>same3le — Turn your notes into a spoken tutor</title>
+  <title>same3le — Free Voice Flashcards That Quiz You Out Loud</title>
+  <meta name="description" content="same3le is a free browser app that turns your question-and-answer list into a spoken tutor. Paste Q&amp;A, load a Google Sheet or CSV, then answer out loud or listen and review." />
+  <link rel="canonical" href="https://www.same3le.com/" />
   <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./favicon.ico" sizes="48x48" />
   <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <meta property="og:title" content="same3le — Free Voice Flashcards That Quiz You Out Loud" />
+  <meta property="og:description" content="A free in-browser spoken Q&amp;A tutor. You bring a Question + Answer list; same3le reads, listens, and keeps going." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.same3le.com/" />
+  <meta property="og:image" content="https://www.same3le.com/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="same3le spoken tutor loop: the app asks a question, you answer out loud, then it continues." />
+  <meta property="og:site_name" content="same3le" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="same3le — Free Voice Flashcards That Quiz You Out Loud" />
+  <meta name="twitter:description" content="A free in-browser spoken Q&amp;A tutor. You bring a Question + Answer list; same3le reads, listens, and keeps going." />
+  <meta name="twitter:image" content="https://www.same3le.com/og-image.png" />
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./features.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://www.same3le.com/#organization",
+        "name": "same3le",
+        "url": "https://www.same3le.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.same3le.com/logo.png"
+        },
+        "image": "https://www.same3le.com/og-image.png"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://www.same3le.com/#website",
+        "url": "https://www.same3le.com/",
+        "name": "same3le",
+        "publisher": { "@id": "https://www.same3le.com/#organization" }
+      },
+      {
+        "@type": ["SoftwareApplication", "WebApplication"],
+        "@id": "https://www.same3le.com/#app",
+        "name": "same3le",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web browser",
+        "description": "A free browser app that turns your question-and-answer list into a spoken tutor.",
+        "url": "https://www.same3le.com/",
+        "image": "https://www.same3le.com/og-image.png",
+        "screenshot": "https://www.same3le.com/og-image.png",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+          "Spoken questions",
+          "Listen-and-review",
+          "Google Sheet and CSV import",
+          "Local matching",
+          "Free core"
+        ],
+        "publisher": { "@id": "https://www.same3le.com/#organization" }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -25,10 +86,23 @@
       </a>
 
       <div class="header-actions">
-        <span class="prototype-badge">Free prototype</span>
+        <span class="prototype-badge">Free. Optional Pro later.</span>
         <button id="accountHeaderButton" class="button ghost compact-button" type="button">Sign in</button>
         <button id="installButton" class="button ghost compact-button" hidden>Install</button>
       </div>
+      <nav class="site-discover-nav" aria-label="Learn about same3le">
+        <a href="/voice-flashcards/">Voice flashcards</a>
+        <a href="/quiz-me-from-my-notes/">Quiz from notes</a>
+        <a href="/google-sheets-flashcards/">Google Sheets</a>
+        <a href="/active-recall-out-loud/">Active recall</a>
+        <a href="/medical-students/">Medical students</a>
+        <a href="/pricing/">Pricing</a>
+        <a href="/about/">About</a>
+        <a href="/medical-disclaimer/">Medical disclaimer</a>
+        <a href="/contact/">Contact</a>
+        <a href="/terms/">Terms</a>
+        <a href="/privacy/">Privacy</a>
+      </nav>
     </header>
 
     <div id="browserWarning" class="notice warning" hidden></div>
@@ -37,7 +111,8 @@
       <section class="hero" aria-labelledby="hero-heading">
         <div class="hero-copy">
           <p class="eyebrow">Study out loud. Remember more.</p>
-          <h1 id="hero-heading">Turn your notes into a tutor that quizzes you.</h1>
+          <h1 id="hero-heading">Free voice flashcards that quiz you out loud.</h1>
+          <p class="hero-definition">same3le is a free browser app that turns your question-and-answer list into a spoken tutor. Open <a href="/voice-flashcards/">voice flashcards</a> to see the study loop.</p>
           <p class="hero-subtitle">Give same3le a list of questions and answers. It reads one question. You answer out loud. Then it checks your answer and keeps going.</p>
 
           <div class="hero-actions">
@@ -447,8 +522,23 @@
         <span class="brand-mark small-mark" aria-hidden="true">3</span>
         <strong>same3le</strong>
       </div>
-      <p><strong>Prototype:</strong> same3le is an educational study tool. It is not medical advice and must not be used for patient care.</p>
+      <p>same3le is an educational study tool, not medical advice. It must not be used for patient care.</p>
       <p>Pasted questions and local Excel, Anki, CSV, TSV, and TXT files stay in this browser. If you sign in, Supabase stores authentication information and saved Google Sheet identifiers. same3le does not intentionally store spoken answers, audio, or transcripts. This version has no payment system.</p>
+      <nav class="homepage-use-cases" aria-label="same3le use cases">
+        <a href="/voice-flashcards/">Voice flashcards</a>
+        <a href="/quiz-me-from-my-notes/">Quiz from notes</a>
+        <a href="/google-sheets-flashcards/">Google Sheets</a>
+        <a href="/active-recall-out-loud/">Active recall</a>
+        <a href="/medical-students/">Medical students</a>
+      </nav>
+      <nav class="homepage-links" aria-label="Product and legal">
+        <a href="/pricing/">Pricing</a>
+        <a href="/about/">About</a>
+        <a href="/medical-disclaimer/">Medical disclaimer</a>
+        <a href="/contact/">Contact</a>
+        <a href="/terms/">Terms</a>
+        <a href="/privacy/">Privacy</a>
+      </nav>
     </footer>
   </div>
 

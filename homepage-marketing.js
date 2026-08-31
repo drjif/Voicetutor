@@ -10,35 +10,12 @@ function setMetadata() {
   document.title = 'same3le — Free Voice Flashcards That Quiz You Out Loud';
   const description = document.querySelector('meta[name="description"]');
   if (description) {
-    description.content = 'Study out loud for free. Choose a ready-made deck, paste Q&A from ChatGPT, Claude, or Gemini, or import your existing questions into same3le.';
-  }
-
-  if (!document.querySelector('link[rel="canonical"]')) {
-    const canonical = document.createElement('link');
-    canonical.rel = 'canonical';
-    canonical.href = 'https://same3le.com/';
-    document.head.append(canonical);
-  }
-
-  if (!document.querySelector('#same3leSoftwareSchema')) {
-    const schema = document.createElement('script');
-    schema.id = 'same3leSoftwareSchema';
-    schema.type = 'application/ld+json';
-    schema.textContent = JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'SoftwareApplication',
-      name: 'same3le',
-      applicationCategory: 'EducationalApplication',
-      operatingSystem: 'Web browser',
-      description: 'A free voice flashcard app that reads questions aloud and can listen to spoken answers.',
-      url: 'https://same3le.com/',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
-    });
-    document.head.append(schema);
+    description.content = 'same3le is a free browser app that turns your question-and-answer list into a spoken tutor. Paste Q&A, load a Google Sheet or CSV, then answer out loud or listen and review.';
   }
 }
 
 function addNavigation() {
+  if (document.querySelector('.site-discover-nav')) return;
   const topbar = document.querySelector('.topbar');
   const actions = document.querySelector('.header-actions');
   if (!topbar || !actions || document.querySelector('.marketing-nav')) return;
@@ -47,18 +24,20 @@ function addNavigation() {
   nav.className = 'marketing-nav';
   nav.setAttribute('aria-label', 'Learn about same3le');
   nav.innerHTML = `
-    <a href="#start-studying">Start</a>
-    <a href="#my-decks-heading">My decks</a>
     <a href="/voice-flashcards/">Voice flashcards</a>
+    <a href="/quiz-me-from-my-notes/">Quiz from notes</a>
+    <a href="/google-sheets-flashcards/">Google Sheets</a>
+    <a href="/active-recall-out-loud/">Active recall</a>
     <a href="/medical-students/">Medical students</a>
     <a href="/pricing/">Pricing</a>
+    <a href="/about/">About</a>
   `;
   topbar.insertBefore(nav, actions);
 }
 
 function strengthenHero() {
   const badge = document.querySelector('.prototype-badge');
-  if (badge) badge.textContent = 'Free app';
+  if (badge) badge.textContent = 'Free. Optional Pro later.';
 
   const eyebrow = document.querySelector('.hero-copy .eyebrow');
   if (eyebrow) eyebrow.textContent = 'Your questions. Your voice. Start in seconds.';
@@ -200,8 +179,9 @@ function addFreePlanStrip() {
 }
 
 function addFooterNavigation() {
+  if (document.querySelector('.homepage-links')) return;
   const footer = document.querySelector('footer');
-  if (!footer || document.querySelector('.homepage-links')) return;
+  if (!footer) return;
 
   const useCases = document.createElement('nav');
   useCases.className = 'homepage-use-cases';
