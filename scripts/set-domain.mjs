@@ -7,7 +7,7 @@ const root = process.cwd();
 const input = process.argv[2];
 
 if (!input) {
-  console.error('Usage: node scripts/set-domain.mjs https://same3le.com');
+  console.error('Usage: node scripts/set-domain.mjs https://www.same3le.com');
   process.exit(1);
 }
 
@@ -21,7 +21,7 @@ try {
   process.exit(1);
 }
 
-const includedExtensions = new Set(['.html', '.xml', '.txt', '.js', '.md']);
+const includedExtensions = new Set(['.html', '.xml', '.txt', '.js', '.mjs', '.md']);
 const ignoredDirectories = new Set(['.git', 'node_modules']);
 let changed = 0;
 

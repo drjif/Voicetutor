@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://same3le.com/sitemap.xml
+Sitemap: https://www.same3le.com/sitemap.xml

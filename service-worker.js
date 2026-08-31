@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v16';
+const CACHE_NAME = 'same3le-v17';
 const ASSETS = [
   './',
   './index.html',
@@ -33,6 +33,10 @@ const ASSETS = [
   './account-ui.js',
   './manifest.webmanifest',
   './icon.svg',
+  './favicon.ico',
+  './apple-touch-icon.png',
+  './og-image.png',
+  './logo.png',
   './data/sample-questions.csv'
 ];
 
