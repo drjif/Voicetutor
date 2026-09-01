@@ -78,6 +78,8 @@ export const elements = {
   markCorrectButton: document.querySelector('#markCorrectButton'),
   continueButton: document.querySelector('#continueButton'),
   browserWarning: document.querySelector('#browserWarning'),
+  testAudioButton: document.querySelector('#testAudioButton'),
+  audioTestResults: document.querySelector('#audioTestResults'),
   installButton: document.querySelector('#installButton'),
   conversionCard: document.querySelector('#conversionCard'),
   wouldPayButton: document.querySelector('#wouldPayButton'),

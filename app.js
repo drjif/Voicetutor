@@ -14,7 +14,13 @@ import { handleWakeLockPreferenceChange, releaseSessionWakeLock, setupPowerManag
 import { loadSavedGoogleSheet, setSheetReadyHandler, setupSheetEvents } from './sheet-v2.js';
 import { hideSheetReadyActions, setSavedSheetLoader, setupAccountUI, showSheetReadyActions } from './account-ui.js';
 import { setupSessionEvents } from './session-next.js';
-import { checkBrowserSupport, populateVoices } from './voice.js';
+import { checkBrowserSupport, populateVoices, applyDiagnosticSupportMessage } from './voice.js';
+import {
+  diagnoseBrowserAudio,
+  formatAudioDiagnosticReport,
+  isSpeechSynthesisUsable,
+  SPEAKER_TEST_SRC
+} from './audio-diagnostics.js';
 
 function updateModePresentation() {
   const mode = selectedMode();
@@ -75,6 +81,33 @@ function setupInstallation() {
   }
 }
 
+function setupAudioDiagnostics() {
+  const button = elements.testAudioButton;
+  const results = elements.audioTestResults;
+  if (!button || !results) return;
+
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    results.hidden = false;
+    results.dataset.type = 'loading';
+    results.textContent = 'Testing speakers and browser voice…';
+    try {
+      const diagnostic = diagnoseBrowserAudio({ audioSrc: SPEAKER_TEST_SRC });
+      const result = await diagnostic;
+      results.textContent = formatAudioDiagnosticReport(result);
+      results.dataset.type = result.htmlAudioPlayed && isSpeechSynthesisUsable(result)
+        ? 'success'
+        : 'warning';
+      applyDiagnosticSupportMessage(result);
+    } catch (error) {
+      results.dataset.type = 'warning';
+      results.textContent = `Audio test failed to run: ${error?.message || error}`;
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
+
 function initialize() {
   setupHomepageMarketing();
   setupFileImportUI();
@@ -91,9 +124,13 @@ function initialize() {
   setupPreferences();
   setupPowerManagement();
   setupInstallation();
+  setupAudioDiagnostics();
   checkBrowserSupport();
   populateVoices();
-  if ('speechSynthesis' in window) window.speechSynthesis.onvoiceschanged = populateVoices;
+  if (window.speechSynthesis) {
+    window.speechSynthesis.addEventListener?.('voiceschanged', populateVoices);
+    window.speechSynthesis.onvoiceschanged = populateVoices;
+  }
   updateModePresentation();
   setSessionStatus('idle', 'Ready');
   updateControls();

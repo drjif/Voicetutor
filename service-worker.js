@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v17';
+const CACHE_NAME = 'same3le-v18';
 const ASSETS = [
   './',
   './index.html',
@@ -24,6 +24,7 @@ const ASSETS = [
   './sheet-data.js',
   './session-next.js',
   './voice.js',
+  './audio-diagnostics.js',
   './grading.js',
   './lib.js',
   './supabase-config.js',
@@ -37,7 +38,8 @@ const ASSETS = [
   './apple-touch-icon.png',
   './og-image.png',
   './logo.png',
-  './data/sample-questions.csv'
+  './data/sample-questions.csv',
+  './audio/speaker-test.wav'
 ];
 
 self.addEventListener('install', (event) => {

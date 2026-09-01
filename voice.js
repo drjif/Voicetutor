@@ -1,4 +1,15 @@
+import {
+  TTS_UNAVAILABLE_WITH_AUDIO,
+  WEBSITE_AUDIO_UNAVAILABLE,
+  inspectSpeechSynthesisApi,
+  isSpeechSynthesisUsable,
+  summarizeAudioDiagnostic,
+  waitForSpeechVoices
+} from './audio-diagnostics.js';
 import { elements, loadSettings, setSessionStatus, state } from './dom.js';
+
+let loadTimeTtsWarning = null;
+let diagnosticSupportMessage = null;
 
 function isIOSDevice() {
   return /iPad|iPhone|iPod/i.test(navigator.userAgent)
@@ -15,9 +26,48 @@ function isSafariBrowser() {
   return /Safari/i.test(userAgent) && !/(CriOS|FxiOS|EdgiOS|OPiOS)/i.test(userAgent);
 }
 
+function renderBrowserSupport(recognitionMessages) {
+  const messages = [...recognitionMessages];
+  if (diagnosticSupportMessage) messages.push(diagnosticSupportMessage);
+  else if (loadTimeTtsWarning) messages.push(loadTimeTtsWarning);
+
+  if (messages.length) {
+    elements.browserWarning.hidden = false;
+    elements.browserWarning.textContent = messages.join(' ');
+  } else {
+    elements.browserWarning.hidden = true;
+    elements.browserWarning.textContent = '';
+  }
+}
+
+function recognitionSupportMessages() {
+  const messages = [];
+  const activeInput = elements.modeInputs.find((input) => input.value === 'active');
+  const passiveInput = elements.modeInputs.find((input) => input.value === 'passive');
+
+  if (!recognitionConstructor()) {
+    messages.push('Answer out loud is unavailable here; use Safari on iPhone or current Chrome or Edge on a computer.');
+    if (activeInput) {
+      activeInput.disabled = true;
+      activeInput.closest('.mode-card')?.setAttribute('aria-disabled', 'true');
+      if (activeInput.checked && passiveInput) passiveInput.checked = true;
+    }
+  } else if (isIOSDevice() && (isStandaloneApp() || !isSafariBrowser())) {
+    messages.push('On iPhone, Answer out loud is most reliable in a Safari browser tab. Installed web apps and other iPhone browsers may expose speech recognition but still fail to start it.');
+  } else if (isIOSDevice()) {
+    messages.push('On iPhone, Answer out loud requires Safari microphone permission and Siri enabled in Settings.');
+  }
+
+  return messages;
+}
+
 export function populateVoices() {
   const voices = window.speechSynthesis?.getVoices?.() ?? [];
   state.voices = voices;
+  if (voices.length && loadTimeTtsWarning && !diagnosticSupportMessage) {
+    loadTimeTtsWarning = null;
+    renderBrowserSupport(recognitionSupportMessages());
+  }
   const savedVoice = loadSettings().voiceURI;
   elements.voiceSelect.innerHTML = '';
   const preferred = voices.filter((voice) => /^en(-|_)/i.test(voice.lang));
@@ -289,33 +339,41 @@ export function listenForAnswer(generation) {
   });
 }
 
+export function applyDiagnosticSupportMessage(diagnostic) {
+  const view = summarizeAudioDiagnostic(diagnostic);
+  if (isSpeechSynthesisUsable(diagnostic)) {
+    diagnosticSupportMessage = null;
+    loadTimeTtsWarning = null;
+  } else if (view.summary === TTS_UNAVAILABLE_WITH_AUDIO || view.summary === WEBSITE_AUDIO_UNAVAILABLE) {
+    diagnosticSupportMessage = view.summary;
+    loadTimeTtsWarning = null;
+  }
+  renderBrowserSupport(recognitionSupportMessages());
+}
+
 export function checkBrowserSupport() {
-  const messages = [];
-  const activeInput = elements.modeInputs.find((input) => input.value === 'active');
-  const passiveInput = elements.modeInputs.find((input) => input.value === 'passive');
+  const api = inspectSpeechSynthesisApi(window);
+  const recognitionMessages = recognitionSupportMessages();
 
-  if (!('speechSynthesis' in window)) {
-    messages.push('This browser cannot read questions aloud.');
+  if (!api.hasSpeechSynthesis || !api.hasSpeechSynthesisUtterance) {
+    loadTimeTtsWarning = 'This browser cannot read questions aloud.';
+    renderBrowserSupport(recognitionMessages);
+    return;
   }
 
-  if (!recognitionConstructor()) {
-    messages.push('Answer out loud is unavailable here; use Safari on iPhone or current Chrome or Edge on a computer.');
-    if (activeInput) {
-      activeInput.disabled = true;
-      activeInput.closest('.mode-card')?.setAttribute('aria-disabled', 'true');
-      if (activeInput.checked && passiveInput) passiveInput.checked = true;
+  // Presence of speechSynthesis is not proof that TTS works (Tesla-style shells
+  // expose the API with zero voices and utterances that never start).
+  loadTimeTtsWarning = null;
+  renderBrowserSupport(recognitionMessages);
+
+  waitForSpeechVoices().then(({ voiceCount }) => {
+    if (diagnosticSupportMessage) return;
+    const liveCount = window.speechSynthesis?.getVoices?.()?.length ?? voiceCount;
+    if (liveCount > 0) {
+      loadTimeTtsWarning = null;
+    } else {
+      loadTimeTtsWarning = 'This browser does not currently provide a usable text-to-speech voice. Tap Test audio to confirm speakers and browser voice.';
     }
-  } else if (isIOSDevice() && (isStandaloneApp() || !isSafariBrowser())) {
-    messages.push('On iPhone, Answer out loud is most reliable in a Safari browser tab. Installed web apps and other iPhone browsers may expose speech recognition but still fail to start it.');
-  } else if (isIOSDevice()) {
-    messages.push('On iPhone, Answer out loud requires Safari microphone permission and Siri enabled in Settings.');
-  }
-
-  if (messages.length) {
-    elements.browserWarning.hidden = false;
-    elements.browserWarning.textContent = messages.join(' ');
-  } else {
-    elements.browserWarning.hidden = true;
-    elements.browserWarning.textContent = '';
-  }
+    renderBrowserSupport(recognitionSupportMessages());
+  });
 }

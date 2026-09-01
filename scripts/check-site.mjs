@@ -182,7 +182,9 @@ expect('file-import.js', fileImport, /parseXlsxWorkbook/i, 'Excel parser is not 
 expect('file-import.js', fileImport, /parseDelimited/i, 'CSV\/TSV parser is not connected');
 
 const serviceWorker = await read('service-worker.js');
-expect('service-worker.js', serviceWorker, /same3le-v17/i, 'SEO/GEO assets must refresh the PWA cache');
+expect('service-worker.js', serviceWorker, /same3le-v18/i, 'SEO/GEO assets must refresh the PWA cache');
+expect('service-worker.js', serviceWorker, /audio-diagnostics\.js/, 'missing audio-diagnostics.js from PWA cache');
+expect('service-worker.js', serviceWorker, /speaker-test\.wav/, 'missing speaker-test.wav from PWA cache');
 for (const asset of ['file-import-ui.js', 'file-import.js', 'xlsx-import.js', 'anki-import.js', 'zip-reader.js', 'sqlite-read.js', 'supabase-config.js', 'auth-state.js', 'auth.js', 'saved-sources.js', 'account-ui.js', 'favicon.ico', 'og-image.png']) {
   expect('service-worker.js', serviceWorker, new RegExp(asset.replace('.', '\\.')), `missing ${asset} from PWA cache`);
 }
@@ -205,6 +207,21 @@ expect('index.html', homepage, /href="\/active-recall-out-loud\/"/, 'homepage do
 expect('index.html', homepage, /href="\/medical-students\/"/, 'homepage does not link medical-students');
 expect('index.html', homepage, /same3le is a free browser app that turns your question-and-answer list into a spoken tutor/, 'missing crawlable definition');
 expect('index.html', homepage, /Free\. Optional Pro later\./, 'missing honest free positioning');
+expect('index.html', homepage, /id="testAudioButton"/, 'missing Test audio button');
+expect('index.html', homepage, /id="audioTestResults"/, 'missing audio test results');
+
+const audioDiagnostics = await read('audio-diagnostics.js');
+expect('audio-diagnostics.js', audioDiagnostics, /speechSynthesis/, 'missing speechSynthesis check');
+expect('audio-diagnostics.js', audioDiagnostics, /SpeechSynthesisUtterance/, 'missing SpeechSynthesisUtterance check');
+expect('audio-diagnostics.js', audioDiagnostics, /getVoices/, 'missing getVoices check');
+expect('audio-diagnostics.js', audioDiagnostics, /voiceschanged/, 'missing voiceschanged check');
+expect('audio-diagnostics.js', audioDiagnostics, /onstart/, 'missing utterance onstart check');
+expect('audio-diagnostics.js', audioDiagnostics, /onend/, 'missing utterance onend check');
+expect('audio-diagnostics.js', audioDiagnostics, /onerror/, 'missing utterance onerror check');
+expect('audio-diagnostics.js', audioDiagnostics, /This browser can play audio but does not provide a usable text-to-speech voice/, 'missing Tesla-style TTS warning');
+expect('audio-diagnostics.js', audioDiagnostics, /Website audio is currently unavailable in this browser\/device/, 'missing both-fail audio warning');
+expect('audio-diagnostics.js', audioDiagnostics, /same3le audio test/, 'missing first-party TTS test phrase');
+await read('audio/speaker-test.wav');
 
 const about = await read('about/index.html');
 expect('about/index.html', about, /does not automatically generate questions from PDFs/i, 'about missing PDF limitation');
