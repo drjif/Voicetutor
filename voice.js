@@ -341,12 +341,13 @@ export function listenForAnswer(generation) {
 
 export function applyDiagnosticSupportMessage(diagnostic) {
   const view = summarizeAudioDiagnostic(diagnostic);
+  loadTimeTtsWarning = null;
+  // Detailed status and the Tesla/both-fail sentences live in #audioTestResults.
+  // Do not repeat them in the top banner.
   if (isSpeechSynthesisUsable(diagnostic)) {
     diagnosticSupportMessage = null;
-    loadTimeTtsWarning = null;
   } else if (view.summary === TTS_UNAVAILABLE_WITH_AUDIO || view.summary === WEBSITE_AUDIO_UNAVAILABLE) {
-    diagnosticSupportMessage = view.summary;
-    loadTimeTtsWarning = null;
+    diagnosticSupportMessage = null;
   }
   renderBrowserSupport(recognitionSupportMessages());
 }
