@@ -394,6 +394,39 @@ input[type="range"] { width: 100%; accent-color: var(--primary); }
 
 .notice { margin-bottom: 18px; padding: 13px 15px; border-radius: 12px; }
 .notice.warning { background: var(--warning-soft); color: var(--warning); border: 1px solid #f6c36f; }
+.audio-test-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin: -6px 0 18px;
+}
+.audio-test-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.audio-test-results {
+  white-space: pre-line;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--ink);
+}
+.audio-test-results[data-type="success"] {
+  background: var(--success-soft);
+  border-color: #b7e4c7;
+  color: var(--success);
+}
+.audio-test-results[data-type="warning"] {
+  background: var(--warning-soft);
+  border-color: #f6c36f;
+  color: var(--warning);
+}
+.audio-test-results[data-type="loading"] {
+  background: var(--primary-soft);
+  border-color: #ffd3c2;
+  color: var(--primary-dark);
+}
 
 .player-card { padding: clamp(22px, 4vw, 34px); }
 .player-topline { display: flex; justify-content: space-between; gap: 12px; align-items: center; font-weight: 800; }
