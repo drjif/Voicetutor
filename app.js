@@ -13,7 +13,7 @@ import { setupHomepageMarketing } from './homepage-marketing.js';
 import { handleWakeLockPreferenceChange, releaseSessionWakeLock, setupPowerManagement } from './power.js';
 import { loadSavedGoogleSheet, setSheetReadyHandler, setupSheetEvents } from './sheet-v2.js';
 import { hideSheetReadyActions, setSavedSheetLoader, setupAccountUI, showSheetReadyActions } from './account-ui.js';
-import { setupSessionEvents } from './session-next.js';
+import { restartAt, setupSessionEvents } from './session-next.js';
 import { checkBrowserSupport, populateVoices } from './voice.js';
 
 function updateModePresentation() {
@@ -32,6 +32,31 @@ function updateModePresentation() {
     elements.startNote.textContent = 'Experimental: start the continuous spoken review before locking your phone. Background playback still depends on your phone and browser. This mode does not listen or grade.';
     releaseSessionWakeLock();
   }
+}
+
+function setupSessionControlGuards() {
+  // startSession performs async cleanup before it marks the run active. Disable
+  // immediately so a fast double-click cannot launch overlapping generations.
+  elements.startButton.addEventListener('click', () => {
+    if (state.status === 'complete') {
+      // A completed run leaves the player on the final card. Start should mean
+      // start the deck again unless the user explicitly chose another start row
+      // (changing the selector moves the session back to Ready first).
+      elements.startRow.value = '0';
+    }
+    elements.startButton.disabled = true;
+  }, { capture: true });
+
+  // At completion Repeat used to be enabled but restartAt treated the session as
+  // inactive, so the button only changed the UI to Ready. Make it actually replay
+  // the currently displayed card.
+  elements.repeatButton.addEventListener('click', (event) => {
+    if (state.status !== 'complete') return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    state.status = 'running';
+    restartAt(state.currentIndex);
+  }, { capture: true });
 }
 
 function setupPreferences() {
@@ -87,6 +112,7 @@ function initialize() {
   });
   setSavedSheetLoader((deck) => loadSavedGoogleSheet(deck));
   setupAccountUI();
+  setupSessionControlGuards();
   setupSessionEvents();
   setupPreferences();
   setupPowerManagement();
