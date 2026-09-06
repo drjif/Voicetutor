@@ -20,6 +20,7 @@ const ASSETS = [
   './paste-data.js',
   './power.js',
   './lockscreen.js',
+  './study-timeline.js',
   './sheet-v2.js',
   './sheet-data.js',
   './session-next.js',

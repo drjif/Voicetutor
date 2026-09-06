@@ -19,8 +19,12 @@ import {
   setLockScreenPlaybackState,
   speakLockScreenTrack
 } from './lockscreen.js';
+import { markerForCharacter } from './study-timeline.js';
 import { releaseSessionWakeLock, requestSessionWakeLock } from './power.js';
 import { assertGeneration, listenForAnswer, pausableWait, speak, waitUntilResumed } from './voice.js';
+
+const PASSIVE_ANSWER_HOLD_MS = 1600;
+const ACTIVE_CORRECT_HOLD_MS = 1200;
 
 function hideReviewControls() {
   elements.reviewDecision.hidden = true;
@@ -35,13 +39,38 @@ function sourceBadgeText(item) {
   return `Question ${state.currentIndex + 1}`;
 }
 
+function ensureAnswerVisible() {
+  window.requestAnimationFrame(() => {
+    if (elements.answerCard.hidden || document.visibilityState === 'hidden') return;
+    const rect = elements.answerCard.getBoundingClientRect();
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    if (rect.top >= 0 && rect.bottom <= viewportHeight) return;
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    elements.answerCard.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'nearest'
+    });
+  });
+}
+
+function setStudyPhase(phase, item, { syncLockScreen = false, bringAnswerIntoView = true } = {}) {
+  elements.sessionPanel.dataset.phase = phase;
+  const showAnswer = phase === 'answer' || phase === 'feedback';
+  elements.answerCard.hidden = !showAnswer;
+
+  if (showAnswer && bringAnswerIntoView) ensureAnswerVisible();
+  if (syncLockScreen && state.mode === 'lockscreen') {
+    setLockScreenMetadata(item, state.currentIndex, state.questions.length, phase);
+  }
+}
+
 export function renderCurrentQuestion() {
   const item = state.questions[state.currentIndex];
   if (!item) return;
   elements.sessionPanel.hidden = false;
   elements.currentQuestion.textContent = item.question;
   elements.currentAnswer.textContent = item.answer;
-  elements.answerCard.hidden = true;
+  setStudyPhase('question', item, { bringAnswerIntoView: false });
   elements.transcriptCard.hidden = true;
   elements.listeningIndicator.hidden = true;
   elements.transcript.textContent = '';
@@ -56,14 +85,16 @@ export function renderCurrentQuestion() {
 }
 
 async function runPassiveItem(item, generation) {
+  setStudyPhase('question', item, { bringAnswerIntoView: false });
   setSessionStatus('running', 'Reading question');
   await speak(item.question, generation);
+  setStudyPhase('thinking', item, { bringAnswerIntoView: false });
   setSessionStatus('waiting', `Waiting ${elements.answerDelay.value}s`);
   await pausableWait(Number(elements.answerDelay.value) * 1000, generation);
-  elements.answerCard.hidden = false;
+  setStudyPhase('answer', item);
   setSessionStatus('running', 'Reading answer');
   await speak(`The answer is: ${item.answer}`, generation);
-  await pausableWait(650, generation);
+  await pausableWait(PASSIVE_ANSWER_HOLD_MS, generation);
 }
 
 function voiceCommand(transcript) {
@@ -138,8 +169,10 @@ function applyVoiceCommand(command) {
 }
 
 async function runActiveItem(item, generation) {
+  setStudyPhase('question', item, { bringAnswerIntoView: false });
   setSessionStatus('running', 'Reading question');
   await speak(item.question, generation);
+  setStudyPhase('thinking', item, { bringAnswerIntoView: false });
   await pausableWait(250, generation);
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -168,10 +201,10 @@ async function runActiveItem(item, generation) {
       : 'No spoken answer detected.';
 
     if (grading.outcome === 'correct') {
-      elements.answerCard.hidden = true;
+      setStudyPhase('feedback', item);
       setSessionStatus('running', 'Correct');
       await speak('Correct.', generation);
-      await pausableWait(450, generation);
+      await pausableWait(ACTIVE_CORRECT_HOLD_MS, generation);
       return;
     }
 
@@ -179,6 +212,7 @@ async function runActiveItem(item, generation) {
       && (!grading.transcript || grading.score >= 0.1);
 
     if (shouldRetry && grading.outcome === 'incorrect') {
+      setStudyPhase('thinking', item, { bringAnswerIntoView: false });
       setSessionStatus('running', 'Try once more');
       const heard = grading.transcript
         ? `I heard: ${grading.transcript}. `
@@ -188,7 +222,7 @@ async function runActiveItem(item, generation) {
       continue;
     }
 
-    elements.answerCard.hidden = false;
+    setStudyPhase('feedback', item);
     if (grading.outcome === 'partial') {
       setSessionStatus('running', 'Partially correct');
       await speak(`Partially correct. The full answer is: ${item.answer}`, generation);
@@ -211,23 +245,15 @@ async function runActiveItem(item, generation) {
   }
 }
 
-function markerForCharacter(markers, charIndex) {
-  let matched = markers[0] ?? null;
-  for (const marker of markers) {
-    if (marker.charIndex > charIndex) break;
-    matched = marker;
-  }
-  return matched;
-}
-
-function updateLockScreenQuestion(index) {
-  const nextIndex = clamp(index, 0, state.questions.length - 1);
+function updateLockScreenPhase(marker) {
+  const nextIndex = clamp(marker.index, 0, state.questions.length - 1);
   if (nextIndex !== state.currentIndex) {
     state.currentIndex = nextIndex;
     renderCurrentQuestion();
   }
   const item = state.questions[nextIndex];
-  setLockScreenMetadata(item, nextIndex, state.questions.length);
+  const phase = marker.phase === 'answer' ? 'answer' : 'question';
+  setStudyPhase(phase, item, { syncLockScreen: true, bringAnswerIntoView: phase === 'answer' });
 }
 
 async function runLockScreenReview(generation) {
@@ -246,14 +272,19 @@ async function runLockScreenReview(generation) {
     onPrevious: () => restartAt(state.currentIndex - 1)
   });
 
-  updateLockScreenQuestion(startIndex);
+  updateLockScreenPhase({ index: startIndex, phase: 'question' });
+  let activeMarkerKey = `${startIndex}:question`;
   setSessionStatus('running', 'Lock-screen review');
   setLockScreenPlaybackState('playing');
 
   try {
     await speakLockScreenTrack(track.text, generation, (charIndex) => {
       const marker = markerForCharacter(track.markers, charIndex);
-      if (marker) updateLockScreenQuestion(marker.index);
+      if (!marker) return;
+      const markerKey = `${marker.index}:${marker.phase}`;
+      if (markerKey === activeMarkerKey) return;
+      activeMarkerKey = markerKey;
+      updateLockScreenPhase(marker);
     });
     assertGeneration(generation);
 
@@ -263,7 +294,7 @@ async function runLockScreenReview(generation) {
 
     state.currentIndex = Math.max(0, state.questions.length - 1);
     renderCurrentQuestion();
-    elements.answerCard.hidden = false;
+    setStudyPhase('answer', state.questions[state.currentIndex]);
     setSessionStatus('complete', 'Review complete');
     elements.startButton.disabled = false;
     noteSessionCompleted();
@@ -299,6 +330,7 @@ async function runSession(generation) {
 
     state.currentIndex = Math.max(0, state.questions.length - 1);
     renderCurrentQuestion();
+    setStudyPhase('answer', state.questions[state.currentIndex]);
     setSessionStatus('complete', 'Session complete');
     elements.startButton.disabled = false;
     noteSessionCompleted();
@@ -421,6 +453,9 @@ export function setupSessionEvents() {
       renderCurrentQuestion();
       setSessionStatus('idle', 'Ready');
     }
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && !elements.answerCard.hidden) ensureAnswerVisible();
   });
   document.addEventListener('keydown', (event) => {
     if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;

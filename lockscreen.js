@@ -1,33 +1,11 @@
 import { elements, state } from './dom.js';
+import { lockScreenMetadataFields } from './study-timeline.js';
 import { assertGeneration, createCancellationError } from './voice.js';
+
+export { createLockScreenTrack } from './study-timeline.js';
 
 function selectedVoice() {
   return state.voices.find((voice) => voice.voiceURI === elements.voiceSelect.value) ?? null;
-}
-
-function cleanText(value) {
-  return String(value ?? '').replace(/\s+/g, ' ').trim();
-}
-
-function thinkingPause(seconds) {
-  const beats = Math.max(1, Math.min(10, Math.round(Number(seconds) / 1.5)));
-  return Array.from({ length: beats }, () => ' ...').join('');
-}
-
-export function createLockScreenTrack(questions, startIndex, thinkSeconds) {
-  let text = 'Lock-screen review starting. ';
-  const markers = [];
-  const pause = thinkingPause(thinkSeconds);
-
-  questions.slice(startIndex).forEach((item, offset) => {
-    const index = startIndex + offset;
-    markers.push({ index, charIndex: text.length });
-    text += `Question ${index + 1}. ${cleanText(item.question)}. Think about your answer.${pause} The answer is ${cleanText(item.answer)}. `;
-    if (index < questions.length - 1) text += 'Next question. ';
-  });
-
-  text += 'Review complete.';
-  return { text, markers };
 }
 
 export function speakLockScreenTrack(text, generation, onBoundary) {
@@ -95,12 +73,11 @@ export function configureLockScreenMediaSession({ onPlay, onPause, onStop, onNex
   setAction('previoustrack', onPrevious);
 }
 
-export function setLockScreenMetadata(item, index, total) {
+export function setLockScreenMetadata(item, index, total, phase = 'question') {
   if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || !item) return;
+  const metadata = lockScreenMetadataFields(item, index, total, phase);
   navigator.mediaSession.metadata = new MediaMetadata({
-    title: item.question,
-    artist: 'same3le — Lock-screen review',
-    album: `Question ${index + 1} of ${total}`,
+    ...metadata,
     artwork: [
       {
         src: new URL('./icon.svg', window.location.href).href,
