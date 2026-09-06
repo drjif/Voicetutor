@@ -21,8 +21,10 @@ export function createLockScreenTrack(questions, startIndex, thinkSeconds) {
 
   questions.slice(startIndex).forEach((item, offset) => {
     const index = startIndex + offset;
-    markers.push({ index, charIndex: text.length });
-    text += `Question ${index + 1}. ${cleanText(item.question)}. Think about your answer.${pause} The answer is ${cleanText(item.answer)}. `;
+    markers.push({ index, phase: 'question', charIndex: text.length });
+    text += `Question ${index + 1}. ${cleanText(item.question)}. Think about your answer.${pause} `;
+    markers.push({ index, phase: 'answer', charIndex: text.length });
+    text += `The answer is ${cleanText(item.answer)}. `;
     if (index < questions.length - 1) text += 'Next question. ';
   });
 
@@ -95,12 +97,16 @@ export function configureLockScreenMediaSession({ onPlay, onPause, onStop, onNex
   setAction('previoustrack', onPrevious);
 }
 
-export function setLockScreenMetadata(item, index, total) {
+export function setLockScreenMetadata(item, index, total, phase = 'question') {
   if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined' || !item) return;
+  const showingAnswer = phase === 'answer';
+  const answer = cleanText(item.answer);
   navigator.mediaSession.metadata = new MediaMetadata({
-    title: item.question,
-    artist: 'same3le — Lock-screen review',
-    album: `Question ${index + 1} of ${total}`,
+    title: cleanText(item.question),
+    artist: showingAnswer
+      ? `Answer: ${answer}`
+      : 'same3le — Think about your answer',
+    album: `Question ${index + 1} of ${total}${showingAnswer ? ' · Answer' : ''}`,
     artwork: [
       {
         src: new URL('./icon.svg', window.location.href).href,
