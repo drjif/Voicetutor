@@ -1,7 +1,16 @@
 import { elements, state } from './dom.js';
 
+const ACTIVE_SESSION_STATUSES = ['running', 'listening', 'waiting', 'paused'];
+
 function wakeLockSupported() {
   return Boolean(navigator.wakeLock?.request);
+}
+
+function activeRecallOwnsWakeLock() {
+  return state.mode === 'active'
+    && ACTIVE_SESSION_STATUSES.includes(state.status)
+    && state.wakeLockRequested
+    && elements.keepScreenAwake.checked;
 }
 
 function setWakeLockStatus(message, type = 'neutral') {
@@ -41,7 +50,11 @@ export async function requestSessionWakeLock() {
   }
 }
 
-export async function releaseSessionWakeLock({ preserveIntent = false } = {}) {
+export async function releaseSessionWakeLock({ preserveIntent = false, force = false } = {}) {
+  // A cancelled session can finish after Repeat/Previous/Next has already started
+  // a replacement session. Do not let that stale cleanup release the new run's lock.
+  if (!force && !preserveIntent && activeRecallOwnsWakeLock()) return false;
+
   if (!preserveIntent) state.wakeLockRequested = false;
   const lock = state.wakeLock;
   state.wakeLock = null;
@@ -55,6 +68,7 @@ export async function releaseSessionWakeLock({ preserveIntent = false } = {}) {
   if (!state.wakeLockRequested) {
     setWakeLockStatus('The screen stays awake only while an active-recall session is running.', 'neutral');
   }
+  return true;
 }
 
 export function handleWakeLockPreferenceChange() {
@@ -62,7 +76,7 @@ export function handleWakeLockPreferenceChange() {
     releaseSessionWakeLock();
     return;
   }
-  if (state.mode === 'active' && ['running', 'listening', 'waiting', 'paused'].includes(state.status)) {
+  if (state.mode === 'active' && ACTIVE_SESSION_STATUSES.includes(state.status)) {
     requestSessionWakeLock();
   }
 }
@@ -76,7 +90,7 @@ export function setupPowerManagement() {
     if (document.visibilityState === 'visible'
         && state.wakeLockRequested
         && state.mode === 'active'
-        && ['running', 'listening', 'waiting', 'paused'].includes(state.status)) {
+        && ACTIVE_SESSION_STATUSES.includes(state.status)) {
       requestSessionWakeLock();
     }
   });
