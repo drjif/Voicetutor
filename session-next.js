@@ -22,6 +22,9 @@ import {
 import { releaseSessionWakeLock, requestSessionWakeLock } from './power.js';
 import { assertGeneration, listenForAnswer, pausableWait, speak, waitUntilResumed } from './voice.js';
 
+const ANSWER_HOLD_MS = 1600;
+const CORRECT_ANSWER_HOLD_MS = 1100;
+
 function hideReviewControls() {
   elements.reviewDecision.hidden = true;
   state.reviewChoice = null;
@@ -35,13 +38,57 @@ function sourceBadgeText(item) {
   return `Question ${state.currentIndex + 1}`;
 }
 
+function answerCardIsVisibleInViewport() {
+  if (!elements.answerCard?.getBoundingClientRect) return true;
+  const rect = elements.answerCard.getBoundingClientRect();
+  const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 0;
+  return rect.top >= 0 && rect.bottom <= viewportHeight;
+}
+
+function revealAnswerCard() {
+  elements.answerCard.hidden = false;
+  if (document.visibilityState && document.visibilityState !== 'visible') return;
+  if (answerCardIsVisibleInViewport() || typeof elements.answerCard.scrollIntoView !== 'function') return;
+
+  const scrollToAnswer = () => {
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    try {
+      elements.answerCard.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'nearest'
+      });
+    } catch {
+      elements.answerCard.scrollIntoView(false);
+    }
+  };
+
+  if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(scrollToAnswer);
+  else scrollToAnswer();
+}
+
+function setStudyPhase(phase, item, index = state.currentIndex, { syncLockScreen = false } = {}) {
+  if (elements.sessionPanel) elements.sessionPanel.dataset.studyPhase = phase;
+  const answerVisible = phase === 'answer' || phase === 'feedback';
+  if (answerVisible) revealAnswerCard();
+  else elements.answerCard.hidden = true;
+
+  if (syncLockScreen && item) {
+    setLockScreenMetadata(
+      item,
+      index,
+      state.questions.length,
+      answerVisible ? 'answer' : 'question'
+    );
+  }
+}
+
 export function renderCurrentQuestion() {
   const item = state.questions[state.currentIndex];
   if (!item) return;
   elements.sessionPanel.hidden = false;
   elements.currentQuestion.textContent = item.question;
   elements.currentAnswer.textContent = item.answer;
-  elements.answerCard.hidden = true;
+  setStudyPhase('question', item, state.currentIndex);
   elements.transcriptCard.hidden = true;
   elements.listeningIndicator.hidden = true;
   elements.transcript.textContent = '';
@@ -56,14 +103,16 @@ export function renderCurrentQuestion() {
 }
 
 async function runPassiveItem(item, generation) {
+  setStudyPhase('question', item);
   setSessionStatus('running', 'Reading question');
   await speak(item.question, generation);
+  setStudyPhase('thinking', item);
   setSessionStatus('waiting', `Waiting ${elements.answerDelay.value}s`);
   await pausableWait(Number(elements.answerDelay.value) * 1000, generation);
-  elements.answerCard.hidden = false;
+  setStudyPhase('answer', item);
   setSessionStatus('running', 'Reading answer');
   await speak(`The answer is: ${item.answer}`, generation);
-  await pausableWait(650, generation);
+  await pausableWait(ANSWER_HOLD_MS, generation);
 }
 
 function voiceCommand(transcript) {
@@ -138,8 +187,10 @@ function applyVoiceCommand(command) {
 }
 
 async function runActiveItem(item, generation) {
+  setStudyPhase('question', item);
   setSessionStatus('running', 'Reading question');
   await speak(item.question, generation);
+  setStudyPhase('thinking', item);
   await pausableWait(250, generation);
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -168,10 +219,10 @@ async function runActiveItem(item, generation) {
       : 'No spoken answer detected.';
 
     if (grading.outcome === 'correct') {
-      elements.answerCard.hidden = true;
+      setStudyPhase('feedback', item);
       setSessionStatus('running', 'Correct');
-      await speak('Correct.', generation);
-      await pausableWait(450, generation);
+      await speak(`Correct. The answer is: ${item.answer}`, generation);
+      await pausableWait(CORRECT_ANSWER_HOLD_MS, generation);
       return;
     }
 
@@ -179,6 +230,7 @@ async function runActiveItem(item, generation) {
       && (!grading.transcript || grading.score >= 0.1);
 
     if (shouldRetry && grading.outcome === 'incorrect') {
+      setStudyPhase('thinking', item);
       setSessionStatus('running', 'Try once more');
       const heard = grading.transcript
         ? `I heard: ${grading.transcript}. `
@@ -188,7 +240,7 @@ async function runActiveItem(item, generation) {
       continue;
     }
 
-    elements.answerCard.hidden = false;
+    setStudyPhase('answer', item);
     if (grading.outcome === 'partial') {
       setSessionStatus('running', 'Partially correct');
       await speak(`Partially correct. The full answer is: ${item.answer}`, generation);
@@ -203,6 +255,7 @@ async function runActiveItem(item, generation) {
       return;
     }
     if (decision === 'correct') {
+      setStudyPhase('feedback', item);
       setSessionStatus('running', 'Marked correct');
       await speak('Marked correct.', generation);
       await pausableWait(300, generation);
@@ -220,14 +273,16 @@ function markerForCharacter(markers, charIndex) {
   return matched;
 }
 
-function updateLockScreenQuestion(index) {
-  const nextIndex = clamp(index, 0, state.questions.length - 1);
+function updateLockScreenPhase(marker) {
+  const nextIndex = clamp(marker.index, 0, state.questions.length - 1);
   if (nextIndex !== state.currentIndex) {
     state.currentIndex = nextIndex;
     renderCurrentQuestion();
   }
   const item = state.questions[nextIndex];
-  setLockScreenMetadata(item, nextIndex, state.questions.length);
+  setStudyPhase(marker.phase === 'answer' ? 'answer' : 'question', item, nextIndex, {
+    syncLockScreen: true
+  });
 }
 
 async function runLockScreenReview(generation) {
@@ -246,14 +301,20 @@ async function runLockScreenReview(generation) {
     onPrevious: () => restartAt(state.currentIndex - 1)
   });
 
-  updateLockScreenQuestion(startIndex);
+  const initialMarker = { index: startIndex, phase: 'question' };
+  updateLockScreenPhase(initialMarker);
+  let activeMarkerKey = `${startIndex}:question`;
   setSessionStatus('running', 'Lock-screen review');
   setLockScreenPlaybackState('playing');
 
   try {
     await speakLockScreenTrack(track.text, generation, (charIndex) => {
       const marker = markerForCharacter(track.markers, charIndex);
-      if (marker) updateLockScreenQuestion(marker.index);
+      if (!marker) return;
+      const markerKey = `${marker.index}:${marker.phase}`;
+      if (markerKey === activeMarkerKey) return;
+      activeMarkerKey = markerKey;
+      updateLockScreenPhase(marker);
     });
     assertGeneration(generation);
 
@@ -263,7 +324,8 @@ async function runLockScreenReview(generation) {
 
     state.currentIndex = Math.max(0, state.questions.length - 1);
     renderCurrentQuestion();
-    elements.answerCard.hidden = false;
+    const finalItem = state.questions[state.currentIndex];
+    if (finalItem) setStudyPhase('answer', finalItem, state.currentIndex);
     setSessionStatus('complete', 'Review complete');
     elements.startButton.disabled = false;
     noteSessionCompleted();
@@ -299,6 +361,8 @@ async function runSession(generation) {
 
     state.currentIndex = Math.max(0, state.questions.length - 1);
     renderCurrentQuestion();
+    const finalItem = state.questions[state.currentIndex];
+    if (finalItem) setStudyPhase('answer', finalItem, state.currentIndex);
     setSessionStatus('complete', 'Session complete');
     elements.startButton.disabled = false;
     noteSessionCompleted();
