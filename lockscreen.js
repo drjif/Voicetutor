@@ -22,20 +22,27 @@ export function speakLockScreenTrack(text, generation, onBoundary) {
       utterance.volume = 1;
       state.currentUtterance = utterance;
 
+      let watchdog = null;
       const finish = (callback) => {
-        if (state.lockScreenWatchdog) clearInterval(state.lockScreenWatchdog);
-        state.lockScreenWatchdog = null;
-        state.currentUtterance = null;
+        if (watchdog) clearInterval(watchdog);
+        if (state.lockScreenWatchdog === watchdog) state.lockScreenWatchdog = null;
+        if (state.currentUtterance === utterance) state.currentUtterance = null;
         callback();
       };
 
       utterance.onboundary = (event) => {
+        if (generation !== state.generation) return;
         if (typeof event.charIndex === 'number') onBoundary?.(event.charIndex);
       };
-      utterance.onend = () => finish(resolve);
+      utterance.onend = () => finish(() => {
+        if (generation !== state.generation) reject(createCancellationError());
+        else resolve();
+      });
       utterance.onerror = (event) => {
         finish(() => {
-          if (event.error === 'canceled' || event.error === 'interrupted') {
+          if (generation !== state.generation
+              || event.error === 'canceled'
+              || event.error === 'interrupted') {
             reject(createCancellationError());
           } else {
             reject(new Error(`Lock-screen speech error: ${event.error}`));
@@ -43,11 +50,17 @@ export function speakLockScreenTrack(text, generation, onBoundary) {
         });
       };
 
-      state.lockScreenWatchdog = window.setInterval(() => {
+      watchdog = window.setInterval(() => {
+        if (generation !== state.generation) {
+          clearInterval(watchdog);
+          if (state.lockScreenWatchdog === watchdog) state.lockScreenWatchdog = null;
+          return;
+        }
         if (state.mode === 'lockscreen' && state.status === 'running' && window.speechSynthesis.paused) {
           window.speechSynthesis.resume();
         }
       }, 5000);
+      state.lockScreenWatchdog = watchdog;
 
       window.speechSynthesis.speak(utterance);
     } catch (error) {
@@ -97,10 +110,16 @@ export function setLockScreenPlaybackState(value) {
   }
 }
 
-export function clearLockScreenMediaSession() {
+export function clearLockScreenMediaSession({ force = false } = {}) {
+  const newerLockScreenRunOwnsMedia = !force
+    && state.mode === 'lockscreen'
+    && ['running', 'listening', 'waiting', 'paused'].includes(state.status)
+    && Boolean(state.currentUtterance);
+  if (newerLockScreenRunOwnsMedia) return false;
+
   if (state.lockScreenWatchdog) clearInterval(state.lockScreenWatchdog);
   state.lockScreenWatchdog = null;
-  if (!('mediaSession' in navigator)) return;
+  if (!('mediaSession' in navigator)) return true;
   ['play', 'pause', 'stop', 'nexttrack', 'previoustrack'].forEach((action) => setAction(action, null));
   try {
     navigator.mediaSession.metadata = null;
@@ -108,4 +127,5 @@ export function clearLockScreenMediaSession() {
   } catch {
     // Ignore cleanup failures.
   }
+  return true;
 }

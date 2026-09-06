@@ -86,13 +86,21 @@ export function speak(text, generation) {
       utterance.pitch = 1;
       utterance.volume = 1;
       state.currentUtterance = utterance;
+
+      const clearCurrentUtterance = () => {
+        if (state.currentUtterance === utterance) state.currentUtterance = null;
+      };
+
       utterance.onend = () => {
-        state.currentUtterance = null;
-        resolve();
+        clearCurrentUtterance();
+        if (generation !== state.generation) reject(createCancellationError());
+        else resolve();
       };
       utterance.onerror = (event) => {
-        state.currentUtterance = null;
-        if (event.error === 'canceled' || event.error === 'interrupted') {
+        clearCurrentUtterance();
+        if (generation !== state.generation
+            || event.error === 'canceled'
+            || event.error === 'interrupted') {
           reject(createCancellationError());
         } else {
           reject(new Error(`Speech synthesis error: ${event.error}`));
