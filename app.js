@@ -16,6 +16,8 @@ import { hideSheetReadyActions, setSavedSheetLoader, setupAccountUI, showSheetRe
 import { restartAt, setupSessionEvents } from './session-next.js';
 import { checkBrowserSupport, populateVoices } from './voice.js';
 
+const ACTIVE_SESSION_STATUSES = ['running', 'listening', 'waiting', 'paused'];
+
 function updateModePresentation() {
   const mode = selectedMode();
   elements.wakeLockControl.hidden = mode !== 'active';
@@ -75,6 +77,12 @@ function setupPreferences() {
     handleWakeLockPreferenceChange();
   });
   elements.modeInputs.forEach((input) => input.addEventListener('change', () => {
+    if (ACTIVE_SESSION_STATUSES.includes(state.status)) {
+      const runningMode = elements.modeInputs.find((candidate) => candidate.value === state.mode);
+      if (runningMode) runningMode.checked = true;
+      updateModePresentation();
+      return;
+    }
     saveSettings();
     updateModePresentation();
   }));
