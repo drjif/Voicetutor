@@ -7,6 +7,21 @@ function thinkingPause(seconds) {
   return Array.from({ length: beats }, () => ' ...').join('');
 }
 
+export function createLockScreenCardTrack(item, index, thinkSeconds) {
+  const pause = thinkingPause(thinkSeconds);
+  let text = `Question ${index + 1}. ${cleanText(item?.question)}. Think about your answer.${pause} `;
+  const answerCharIndex = text.length;
+  text += `The answer is ${cleanText(item?.answer)}.`;
+  return { text, answerCharIndex };
+}
+
+export function lockScreenCardPhase(answerCharIndex, charIndex) {
+  if (!Number.isFinite(charIndex) || charIndex < 0) return 'question';
+  return charIndex >= answerCharIndex ? 'answer' : 'question';
+}
+
+// Legacy whole-deck builder retained for compatibility/tests, but the live
+// lock-screen engine no longer uses one giant utterance for navigation.
 export function createLockScreenTrack(questions, startIndex, thinkSeconds) {
   let text = 'Lock-screen review starting. ';
   const markers = [];
@@ -27,11 +42,6 @@ export function createLockScreenTrack(questions, startIndex, thinkSeconds) {
 
 const markerCursorState = new WeakMap();
 
-// SpeechSynthesis boundary events are browser/OS supplied and are not perfectly
-// consistent. Some engines can emit a late or end-of-utterance charIndex after a
-// cancel/restart. Never let one boundary event skip across multiple study phases
-// or questions. The caller advances at most one marker per strictly increasing
-// boundary event; normal word-boundary streams catch up naturally on later events.
 export function advanceMarkerCursor(markers, cursor, charIndex, previousCharIndex = -1) {
   if (!markers.length || !Number.isFinite(charIndex) || charIndex < 0) {
     return { cursor, marker: null, lastCharIndex: previousCharIndex };
