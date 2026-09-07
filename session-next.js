@@ -14,12 +14,12 @@ import { noteQuestionCompleted, noteSessionCompleted, noteSessionStarted } from 
 import {
   clearLockScreenMediaSession,
   configureLockScreenMediaSession,
-  createLockScreenTrack,
+  createLockScreenCardTrack,
+  lockScreenCardPhase,
   setLockScreenMetadata,
   setLockScreenPlaybackState,
   speakLockScreenTrack
 } from './lockscreen.js';
-import { markerForCharacter } from './study-timeline.js';
 import { releaseSessionWakeLock, requestSessionWakeLock } from './power.js';
 import {
   ACTIVE_SESSION_STATUSES,
@@ -260,24 +260,8 @@ async function runActiveItem(item, generation) {
   }
 }
 
-function updateLockScreenPhase(marker) {
-  const nextIndex = clamp(marker.index, 0, state.questions.length - 1);
-  if (nextIndex !== state.currentIndex) {
-    state.currentIndex = nextIndex;
-    renderCurrentQuestion();
-  }
-  const item = state.questions[nextIndex];
-  const phase = marker.phase === 'answer' ? 'answer' : 'question';
-  setStudyPhase(phase, item, { syncLockScreen: true, bringAnswerIntoView: phase === 'answer' });
-}
-
 async function runLockScreenReview(generation) {
-  const startIndex = state.currentIndex;
-  const track = createLockScreenTrack(
-    state.questions,
-    startIndex,
-    Number(elements.answerDelay.value)
-  );
+  const startIndex = clamp(state.currentIndex, 0, state.questions.length - 1);
 
   configureLockScreenMediaSession({
     onPlay: resumeSession,
@@ -287,36 +271,53 @@ async function runLockScreenReview(generation) {
     onPrevious: () => restartAt(transportAnchorIndex(state, state.questions.length) - 1)
   });
 
-  updateLockScreenPhase({ index: startIndex, phase: 'question' });
-  let activeMarkerKey = `${startIndex}:question`;
   setSessionStatus('running', 'Lock-screen review');
   setLockScreenPlaybackState('playing');
 
   try {
-    await speakLockScreenTrack(track.text, generation, (charIndex) => {
-      if (!shouldApplySpeechBoundary({
-        generation,
-        currentGeneration: state.generation,
-        status: state.status
-      })) return;
-
-      const marker = markerForCharacter(track.markers, charIndex);
-      if (!marker) return;
-      const markerKey = `${marker.index}:${marker.phase}`;
-      if (markerKey === activeMarkerKey) return;
-      activeMarkerKey = markerKey;
-      updateLockScreenPhase(marker);
-    });
-    assertGeneration(generation);
-
     for (let index = startIndex; index < state.questions.length; index += 1) {
+      assertGeneration(generation);
+
+      // The application, not SpeechSynthesis boundary events, owns navigation.
+      // A browser callback can reveal the answer for this card, but it can never
+      // mutate currentIndex or move to another question.
+      state.pausedIndex = null;
+      state.currentIndex = index;
+      const item = state.questions[index];
+      renderCurrentQuestion();
+      setStudyPhase('question', item, { syncLockScreen: true, bringAnswerIntoView: false });
+
+      const cardTrack = createLockScreenCardTrack(
+        item,
+        index,
+        Number(elements.answerDelay.value)
+      );
+      let answerShown = false;
+
+      await speakLockScreenTrack(cardTrack.text, generation, (charIndex) => {
+        if (!shouldApplySpeechBoundary({
+          generation,
+          currentGeneration: state.generation,
+          status: state.status
+        })) return;
+        if (answerShown) return;
+        if (lockScreenCardPhase(cardTrack.answerCharIndex, charIndex) !== 'answer') return;
+
+        answerShown = true;
+        setStudyPhase('answer', item, { syncLockScreen: true, bringAnswerIntoView: true });
+      });
+      assertGeneration(generation);
+
+      // Some speech engines do not emit boundary events. In that case reveal the
+      // answer at utterance completion, without affecting navigation.
+      if (!answerShown) {
+        setStudyPhase('answer', item, { syncLockScreen: true, bringAnswerIntoView: true });
+      }
       noteQuestionCompleted();
     }
 
+    assertGeneration(generation);
     state.pausedIndex = null;
-    state.currentIndex = Math.max(0, state.questions.length - 1);
-    renderCurrentQuestion();
-    setStudyPhase('answer', state.questions[state.currentIndex]);
     setSessionStatus('complete', 'Review complete');
     elements.startButton.disabled = false;
     noteSessionCompleted();
@@ -372,6 +373,7 @@ async function runSession(generation) {
 export async function startSession() {
   if (!state.questions.length) return;
   saveSettings();
+  cancelSpeechForTransport();
   clearLockScreenMediaSession({ force: true });
   await releaseSessionWakeLock({ force: true });
   state.generation += 1;
@@ -416,9 +418,8 @@ export function resumeSession() {
 
   const anchorIndex = transportAnchorIndex(state, state.questions.length);
   if (state.mode === 'lockscreen') {
-    // Long SpeechSynthesis utterances can flush queued boundary events after a
-    // pause. Restart the current card with a fresh generation instead of trusting
-    // the browser to resume the old event stream in place.
+    // Lock-screen transport restarts the current card instead of resuming an
+    // opaque browser speech position. This makes Pause/Resume deterministic.
     restartAt(anchorIndex);
     return;
   }
