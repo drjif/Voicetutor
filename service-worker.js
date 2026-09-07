@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v17-repeat2';
+const CACHE_NAME = 'same3le-v17-pause3';
 const ASSETS = [
   './',
   './index.html',
@@ -21,6 +21,7 @@ const ASSETS = [
   './power.js',
   './lockscreen.js',
   './study-timeline.js',
+  './session-transport.js',
   './sheet-v2.js',
   './sheet-data.js',
   './session-next.js',

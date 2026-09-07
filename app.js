@@ -14,9 +14,8 @@ import { handleWakeLockPreferenceChange, releaseSessionWakeLock, setupPowerManag
 import { loadSavedGoogleSheet, setSheetReadyHandler, setupSheetEvents } from './sheet-v2.js';
 import { hideSheetReadyActions, setSavedSheetLoader, setupAccountUI, showSheetReadyActions } from './account-ui.js';
 import { restartAt, setupSessionEvents } from './session-next.js';
+import { ACTIVE_SESSION_STATUSES, transportAnchorIndex } from './session-transport.js';
 import { checkBrowserSupport, populateVoices } from './voice.js';
-
-const ACTIVE_SESSION_STATUSES = ['running', 'listening', 'waiting', 'paused'];
 
 function updateModePresentation() {
   const mode = selectedMode();
@@ -37,26 +36,16 @@ function updateModePresentation() {
 }
 
 function setupSessionControlGuards() {
-  // startSession performs async cleanup before it marks the run active. Disable
-  // immediately so a fast double-click cannot launch overlapping generations.
   elements.startButton.addEventListener('click', () => {
-    if (state.status === 'complete') {
-      // A completed run leaves the player on the final card. Start should mean
-      // start the deck again unless the user explicitly chose another start row
-      // (changing the selector moves the session back to Ready first).
-      elements.startRow.value = '0';
-    }
+    if (state.status === 'complete') elements.startRow.value = '0';
     elements.startButton.disabled = true;
   }, { capture: true });
 
-  // Repeat is owned here in the capture phase for every session state. Capturing
-  // the target index before speech cancellation prevents any browser callback or
-  // duplicate bubbling listener from changing what card the user asked to replay.
   elements.repeatButton.addEventListener('click', (event) => {
-    const targetIndex = state.currentIndex;
     const canReplay = ACTIVE_SESSION_STATUSES.includes(state.status) || state.status === 'complete';
     if (!canReplay) return;
 
+    const targetIndex = transportAnchorIndex(state, state.questions.length);
     event.preventDefault();
     event.stopImmediatePropagation();
     if (state.status === 'complete') state.status = 'running';

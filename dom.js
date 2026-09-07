@@ -90,6 +90,7 @@ export const state = {
   currentDeck: null,
   questions: [],
   currentIndex: 0,
+  pausedIndex: null,
   mode: 'active',
   status: 'idle',
   generation: 0,
