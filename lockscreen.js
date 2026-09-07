@@ -2,7 +2,7 @@ import { elements, state } from './dom.js';
 import { lockScreenMetadataFields } from './study-timeline.js';
 import { assertGeneration, createCancellationError } from './voice.js';
 
-export { createLockScreenTrack } from './study-timeline.js';
+export { createLockScreenCardTrack, createLockScreenTrack, lockScreenCardPhase } from './study-timeline.js';
 
 function selectedVoice() {
   return state.voices.find((voice) => voice.voiceURI === elements.voiceSelect.value) ?? null;
@@ -12,7 +12,13 @@ export function speakLockScreenTrack(text, generation, onBoundary) {
   return new Promise(async (resolve, reject) => {
     try {
       assertGeneration(generation);
-      window.speechSynthesis.cancel();
+
+      // Give a just-cancelled browser speech queue one task turn to settle before
+      // starting the replacement segment. Do not cancel here: explicit transport
+      // actions own cancellation, while normal card-to-card progression chains
+      // completed utterances without disturbing the next one.
+      await new Promise((settle) => setTimeout(settle, 25));
+      assertGeneration(generation);
 
       const utterance = new SpeechSynthesisUtterance(text);
       const voice = selectedVoice();
@@ -23,7 +29,10 @@ export function speakLockScreenTrack(text, generation, onBoundary) {
       state.currentUtterance = utterance;
 
       let watchdog = null;
+      let settled = false;
       const finish = (callback) => {
+        if (settled) return;
+        settled = true;
         if (watchdog) clearInterval(watchdog);
         if (state.lockScreenWatchdog === watchdog) state.lockScreenWatchdog = null;
         if (state.currentUtterance === utterance) state.currentUtterance = null;

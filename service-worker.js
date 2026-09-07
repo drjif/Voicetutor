@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v17-pause3';
+const CACHE_NAME = 'same3le-v17-segmented-lockscreen';
 const ASSETS = [
   './',
   './index.html',
