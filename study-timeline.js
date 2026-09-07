@@ -20,8 +20,6 @@ export function lockScreenCardPhase(answerCharIndex, charIndex) {
   return charIndex >= answerCharIndex ? 'answer' : 'question';
 }
 
-// Legacy whole-deck builder retained for compatibility/tests, but the live
-// lock-screen engine no longer uses one giant utterance for navigation.
 export function createLockScreenTrack(questions, startIndex, thinkSeconds) {
   let text = 'Lock-screen review starting. ';
   const markers = [];
@@ -38,6 +36,28 @@ export function createLockScreenTrack(questions, startIndex, thinkSeconds) {
 
   text += 'Review complete.';
   return { text, markers };
+}
+
+// Accept only the immediately expected phase marker, and only when the browser's
+// charIndex lands inside that phase's own text window. A bogus end-of-utterance
+// charIndex therefore cannot be interpreted as hundreds of completed questions.
+export function advanceExpectedMarker(markers, cursor, charIndex) {
+  if (!Array.isArray(markers) || !markers.length || !Number.isFinite(charIndex) || charIndex < 0) {
+    return { cursor, marker: null };
+  }
+
+  const nextCursor = cursor + 1;
+  const nextMarker = markers[nextCursor] ?? null;
+  if (!nextMarker || charIndex < nextMarker.charIndex) {
+    return { cursor, marker: null };
+  }
+
+  const followingMarker = markers[nextCursor + 1] ?? null;
+  if (followingMarker && charIndex >= followingMarker.charIndex) {
+    return { cursor, marker: null };
+  }
+
+  return { cursor: nextCursor, marker: nextMarker };
 }
 
 const markerCursorState = new WeakMap();
