@@ -34,6 +34,33 @@ export function markerForCharacter(markers, charIndex) {
   return matched;
 }
 
+// SpeechSynthesis boundary events are browser/OS supplied and are not perfectly
+// consistent. Some engines can emit a late or end-of-utterance charIndex after a
+// cancel/restart. Never let one boundary event skip across multiple study phases
+// or questions. The caller advances at most one marker per strictly increasing
+// boundary event; normal word-boundary streams catch up naturally on later events.
+export function advanceMarkerCursor(markers, cursor, charIndex, previousCharIndex = -1) {
+  if (!markers.length || !Number.isFinite(charIndex) || charIndex < 0) {
+    return { cursor, marker: null, lastCharIndex: previousCharIndex };
+  }
+
+  if (charIndex <= previousCharIndex) {
+    return { cursor, marker: null, lastCharIndex: previousCharIndex };
+  }
+
+  const nextCursor = cursor + 1;
+  const nextMarker = markers[nextCursor] ?? null;
+  if (!nextMarker || charIndex < nextMarker.charIndex) {
+    return { cursor, marker: null, lastCharIndex: charIndex };
+  }
+
+  return {
+    cursor: nextCursor,
+    marker: nextMarker,
+    lastCharIndex: charIndex
+  };
+}
+
 export function lockScreenMetadataFields(item, index, total, phase = 'question') {
   const question = cleanText(item?.question) || `Question ${index + 1}`;
   const answer = cleanText(item?.answer);
