@@ -3,10 +3,37 @@ import assert from 'node:assert/strict';
 
 import {
   advanceMarkerCursor,
+  createLockScreenCardTrack,
   createLockScreenTrack,
+  lockScreenCardPhase,
   lockScreenMetadataFields,
   markerForCharacter
 } from '../study-timeline.js';
+
+test('lock-screen card track contains exactly one card and one answer boundary', () => {
+  const card = createLockScreenCardTrack(
+    { question: 'Capital of France?', answer: 'Paris' },
+    11,
+    3
+  );
+
+  assert.equal(card.text.includes('Question 12.'), true);
+  assert.equal(card.text.includes('Capital of France?'), true);
+  assert.equal(card.text.slice(card.answerCharIndex).startsWith('The answer is Paris.'), true);
+  assert.equal(card.text.includes('Next question.'), false);
+});
+
+test('even an absurd card boundary can reveal only the current answer, never navigate', () => {
+  const card = createLockScreenCardTrack(
+    { question: 'Q12', answer: 'A12' },
+    11,
+    3
+  );
+
+  assert.equal(lockScreenCardPhase(card.answerCharIndex, card.answerCharIndex - 1), 'question');
+  assert.equal(lockScreenCardPhase(card.answerCharIndex, card.answerCharIndex), 'answer');
+  assert.equal(lockScreenCardPhase(card.answerCharIndex, 1_000_000), 'answer');
+});
 
 test('lock-screen track creates question and answer markers for every card', () => {
   const track = createLockScreenTrack([
