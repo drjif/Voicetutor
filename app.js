@@ -49,15 +49,18 @@ function setupSessionControlGuards() {
     elements.startButton.disabled = true;
   }, { capture: true });
 
-  // At completion Repeat used to be enabled but restartAt treated the session as
-  // inactive, so the button only changed the UI to Ready. Make it actually replay
-  // the currently displayed card.
+  // Repeat is owned here in the capture phase for every session state. Capturing
+  // the target index before speech cancellation prevents any browser callback or
+  // duplicate bubbling listener from changing what card the user asked to replay.
   elements.repeatButton.addEventListener('click', (event) => {
-    if (state.status !== 'complete') return;
+    const targetIndex = state.currentIndex;
+    const canReplay = ACTIVE_SESSION_STATUSES.includes(state.status) || state.status === 'complete';
+    if (!canReplay) return;
+
     event.preventDefault();
     event.stopImmediatePropagation();
-    state.status = 'running';
-    restartAt(state.currentIndex);
+    if (state.status === 'complete') state.status = 'running';
+    restartAt(targetIndex);
   }, { capture: true });
 }
 
