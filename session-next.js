@@ -21,6 +21,11 @@ import {
 } from './lockscreen.js';
 import { markerForCharacter } from './study-timeline.js';
 import { releaseSessionWakeLock, requestSessionWakeLock } from './power.js';
+import {
+  ACTIVE_SESSION_STATUSES,
+  shouldApplySpeechBoundary,
+  transportAnchorIndex
+} from './session-transport.js';
 import { assertGeneration, listenForAnswer, pausableWait, speak, waitUntilResumed } from './voice.js';
 
 const PASSIVE_ANSWER_HOLD_MS = 1600;
@@ -62,6 +67,16 @@ function setStudyPhase(phase, item, { syncLockScreen = false, bringAnswerIntoVie
   if (syncLockScreen && state.mode === 'lockscreen') {
     setLockScreenMetadata(item, state.currentIndex, state.questions.length, phase);
   }
+}
+
+function cancelSpeechForTransport() {
+  const synth = window.speechSynthesis;
+  try {
+    if (synth?.paused) synth.resume();
+  } catch {}
+  try {
+    synth?.cancel();
+  } catch {}
 }
 
 export function renderCurrentQuestion() {
@@ -268,8 +283,8 @@ async function runLockScreenReview(generation) {
     onPlay: resumeSession,
     onPause: pauseSession,
     onStop: stopSession,
-    onNext: () => restartAt(state.currentIndex + 1),
-    onPrevious: () => restartAt(state.currentIndex - 1)
+    onNext: () => restartAt(transportAnchorIndex(state, state.questions.length) + 1),
+    onPrevious: () => restartAt(transportAnchorIndex(state, state.questions.length) - 1)
   });
 
   updateLockScreenPhase({ index: startIndex, phase: 'question' });
@@ -279,6 +294,12 @@ async function runLockScreenReview(generation) {
 
   try {
     await speakLockScreenTrack(track.text, generation, (charIndex) => {
+      if (!shouldApplySpeechBoundary({
+        generation,
+        currentGeneration: state.generation,
+        status: state.status
+      })) return;
+
       const marker = markerForCharacter(track.markers, charIndex);
       if (!marker) return;
       const markerKey = `${marker.index}:${marker.phase}`;
@@ -292,6 +313,7 @@ async function runLockScreenReview(generation) {
       noteQuestionCompleted();
     }
 
+    state.pausedIndex = null;
     state.currentIndex = Math.max(0, state.questions.length - 1);
     renderCurrentQuestion();
     setStudyPhase('answer', state.questions[state.currentIndex]);
@@ -328,6 +350,7 @@ async function runSession(generation) {
       state.currentIndex += 1;
     }
 
+    state.pausedIndex = null;
     state.currentIndex = Math.max(0, state.questions.length - 1);
     renderCurrentQuestion();
     setStudyPhase('answer', state.questions[state.currentIndex]);
@@ -349,9 +372,10 @@ async function runSession(generation) {
 export async function startSession() {
   if (!state.questions.length) return;
   saveSettings();
-  clearLockScreenMediaSession();
-  await releaseSessionWakeLock();
+  clearLockScreenMediaSession({ force: true });
+  await releaseSessionWakeLock({ force: true });
   state.generation += 1;
+  state.pausedIndex = null;
   state.currentIndex = clamp(Number(elements.startRow.value) || 0, 0, state.questions.length - 1);
   state.mode = selectedMode();
   state.status = 'running';
@@ -375,31 +399,43 @@ export async function startSession() {
 
 export function pauseSession() {
   if (!['running', 'listening', 'waiting'].includes(state.status)) return;
-  state.status = 'paused';
-  window.speechSynthesis.pause();
+
+  state.pausedIndex = clamp(state.currentIndex, 0, Math.max(0, state.questions.length - 1));
+  setSessionStatus('paused', 'Paused');
+
+  try { window.speechSynthesis.pause(); } catch {}
   if (state.recognition) {
     try { state.recognition.abort(); } catch {}
   }
   if (state.mode === 'lockscreen') setLockScreenPlaybackState('paused');
-  setSessionStatus('paused', 'Paused');
   updateControls();
 }
 
 export function resumeSession() {
   if (state.status !== 'paused') return;
-  state.status = 'running';
-  window.speechSynthesis.resume();
+
+  const anchorIndex = transportAnchorIndex(state, state.questions.length);
+  if (state.mode === 'lockscreen') {
+    // Long SpeechSynthesis utterances can flush queued boundary events after a
+    // pause. Restart the current card with a fresh generation instead of trusting
+    // the browser to resume the old event stream in place.
+    restartAt(anchorIndex);
+    return;
+  }
+
+  state.pausedIndex = null;
+  setSessionStatus('running', 'Resuming');
+  try { window.speechSynthesis.resume(); } catch {}
   state.resumeResolvers.splice(0).forEach((resolve) => resolve());
   if (state.mode === 'active') requestSessionWakeLock();
-  if (state.mode === 'lockscreen') setLockScreenPlaybackState('playing');
-  setSessionStatus('running', 'Resuming');
   updateControls();
 }
 
 export function stopSession() {
   state.generation += 1;
+  state.pausedIndex = null;
   state.status = 'idle';
-  window.speechSynthesis.cancel();
+  cancelSpeechForTransport();
   if (state.recognition) {
     try { state.recognition.abort(); } catch {}
     state.recognition = null;
@@ -407,26 +443,32 @@ export function stopSession() {
   state.resumeResolvers.splice(0).forEach((resolve) => resolve());
   elements.listeningIndicator.hidden = true;
   hideReviewControls();
-  clearLockScreenMediaSession();
-  releaseSessionWakeLock();
+  clearLockScreenMediaSession({ force: true });
+  releaseSessionWakeLock({ force: true });
   setSessionStatus('idle', 'Stopped');
   updateControls();
 }
 
 export function restartAt(index) {
   if (!state.questions.length) return;
-  const wasActive = ['running', 'listening', 'waiting', 'paused'].includes(state.status);
+
+  const targetIndex = clamp(index, 0, state.questions.length - 1);
+  const wasActive = ACTIVE_SESSION_STATUSES.includes(state.status);
   state.generation += 1;
-  window.speechSynthesis.cancel();
+  state.pausedIndex = null;
+
+  cancelSpeechForTransport();
   if (state.recognition) {
     try { state.recognition.abort(); } catch {}
   }
   hideReviewControls();
-  clearLockScreenMediaSession();
-  state.currentIndex = clamp(index, 0, state.questions.length - 1);
+  clearLockScreenMediaSession({ force: true });
+  state.currentIndex = targetIndex;
+
+  if (wasActive) state.status = 'running';
   renderCurrentQuestion();
+
   if (wasActive) {
-    state.status = 'running';
     const generation = state.generation;
     setSessionStatus('running', 'Continuing');
     if (state.mode === 'lockscreen') runLockScreenReview(generation);
@@ -441,14 +483,18 @@ export function setupSessionEvents() {
   elements.pauseButton.addEventListener('click', pauseSession);
   elements.resumeButton.addEventListener('click', resumeSession);
   elements.stopButton.addEventListener('click', stopSession);
-  elements.repeatButton.addEventListener('click', () => restartAt(state.currentIndex));
-  elements.previousButton.addEventListener('click', () => restartAt(state.currentIndex - 1));
-  elements.nextButton.addEventListener('click', () => restartAt(state.currentIndex + 1));
+  elements.previousButton.addEventListener('click', () => {
+    restartAt(transportAnchorIndex(state, state.questions.length) - 1);
+  });
+  elements.nextButton.addEventListener('click', () => {
+    restartAt(transportAnchorIndex(state, state.questions.length) + 1);
+  });
   elements.tryAgainButton.addEventListener('click', () => { state.reviewChoice = 'retry'; });
   elements.markCorrectButton.addEventListener('click', () => { state.reviewChoice = 'correct'; });
   elements.continueButton.addEventListener('click', () => { state.reviewChoice = 'continue'; });
   elements.startRow.addEventListener('change', () => {
     if (state.status === 'idle' || state.status === 'complete') {
+      state.pausedIndex = null;
       state.currentIndex = Number(elements.startRow.value) || 0;
       renderCurrentQuestion();
       setSessionStatus('idle', 'Ready');
@@ -460,18 +506,19 @@ export function setupSessionEvents() {
   document.addEventListener('keydown', (event) => {
     if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
     const key = event.key.toLowerCase();
+    const anchorIndex = transportAnchorIndex(state, state.questions.length);
 
     if (event.code === 'Space') {
       event.preventDefault();
       if (state.status === 'paused') resumeSession();
       else pauseSession();
     } else if (event.key === 'ArrowRight') {
-      restartAt(state.currentIndex + 1);
+      restartAt(anchorIndex + 1);
     } else if (event.key === 'ArrowLeft') {
-      restartAt(state.currentIndex - 1);
+      restartAt(anchorIndex - 1);
     } else if (event.altKey && key === 'r') {
       event.preventDefault();
-      restartAt(state.currentIndex);
+      restartAt(anchorIndex);
     } else if (event.altKey && key === 't' && !elements.reviewDecision.hidden) {
       event.preventDefault();
       state.reviewChoice = 'retry';
