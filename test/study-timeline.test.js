@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  advanceMarkerCursor,
   createLockScreenTrack,
   lockScreenMetadataFields,
   markerForCharacter
@@ -35,6 +36,43 @@ test('markerForCharacter advances from question to answer without revealing earl
   assert.equal(markerForCharacter(track.markers, questionMarker.charIndex).phase, 'question');
   assert.equal(markerForCharacter(track.markers, answerMarker.charIndex - 1).phase, 'question');
   assert.equal(markerForCharacter(track.markers, answerMarker.charIndex).phase, 'answer');
+});
+
+test('a single bogus end-of-track boundary cannot jump to the last question', () => {
+  const track = createLockScreenTrack([
+    { question: 'Q1', answer: 'A1' },
+    { question: 'Q2', answer: 'A2' },
+    { question: 'Q3', answer: 'A3' },
+    { question: 'Q4', answer: 'A4' }
+  ], 0, 3);
+
+  const marker = markerForCharacter(track.markers, track.text.length);
+  assert.deepEqual({ index: marker.index, phase: marker.phase }, { index: 0, phase: 'answer' });
+
+  const duplicate = markerForCharacter(track.markers, track.text.length);
+  assert.deepEqual({ index: duplicate.index, phase: duplicate.phase }, { index: 0, phase: 'answer' });
+});
+
+test('advanceMarkerCursor advances at most one phase per increasing boundary event', () => {
+  const track = createLockScreenTrack([
+    { question: 'Q1', answer: 'A1' },
+    { question: 'Q2', answer: 'A2' },
+    { question: 'Q3', answer: 'A3' }
+  ], 0, 2);
+
+  let cursor = 0;
+  let lastCharIndex = -1;
+  const hugeBoundary = track.text.length;
+
+  let step = advanceMarkerCursor(track.markers, cursor, hugeBoundary, lastCharIndex);
+  assert.equal(step.cursor, 1);
+  assert.equal(step.marker.phase, 'answer');
+  cursor = step.cursor;
+  lastCharIndex = step.lastCharIndex;
+
+  step = advanceMarkerCursor(track.markers, cursor, hugeBoundary, lastCharIndex);
+  assert.equal(step.cursor, 1);
+  assert.equal(step.marker, null);
 });
 
 test('lock-screen metadata withholds the answer until answer phase', () => {

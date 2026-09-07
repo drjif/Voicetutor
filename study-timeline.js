@@ -25,13 +25,55 @@ export function createLockScreenTrack(questions, startIndex, thinkSeconds) {
   return { text, markers };
 }
 
-export function markerForCharacter(markers, charIndex) {
-  let matched = markers[0] ?? null;
-  for (const marker of markers) {
-    if (marker.charIndex > charIndex) break;
-    matched = marker;
+const markerCursorState = new WeakMap();
+
+// SpeechSynthesis boundary events are browser/OS supplied and are not perfectly
+// consistent. Some engines can emit a late or end-of-utterance charIndex after a
+// cancel/restart. Never let one boundary event skip across multiple study phases
+// or questions. The caller advances at most one marker per strictly increasing
+// boundary event; normal word-boundary streams catch up naturally on later events.
+export function advanceMarkerCursor(markers, cursor, charIndex, previousCharIndex = -1) {
+  if (!markers.length || !Number.isFinite(charIndex) || charIndex < 0) {
+    return { cursor, marker: null, lastCharIndex: previousCharIndex };
   }
-  return matched;
+
+  if (charIndex <= previousCharIndex) {
+    return { cursor, marker: null, lastCharIndex: previousCharIndex };
+  }
+
+  const nextCursor = cursor + 1;
+  const nextMarker = markers[nextCursor] ?? null;
+  if (!nextMarker || charIndex < nextMarker.charIndex) {
+    return { cursor, marker: null, lastCharIndex: charIndex };
+  }
+
+  return {
+    cursor: nextCursor,
+    marker: nextMarker,
+    lastCharIndex: charIndex
+  };
+}
+
+export function markerForCharacter(markers, charIndex) {
+  if (!Array.isArray(markers) || !markers.length) return null;
+
+  const current = markerCursorState.get(markers) ?? {
+    cursor: 0,
+    lastCharIndex: -1
+  };
+  const next = advanceMarkerCursor(
+    markers,
+    current.cursor,
+    charIndex,
+    current.lastCharIndex
+  );
+
+  markerCursorState.set(markers, {
+    cursor: next.cursor,
+    lastCharIndex: next.lastCharIndex
+  });
+
+  return markers[next.cursor] ?? markers[0] ?? null;
 }
 
 export function lockScreenMetadataFields(item, index, total, phase = 'question') {
