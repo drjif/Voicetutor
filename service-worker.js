@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v17-prequeued-lockscreen';
+const CACHE_NAME = 'same3le-v17-continuous-safe';
 const ASSETS = [
   './',
   './index.html',
