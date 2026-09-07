@@ -3,7 +3,7 @@ import {
   createLockScreenCardTrack,
   lockScreenMetadataFields
 } from './study-timeline.js';
-import { assertGeneration, createCancellationError } from './voice.js';
+import { assertGeneration } from './voice.js';
 
 export { createLockScreenCardTrack, createLockScreenTrack, lockScreenCardPhase } from './study-timeline.js';
 
@@ -13,11 +13,11 @@ function selectedVoice() {
   return state.voices.find((voice) => voice.voiceURI === elements.voiceSelect.value) ?? null;
 }
 
-function settleEntry(entry, callback) {
+function settleEntry(entry) {
   if (!entry || entry.settled) return;
   entry.settled = true;
   if (state.currentUtterance === entry.utterance) state.currentUtterance = null;
-  callback();
+  entry.resolve();
 }
 
 function discardQueuedLockScreenRun() {
@@ -30,7 +30,7 @@ function discardQueuedLockScreenRun() {
     // Resolve rather than reject here. Explicit transport operations increment the
     // generation first, so the awaiting session will fail its next generation
     // assertion without creating unhandled rejections for future queued cards.
-    settleEntry(entry, entry.resolve);
+    settleEntry(entry);
   });
 
   if (state.lockScreenWatchdog) clearInterval(state.lockScreenWatchdog);
@@ -61,10 +61,8 @@ function buildQueuedLockScreenRun(generation, startIndex) {
     utterance.volume = 1;
 
     let resolveEntry;
-    let rejectEntry;
-    const promise = new Promise((resolve, reject) => {
+    const promise = new Promise((resolve) => {
       resolveEntry = resolve;
-      rejectEntry = reject;
     });
 
     const entry = {
@@ -74,8 +72,8 @@ function buildQueuedLockScreenRun(generation, startIndex) {
       utterance,
       promise,
       resolve: resolveEntry,
-      reject: rejectEntry,
       settled: false,
+      error: null,
       answerReached: false,
       externalBoundary: null
     };
@@ -106,22 +104,16 @@ function buildQueuedLockScreenRun(generation, startIndex) {
     };
 
     utterance.onend = () => {
-      settleEntry(entry, () => {
-        if (generation !== state.generation) entry.resolve();
-        else entry.resolve();
-      });
+      settleEntry(entry);
     };
 
     utterance.onerror = (event) => {
-      settleEntry(entry, () => {
-        if (generation !== state.generation
-            || event.error === 'canceled'
-            || event.error === 'interrupted') {
-          entry.resolve();
-        } else {
-          entry.reject(new Error(`Lock-screen speech error: ${event.error}`));
-        }
-      });
+      if (generation === state.generation
+          && event.error !== 'canceled'
+          && event.error !== 'interrupted') {
+        entry.error = new Error(`Lock-screen speech error: ${event.error}`);
+      }
+      settleEntry(entry);
     };
   }
 
@@ -178,6 +170,7 @@ export async function speakLockScreenTrack(text, generation, onBoundary) {
   try {
     await entry.promise;
     assertGeneration(generation);
+    if (entry.error) throw entry.error;
   } finally {
     if (entry.externalBoundary === onBoundary) entry.externalBoundary = null;
   }
