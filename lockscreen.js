@@ -1,127 +1,168 @@
 import { elements, state } from './dom.js';
 import {
-  createLockScreenCardTrack,
+  advanceExpectedMarker,
+  createLockScreenTrack,
   lockScreenMetadataFields
 } from './study-timeline.js';
 import { assertGeneration } from './voice.js';
 
 export { createLockScreenCardTrack, createLockScreenTrack, lockScreenCardPhase } from './study-timeline.js';
 
-let queuedLockScreenRun = null;
+let continuousRun = null;
 
 function selectedVoice() {
   return state.voices.find((voice) => voice.voiceURI === elements.voiceSelect.value) ?? null;
 }
 
+function createEntry() {
+  let resolveEntry;
+  const promise = new Promise((resolve) => {
+    resolveEntry = resolve;
+  });
+  return {
+    promise,
+    resolve: resolveEntry,
+    settled: false,
+    externalBoundary: null
+  };
+}
+
+function entryFor(run, index) {
+  let entry = run.entries.get(index);
+  if (!entry) {
+    entry = createEntry();
+    run.entries.set(index, entry);
+    if (run.completedThrough >= index || run.ended) settleEntry(entry);
+  }
+  return entry;
+}
+
 function settleEntry(entry) {
   if (!entry || entry.settled) return;
   entry.settled = true;
-  if (state.currentUtterance === entry.utterance) state.currentUtterance = null;
   entry.resolve();
 }
 
-function discardQueuedLockScreenRun() {
-  const run = queuedLockScreenRun;
-  queuedLockScreenRun = null;
+function settleAll(run) {
+  run.entries.forEach((entry) => settleEntry(entry));
+}
+
+function discardContinuousRun() {
+  const run = continuousRun;
+  continuousRun = null;
   if (!run) return;
 
   run.entries.forEach((entry) => {
     entry.externalBoundary = null;
-    // Resolve rather than reject here. Explicit transport operations increment the
-    // generation first, so the awaiting session will fail its next generation
-    // assertion without creating unhandled rejections for future queued cards.
     settleEntry(entry);
   });
 
   if (state.lockScreenWatchdog) clearInterval(state.lockScreenWatchdog);
   state.lockScreenWatchdog = null;
-  state.currentUtterance = null;
+  if (state.currentUtterance === run.utterance) state.currentUtterance = null;
 }
 
-function buildQueuedLockScreenRun(generation, startIndex) {
+function markerOffsets(track) {
+  const questionStart = new Map();
+  const answerStart = new Map();
+  track.markers.forEach((marker) => {
+    if (marker.phase === 'question') questionStart.set(marker.index, marker.charIndex);
+    else if (marker.phase === 'answer') answerStart.set(marker.index, marker.charIndex);
+  });
+  return { questionStart, answerStart };
+}
+
+function localBoundaryIndex(run, index, globalCharIndex) {
+  const start = run.questionStart.get(index) ?? 0;
+  return Math.max(0, globalCharIndex - start);
+}
+
+function buildContinuousRun(generation, startIndex) {
+  const track = createLockScreenTrack(
+    state.questions,
+    startIndex,
+    Number(elements.answerDelay.value)
+  );
+  const offsets = markerOffsets(track);
+  const utterance = new SpeechSynthesisUtterance(track.text);
   const voice = selectedVoice();
-  const rate = Number(elements.speechRate.value);
-  const thinkSeconds = Number(elements.answerDelay.value);
-  const total = state.questions.length;
-  const entries = new Map();
+  if (voice) utterance.voice = voice;
+  utterance.rate = Number(elements.speechRate.value);
+  utterance.pitch = 1;
+  utterance.volume = 1;
 
   const run = {
     generation,
     startIndex,
-    entries
+    track,
+    utterance,
+    cursor: 0,
+    currentIndex: startIndex,
+    completedThrough: startIndex - 1,
+    ended: false,
+    error: null,
+    entries: new Map(),
+    answerReached: new Set(),
+    ...offsets
+  };
+  continuousRun = run;
+  state.currentUtterance = utterance;
+  state.currentIndex = startIndex;
+  setLockScreenMetadata(state.questions[startIndex], startIndex, state.questions.length, 'question');
+  setLockScreenPlaybackState('playing');
+
+  utterance.onboundary = (event) => {
+    if (generation !== state.generation || state.status !== 'running') return;
+    if (typeof event.charIndex !== 'number') return;
+
+    const step = advanceExpectedMarker(run.track.markers, run.cursor, event.charIndex);
+    if (!step.marker) return;
+
+    run.cursor = step.cursor;
+    const marker = step.marker;
+    const item = state.questions[marker.index];
+
+    if (marker.phase === 'answer') {
+      run.answerReached.add(marker.index);
+      setLockScreenMetadata(item, marker.index, state.questions.length, 'answer');
+      const entry = entryFor(run, marker.index);
+      entry.externalBoundary?.(localBoundaryIndex(run, marker.index, event.charIndex));
+      return;
+    }
+
+    if (marker.index > run.currentIndex) {
+      run.completedThrough = Math.max(run.completedThrough, run.currentIndex);
+      settleEntry(entryFor(run, run.currentIndex));
+    }
+
+    run.currentIndex = marker.index;
+    state.currentIndex = marker.index;
+    setLockScreenMetadata(item, marker.index, state.questions.length, 'question');
   };
 
-  for (let index = startIndex; index < total; index += 1) {
-    const item = state.questions[index];
-    const track = createLockScreenCardTrack(item, index, thinkSeconds);
-    const utterance = new SpeechSynthesisUtterance(track.text);
-    if (voice) utterance.voice = voice;
-    utterance.rate = rate;
-    utterance.pitch = 1;
-    utterance.volume = 1;
+  utterance.onend = () => {
+    if (continuousRun !== run) return;
+    run.ended = true;
+    run.completedThrough = state.questions.length - 1;
+    settleAll(run);
+    if (state.currentUtterance === utterance) state.currentUtterance = null;
+  };
 
-    let resolveEntry;
-    const promise = new Promise((resolve) => {
-      resolveEntry = resolve;
-    });
-
-    const entry = {
-      index,
-      item,
-      track,
-      utterance,
-      promise,
-      resolve: resolveEntry,
-      settled: false,
-      error: null,
-      answerReached: false,
-      externalBoundary: null
-    };
-    entries.set(index, entry);
-
-    utterance.onstart = () => {
-      if (generation !== state.generation || state.status !== 'running') return;
-
-      // The speech engine may start the next queued card while the document is
-      // backgrounded. One onstart event maps to exactly one known card; unlike
-      // word-boundary charIndex values, it cannot skip hundreds of questions.
-      state.currentIndex = index;
-      state.currentUtterance = utterance;
-      setLockScreenMetadata(item, index, total, 'question');
-      setLockScreenPlaybackState('playing');
-    };
-
-    utterance.onboundary = (event) => {
-      if (generation !== state.generation || state.status !== 'running') return;
-      if (typeof event.charIndex !== 'number') return;
-
-      if (!entry.answerReached && event.charIndex >= track.answerCharIndex) {
-        entry.answerReached = true;
-        setLockScreenMetadata(item, index, total, 'answer');
-      }
-
-      entry.externalBoundary?.(event.charIndex);
-    };
-
-    utterance.onend = () => {
-      settleEntry(entry);
-    };
-
-    utterance.onerror = (event) => {
-      if (generation === state.generation
-          && event.error !== 'canceled'
-          && event.error !== 'interrupted') {
-        entry.error = new Error(`Lock-screen speech error: ${event.error}`);
-      }
-      settleEntry(entry);
-    };
-  }
-
-  queuedLockScreenRun = run;
+  utterance.onerror = (event) => {
+    if (continuousRun !== run) return;
+    if (generation === state.generation
+        && event.error !== 'canceled'
+        && event.error !== 'interrupted') {
+      run.error = new Error(`Lock-screen speech error: ${event.error}`);
+    }
+    run.ended = true;
+    settleAll(run);
+    if (state.currentUtterance === utterance) state.currentUtterance = null;
+  };
 
   if (state.lockScreenWatchdog) clearInterval(state.lockScreenWatchdog);
   const watchdog = window.setInterval(() => {
-    if (generation !== state.generation) {
+    if (generation !== state.generation || continuousRun !== run) {
       clearInterval(watchdog);
       if (state.lockScreenWatchdog === watchdog) state.lockScreenWatchdog = null;
       return;
@@ -132,52 +173,47 @@ function buildQueuedLockScreenRun(generation, startIndex) {
   }, 5000);
   state.lockScreenWatchdog = watchdog;
 
-  // Queue every remaining card synchronously while the page is still foregrounded.
-  // The browser speech queue can then continue from card to card after screen lock
-  // without waiting for page JavaScript to wake up and enqueue the next question.
-  entries.forEach((entry) => window.speechSynthesis.speak(entry.utterance));
-
+  // One already-running utterance is intentional. iOS can suspend page JavaScript
+  // when the screen locks, but an utterance that is already in progress has a much
+  // better chance of continuing than asking the suspended page to enqueue another
+  // utterance between cards.
+  window.speechSynthesis.speak(utterance);
   return run;
 }
 
 export async function speakLockScreenTrack(text, generation, onBoundary) {
   assertGeneration(generation);
-
   const requestedIndex = state.currentIndex;
-  let run = queuedLockScreenRun;
+  let run = continuousRun;
 
-  if (!run || run.generation !== generation || !run.entries.has(requestedIndex)) {
-    discardQueuedLockScreenRun();
-
-    // Give an explicitly cancelled speech queue one task turn to settle, then
-    // prequeue the entire remaining review before the device can suspend the page.
+  if (!run
+      || run.generation !== generation
+      || requestedIndex < run.startIndex
+      || requestedIndex >= state.questions.length) {
+    discardContinuousRun();
     await new Promise((settle) => setTimeout(settle, 25));
     assertGeneration(generation);
-    run = buildQueuedLockScreenRun(generation, requestedIndex);
+    run = buildContinuousRun(generation, requestedIndex);
   }
 
-  const entry = run.entries.get(requestedIndex);
-  if (!entry) throw new Error('Lock-screen speech queue lost the current question.');
-
+  const entry = entryFor(run, requestedIndex);
   entry.externalBoundary = onBoundary ?? null;
 
-  // If this card already passed its answer boundary while the page was suspended,
-  // let the visual session catch up immediately when JavaScript resumes.
-  if (entry.answerReached && entry.externalBoundary) {
-    entry.externalBoundary(entry.track.answerCharIndex);
+  if (run.answerReached.has(requestedIndex) && entry.externalBoundary) {
+    const answerStart = run.answerStart.get(requestedIndex) ?? run.questionStart.get(requestedIndex) ?? 0;
+    entry.externalBoundary(localBoundaryIndex(run, requestedIndex, answerStart));
   }
 
   try {
     await entry.promise;
     assertGeneration(generation);
-    if (entry.error) throw entry.error;
+    if (run.error) throw run.error;
   } finally {
     if (entry.externalBoundary === onBoundary) entry.externalBoundary = null;
   }
 
-  // Preserve the supplied argument in the public API. The first queued entry was
-  // built from the same card content; later calls attach to their already-queued
-  // utterances rather than enqueueing duplicate speech.
+  // The live lock-screen engine owns a single whole-review utterance. The per-card
+  // text argument is retained only so the session controller API stays unchanged.
   void text;
 }
 
@@ -229,7 +265,7 @@ export function clearLockScreenMediaSession({ force = false } = {}) {
     && Boolean(state.currentUtterance);
   if (newerLockScreenRunOwnsMedia) return false;
 
-  discardQueuedLockScreenRun();
+  discardContinuousRun();
   if (!('mediaSession' in navigator)) return true;
   ['play', 'pause', 'stop', 'nexttrack', 'previoustrack'].forEach((action) => setAction(action, null));
   try {
