@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  advanceExpectedMarker,
   advanceMarkerCursor,
   createLockScreenCardTrack,
   createLockScreenTrack,
@@ -52,6 +53,50 @@ test('lock-screen track creates question and answer markers for every card', () 
   assert.equal(track.text.slice(firstAnswer.charIndex).startsWith('The answer is Paris.'), true);
   const secondAnswer = track.markers[3];
   assert.equal(track.text.slice(secondAnswer.charIndex).startsWith('The answer is 4.'), true);
+});
+
+test('strict marker progression accepts only the immediately expected phase window', () => {
+  const track = createLockScreenTrack([
+    { question: 'Q1', answer: 'A1' },
+    { question: 'Q2', answer: 'A2' },
+    { question: 'Q3', answer: 'A3' }
+  ], 0, 2);
+
+  let cursor = 0;
+  const firstAnswer = track.markers[1];
+  const secondQuestion = track.markers[2];
+
+  let step = advanceExpectedMarker(track.markers, cursor, firstAnswer.charIndex);
+  assert.deepEqual(step.marker, firstAnswer);
+  cursor = step.cursor;
+
+  step = advanceExpectedMarker(track.markers, cursor, secondQuestion.charIndex);
+  assert.deepEqual(step.marker, secondQuestion);
+});
+
+test('strict marker progression rejects an end-of-track charIndex instead of jumping', () => {
+  const track = createLockScreenTrack([
+    { question: 'Q1', answer: 'A1' },
+    { question: 'Q2', answer: 'A2' },
+    { question: 'Q3', answer: 'A3' },
+    { question: 'Q4', answer: 'A4' }
+  ], 0, 3);
+
+  const step = advanceExpectedMarker(track.markers, 0, track.text.length);
+  assert.equal(step.cursor, 0);
+  assert.equal(step.marker, null);
+});
+
+test('strict marker progression ignores a boundary that skipped the expected phase', () => {
+  const track = createLockScreenTrack([
+    { question: 'Q1', answer: 'A1' },
+    { question: 'Q2', answer: 'A2' }
+  ], 0, 2);
+
+  const secondQuestion = track.markers[2];
+  const step = advanceExpectedMarker(track.markers, 0, secondQuestion.charIndex);
+  assert.equal(step.cursor, 0);
+  assert.equal(step.marker, null);
 });
 
 test('markerForCharacter advances from question to answer without revealing early', () => {
