@@ -31,7 +31,7 @@ export function speakLockScreenTrack(text, generation, onBoundary) {
       };
 
       utterance.onboundary = (event) => {
-        if (generation !== state.generation) return;
+        if (generation !== state.generation || state.status !== 'running') return;
         if (typeof event.charIndex === 'number') onBoundary?.(event.charIndex);
       };
       utterance.onend = () => finish(() => {
