@@ -1,10 +1,24 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8FVETBN9N5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-8FVETBN9N5', { send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false });
+    window.addEventListener('DOMContentLoaded', function () {
+      var safeLocation = window.location.origin + window.location.pathname;
+      var safeReferrer = '';
+      try { if (document.referrer) { var referrerUrl = new URL(document.referrer); safeReferrer = referrerUrl.origin + referrerUrl.pathname; } } catch (error) {}
+      gtag('event', 'page_view', { page_title: document.title, page_location: safeLocation, page_referrer: safeReferrer });
+    }, { once: true });
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Privacy Policy | same3le</title>
-  <meta name="description" content="How same3le handles browser data, local study files, speech services, optional Supabase accounts, saved Google Sheet identifiers, and privacy requests." />
+  <meta name="description" content="How same3le handles browser data, local study files, Google Analytics, speech services, optional Supabase accounts, saved Google Sheet identifiers, and privacy requests." />
   <meta name="robots" content="noindex,follow" />
   <link rel="icon" href="/icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/marketing.css" />
@@ -13,15 +27,16 @@
   <a class="skip-link" href="#content">Skip to content</a>
   <header class="site-shell site-header"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>same3le</strong><small>recite to me</small></span></a><nav class="site-nav"><a href="/terms/">Terms</a><a href="/pricing/">Pricing</a><a class="nav-cta" href="/">Open the app</a></nav></header>
   <main id="content" class="site-shell content-section">
-    <div class="notice-box"><strong>Privacy draft for Account Sync v1.</strong> Optional sign-in stores authentication information and saved Google Sheet identifiers in Supabase. Local imported deck contents remain browser-local in this version. Paid checkout is not active. The legal operator identity, mailing address, privacy email, vendor configuration, and request workflow still need to be finalized before public account signup is treated as production-ready.</div>
+    <div class="notice-box"><strong>Privacy draft for Account Sync v1.</strong> Optional sign-in stores authentication information and saved Google Sheet identifiers in Supabase. Local imported deck contents remain browser-local in this version. same3le uses Google Analytics 4 for aggregate website and product-usage measurement with study content and account identifiers excluded from analytics events. Paid checkout is not active. The legal operator identity, mailing address, privacy email, and request workflow still need to be finalized before public account signup is treated as production-ready.</div>
     <article class="prose">
       <h1>Privacy Policy</h1>
-      <p><strong>Effective date:</strong> August 15, 2026</p>
-      <p>This Privacy Policy explains how same3le handles information when you use the website, Progressive Web App, local import tools, voice-study features, and future account or subscription services.</p>
+      <p><strong>Effective date:</strong> September 7, 2026</p>
+      <p>This Privacy Policy explains how same3le handles information when you use the website, Progressive Web App, local import tools, voice-study features, analytics, and future account or subscription services.</p>
 
       <h2>1. Current prototype versus production accounts</h2>
       <p>You can study without creating an account. Paste, local Excel, Anki, CSV, TSV, TXT, demo, and ordinary studying remain available while signed out.</p>
       <p>If you sign in, Supabase stores authentication information (such as your user id and email) and any Google Sheet identifiers you choose to save. Local imported deck contents remain in this browser in Account Sync v1 and are not uploaded to a same3le application database. same3le does not intentionally store spoken answers, audio, or transcripts.</p>
+      <p>Google Analytics 4 is used for aggregate website and product analytics. Analytics events are deliberately limited to page paths and coarse non-content fields such as study mode, source category, and question-count range. same3le does not intentionally send question text, answer text, spoken responses, transcripts, filenames, Google Sheet URLs or identifiers, email addresses, account or Supabase user identifiers, or deck names to Google Analytics.</p>
       <p>Paid subscriptions are not active. Legal operator identity, monitored privacy contacts, custom SMTP, and related launch items still need to be completed before public account signup is treated as production-ready.</p>
 
       <h2>2. Information handled today</h2>
@@ -32,11 +47,12 @@
           <tr><td>Saved Google Sheet identifiers</td><td>Remembers a display name, spreadsheet id, sheet tab id, last-opened time, and last source row.</td><td>Supabase Postgres with Row Level Security. Raw Sheet URLs and question text are not stored.</td></tr>
           <tr><td>Required legal acceptance and optional marketing preference</td><td>Records that you accepted the Terms, Privacy Policy, and Acceptable Use Policy. Marketing consent is separate and optional.</td><td>Supabase, if you create an account.</td></tr>
           <tr><td>Settings and local progress</td><td>Remembers mode, speed, timing, voice, matching preference, and current position on this device.</td><td>Browser local storage.</td></tr>
-          <tr><td>Pasted question-and-answer text</td><td>Parses structured Q&amp;A into a spoken study session.</td><td>Processed locally in browser memory; not uploaded to a same3le account database in v1.</td></tr>
-          <tr><td>Local Excel, Anki, CSV, TSV, and TXT files</td><td>Extracts structured questions and answers for the study session.</td><td>Read and parsed in the browser. File contents are not uploaded to a same3le application server in v1.</td></tr>
-          <tr><td>Google Sheet data</td><td>Creates the study session.</td><td>Requested directly from Google by the browser. If you save the sheet, only identifiers needed to request it again are stored by Supabase.</td></tr>
-          <tr><td>Spoken answers</td><td>Converts speech to text for answer matching.</td><td>May be processed by the browser, operating system, or speech-service provider. same3le does not intentionally store audio or transcripts.</td></tr>
-          <tr><td>Technical request information</td><td>Delivers and protects the website and third-party code dependencies.</td><td>The hosting provider, Supabase, and when required for modern Anki decompression the decoder CDN, may receive ordinary request information such as IP address, user agent, timestamps, and requested asset.</td></tr>
+          <tr><td>Aggregate website and product analytics</td><td>Measures page views and coarse funnel events such as loading a source, starting or completing a study session, reaching five or ten completed questions, creating an account, or saving a deck.</td><td>Google Analytics 4. Page URLs and referrers are reduced to origin and path before being sent; query strings and URL fragments are excluded. Custom event parameters are restricted to coarse study mode, source category, and question-count bucket where applicable.</td></tr>
+          <tr><td>Pasted question-and-answer text</td><td>Parses structured Q&amp;A into a spoken study session.</td><td>Processed locally in browser memory; not uploaded to a same3le account database or intentionally sent to Google Analytics.</td></tr>
+          <tr><td>Local Excel, Anki, CSV, TSV, and TXT files</td><td>Extracts structured questions and answers for the study session.</td><td>Read and parsed in the browser. File contents and filenames are not intentionally sent to Google Analytics or uploaded to a same3le application server in v1.</td></tr>
+          <tr><td>Google Sheet data</td><td>Creates the study session.</td><td>Requested directly from Google by the browser. If you save the sheet, only identifiers needed to request it again are stored by Supabase. Sheet URLs, spreadsheet identifiers, tab identifiers, and question content are not intentionally sent to Google Analytics.</td></tr>
+          <tr><td>Spoken answers</td><td>Converts speech to text for answer matching.</td><td>May be processed by the browser, operating system, or speech-service provider. same3le does not intentionally store audio or transcripts or send them to Google Analytics.</td></tr>
+          <tr><td>Technical request information</td><td>Delivers and protects the website and third-party code dependencies and supports aggregate analytics.</td><td>The hosting provider, Supabase, Google Analytics, and when required for modern Anki decompression the decoder CDN may receive ordinary request information such as IP address, user agent, timestamps, and requested asset as part of providing their services.</td></tr>
         </tbody>
       </table>
 
@@ -44,24 +60,23 @@
       <p>When an Anki <code>.apkg</code> file contains a legacy SQLite collection, same3le reads that collection locally. Some modern Anki packages contain a zstd-compressed collection. The importer first attempts to use a browser-native decompressor. If that is unavailable, the browser may download a pinned open-source zstd decoder module from a third-party CDN. The deck file itself is not intentionally sent to that decoder CDN; the downloaded code runs against the deck in the browser. If the decoder cannot be loaded, the user is instructed to export an older-compatible Anki package instead.</p>
       <p>The current Anki importer does not intentionally persist Anki scheduling data, review history, images, audio, or card-template state in a same3le database. It extracts text needed to create oral-study questions.</p>
 
-      <h2>4. Planned production-account information</h2>
-      <p>Once additional account features are activated, same3le expects to collect or generate:</p>
-      <ul><li>Account identifier and email address</li><li>Account creation and last-sign-in timestamps</li><li>Terms and Privacy Policy versions accepted</li><li>Optional marketing consent and preference changes</li><li>Saved Google Sheet identifiers and lightweight last-opened progress</li><li>Plan name, subscription status, renewal period, and payment-provider customer reference when payments launch</li><li>Limited events such as demo completion, successful question-list load, session completion, ten-question milestone, seven-day return, and Pro-interest response</li><li>Account-deletion or privacy-request records</li></ul>
-      <p>The planned backend is not intended to receive raw payment-card numbers. A payment processor should handle card entry. Question text, answer text, local file contents, audio, transcripts, raw Google Sheet URLs, precise location, advertising identifiers, and cross-site browsing data should not be collected by default.</p>
+      <h2>4. Account and product information</h2>
+      <p>Current or planned account and product records may include:</p>
+      <ul><li>Account identifier and email address in Supabase</li><li>Account creation and last-sign-in timestamps</li><li>Terms and Privacy Policy versions accepted</li><li>Optional marketing consent and preference changes</li><li>Saved Google Sheet identifiers and lightweight last-opened progress</li><li>Plan name, subscription status, renewal period, and payment-provider customer reference when payments launch</li><li>Privacy-safe aggregate analytics events such as demo start, source category loaded, session start or completion, five- and ten-question milestones, account creation, and deck save</li><li>Account-deletion or privacy-request records</li></ul>
+      <p>The planned backend is not intended to receive raw payment-card numbers. A payment processor should handle card entry. Question text, answer text, local file contents, filenames, audio, transcripts, raw Google Sheet URLs or identifiers, precise location, advertising identifiers, and cross-site browsing data are not intended to be included in same3le's custom analytics events.</p>
 
       <h2>5. Purposes</h2>
-      <p>Information may be used to provide and secure accounts, authenticate users, remember preferences, administer Free and Pro access, process and document subscriptions, measure whether core workflows function, answer support or privacy requests, prevent abuse, comply with law, and communicate transactional service information. Promotional email requires separate optional consent where required.</p>
+      <p>Information may be used to provide and secure accounts, authenticate users, remember preferences, administer Free and Pro access, process and document subscriptions, measure aggregate traffic and whether core workflows function, answer support or privacy requests, prevent abuse, comply with law, and communicate transactional service information. Promotional email requires separate optional consent where required.</p>
 
       <h2>6. Vendors</h2>
       <p>The Service currently or potentially uses:</p>
-      <ul><li><strong>Hosting provider:</strong> to deliver static application files and process ordinary server logs.</li><li><strong>Google:</strong> when you provide a link-accessible Google Sheet.</li><li><strong>Browser or operating-system speech services:</strong> for speech synthesis and recognition.</li><li><strong>Decoder CDN:</strong> only when a modern Anki package requires the optional pinned browser zstd decoder fallback.</li><li><strong>Supabase:</strong> authentication, Postgres records for saved Google Sheet identifiers and consent, Row Level Security, and the JavaScript client loaded from a third-party CDN.</li><li><strong>Email provider:</strong> for one-time codes, magic links, security messages, service notices, and separately consented marketing.</li><li><strong>Payment processor:</strong> planned for subscription checkout, billing, tax-related transaction records, and billing-portal access. Payments are not active in this version.</li></ul>
-      <p>The final vendor names, processing purposes, and links to their policies will be confirmed before production collection begins.</p>
+      <ul><li><strong>Hosting provider:</strong> to deliver static application files and process ordinary server logs.</li><li><strong>Google:</strong> to retrieve a link-accessible Google Sheet when you choose that import method, and Google Analytics 4 to measure aggregate website and product usage.</li><li><strong>Browser or operating-system speech services:</strong> for speech synthesis and recognition.</li><li><strong>Decoder CDN:</strong> only when a modern Anki package requires the optional pinned browser zstd decoder fallback.</li><li><strong>Supabase:</strong> authentication, Postgres records for saved Google Sheet identifiers and consent, Row Level Security, and the JavaScript client loaded from a third-party CDN.</li><li><strong>Email provider:</strong> for one-time codes, magic links, security messages, service notices, and separately consented marketing.</li><li><strong>Payment processor:</strong> planned for subscription checkout, billing, tax-related transaction records, and billing-portal access. Payments are not active in this version.</li></ul>
 
       <h2>7. Sale, sharing, and advertising</h2>
-      <p>same3le does not intend to sell personal information or share it for cross-context behavioral advertising. The prototype does not use advertising pixels. If this practice changes, this policy and any legally required opt-out controls will be updated before the change.</p>
+      <p>same3le does not intend to sell personal information or share it for cross-context behavioral advertising. Google Analytics is configured without Google Signals and without advertising-personalization signals. same3le does not enable Google Ads or remarketing through this analytics implementation. If these practices change, this policy and any legally required opt-out controls will be updated before the change.</p>
 
       <h2>8. Retention</h2>
-      <p>Browser settings and prototype access data remain until you remove local access, clear site data, or the browser deletes them. Pasted Q&amp;A and local-file contents are not intentionally persisted by the current import feature after the page or in-memory session is discarded. Planned production retention targets are: account and consent records while the account is active plus a limited legal period; subscription and transaction records as required for accounting, disputes, and law; security logs approximately 30–90 days unless an incident requires longer retention; and product-usage events approximately 12 months. Final periods will be confirmed before production launch.</p>
+      <p>Browser settings and prototype access data remain until you remove local access, clear site data, or the browser deletes them. Pasted Q&amp;A and local-file contents are not intentionally persisted by the current import feature after the page or in-memory session is discarded. Account, consent, hosting, and analytics information is retained according to the applicable service configuration and operational or legal needs. Final subscription-era retention periods will be documented before paid launch.</p>
 
       <h2>9. Your choices and rights</h2>
       <p>Depending on where you live and which laws apply, you may have rights to access, correct, delete, or obtain a copy of personal information; withdraw marketing consent; appeal a denied request; and opt out of certain sale, sharing, targeted advertising, or profiling. same3le intends to honor Global Privacy Control signals if a legally relevant sale or sharing practice is ever introduced, but no such practice is planned.</p>
@@ -71,7 +86,7 @@
       <p>The Service is not directed to children under 13 and the planned account service is restricted to users age 18 or older. We do not knowingly collect personal information from children through production accounts. If a child’s information is discovered, contact information will be provided for deletion requests before accounts launch.</p>
 
       <h2>11. Security</h2>
-      <p>Planned safeguards include HTTPS, Supabase authentication, Row Level Security, least-privilege access, separate public and server secrets, rate limiting, secure authentication redirects, dependency and secret scanning, limited data collection, and an incident-response process. Local processing reduces application-server collection but does not eliminate browser, device, extension, hosting, speech-provider, or network risks. No security measure can guarantee absolute protection.</p>
+      <p>Planned safeguards include HTTPS, Supabase authentication, Row Level Security, least-privilege access, separate public and server secrets, rate limiting, secure authentication redirects, dependency and secret scanning, limited data collection, and an incident-response process. Local processing reduces application-server collection but does not eliminate browser, device, extension, hosting, analytics, speech-provider, or network risks. No security measure can guarantee absolute protection.</p>
 
       <h2>12. International and regional use</h2>
       <p>The prototype is intended for access from the United States. Internet routing and vendors may process request information in other locations. A regional gate is not proof of citizenship or residence. International expansion would require an updated legal and privacy review.</p>

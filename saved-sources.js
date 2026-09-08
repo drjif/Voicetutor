@@ -1,3 +1,4 @@
+import { trackAnalyticsEvent } from './analytics.js';
 import { reconstructGoogleSheetUrls } from './sheet-data.js';
 
 export const SAVED_SOURCE_TYPE = 'google-sheet';
@@ -185,6 +186,7 @@ export function createSavedSourceRepository(client) {
         .select('id,user_id,display_name,source_type,spreadsheet_id,sheet_gid,last_source_row,last_opened_at,created_at,updated_at')
         .single();
       if (error) throw error;
+      trackAnalyticsEvent('deck_saved', { source_type: 'google_sheet' });
       return { action: 'insert', record: normalizeSavedSource(data) };
     },
 

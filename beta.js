@@ -1,3 +1,4 @@
+import { analyticsSourceType, trackAnalyticsEvent } from './analytics.js';
 import { elements, state } from './dom.js';
 
 const METRICS_KEY = 'same3le.prototypeMetrics.v1';
@@ -62,6 +63,14 @@ function recordVisit() {
   recordMetric('visit');
 }
 
+function analyticsContext() {
+  return {
+    study_mode: state.mode,
+    source_type: analyticsSourceType(state.sourceKind),
+    question_count: state.questions.length
+  };
+}
+
 export function setupBetaFunnel() {
   migrateLegacyStorage();
   LEGACY_ACCOUNT_KEYS.forEach((key) => localStorage.removeItem(key));
@@ -102,6 +111,14 @@ export function noteSourceLoaded(sourceType, questionCount) {
   } else {
     recordMetric('personal_question_bank_loaded', { questionCount });
   }
+
+  const context = {
+    source_type: analyticsSourceType(state.sourceKind),
+    question_count: questionCount
+  };
+  if (state.sourceKind === 'paste') trackAnalyticsEvent('paste_deck_loaded', context);
+  else if (state.sourceKind === 'google-sheet') trackAnalyticsEvent('google_sheet_loaded', context);
+  else if (context.source_type === 'file') trackAnalyticsEvent('file_deck_loaded', context);
 }
 
 export function noteSessionStarted() {
@@ -110,10 +127,22 @@ export function noteSessionStarted() {
   recordMetric(state.sourceType === 'demo' ? 'demo_started' : 'personal_session_started', {
     questionCount: state.questions.length
   });
+
+  const context = analyticsContext();
+  trackAnalyticsEvent('study_session_started', context);
+  if (state.sourceType === 'demo') trackAnalyticsEvent('demo_started', context);
 }
 
 export function noteQuestionCompleted() {
   state.completedQuestionCount += 1;
+
+  if (state.completedQuestionCount === 5) {
+    trackAnalyticsEvent('five_questions_completed', analyticsContext());
+  }
+  if (state.completedQuestionCount === 10) {
+    trackAnalyticsEvent('ten_questions_completed', analyticsContext());
+  }
+
   if (state.sourceType === 'personal'
       && state.completedQuestionCount >= 10
       && !state.tenQuestionMilestoneRecorded) {
@@ -131,6 +160,7 @@ export function noteSessionCompleted() {
   } else {
     recordMetric('personal_session_completed', { completedQuestions: state.completedQuestionCount });
   }
+  trackAnalyticsEvent('study_session_completed', analyticsContext());
   elements.conversionCard.hidden = false;
   elements.conversionCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
