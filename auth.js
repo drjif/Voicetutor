@@ -1,3 +1,4 @@
+import { maybeTrackAccountCreated } from './analytics.js';
 import {
   AUTH_STATUS,
   createPendingConsent,
@@ -184,7 +185,10 @@ export async function initializeAuth() {
     const { data, error } = await supabase.auth.getSession();
     if (error) throw error;
     lastUser = data?.session?.user ?? null;
-    if (lastUser) await persistPendingConsent(lastUser);
+    if (lastUser) {
+      await persistPendingConsent(lastUser);
+      maybeTrackAccountCreated(lastUser);
+    }
     cleanAuthParamsFromUrl();
     const snapshot = snapshotFor(lastUser ? AUTH_STATUS.signedIn : AUTH_STATUS.signedOut);
     notify(snapshot);
@@ -193,6 +197,7 @@ export async function initializeAuth() {
       lastUser = session?.user ?? null;
       if (lastUser && (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION')) {
         await persistPendingConsent(lastUser);
+        maybeTrackAccountCreated(lastUser);
       }
       notify(snapshotFor(lastUser ? AUTH_STATUS.signedIn : AUTH_STATUS.signedOut));
     });
@@ -277,7 +282,10 @@ export async function verifyEmailCode(email, token) {
     throw new Error(message);
   }
   lastUser = data?.user ?? data?.session?.user ?? lastUser;
-  if (lastUser) await persistPendingConsent(lastUser);
+  if (lastUser) {
+    await persistPendingConsent(lastUser);
+    maybeTrackAccountCreated(lastUser);
+  }
   const snapshot = snapshotFor(AUTH_STATUS.signedIn);
   notify(snapshot);
   return snapshot;
