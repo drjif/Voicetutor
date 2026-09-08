@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v17-continuous-safe';
+const CACHE_NAME = 'same3le-v18-ga4';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './homepage-marketing.css',
   './marketing.css',
   './app.js',
+  './analytics.js',
   './homepage-marketing.js',
   './file-import-ui.js',
   './file-import.js',
