@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v18-ga4';
+const CACHE_NAME = 'same3le-v17-ga4';
 const ASSETS = [
   './',
   './index.html',
