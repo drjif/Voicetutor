@@ -1,5 +1,5 @@
 import { isSignedIn, loadSupabaseClient, onAuthChange } from './auth.js';
-import { elements, state } from './dom.js';
+import { state } from './dom.js';
 import { createStarredQuestionRepository, starredRowsForSource } from './starred-questions.js';
 
 let loadedSourceId = null;
@@ -9,6 +9,37 @@ let starRequestInFlight = false;
 async function repository() {
   const client = await loadSupabaseClient();
   return client ? createStarredQuestionRepository(client) : null;
+}
+
+function ensureStarControls() {
+  const card = document.querySelector('.question-card');
+  const question = document.querySelector('#currentQuestion');
+  if (!card || !question) return { button: null, status: null };
+
+  let button = document.querySelector('#starQuestionButton');
+  if (!button) {
+    button = document.createElement('button');
+    button.id = 'starQuestionButton';
+    button.type = 'button';
+    button.className = 'button ghost compact-button';
+    button.hidden = true;
+    button.setAttribute('aria-pressed', 'false');
+    button.setAttribute('aria-label', 'Star this question');
+    button.style.float = 'right';
+    button.style.margin = '-4px 0 8px 12px';
+    card.insertBefore(button, question);
+  }
+
+  let status = document.querySelector('#starQuestionStatus');
+  if (!status) {
+    status = document.createElement('span');
+    status.id = 'starQuestionStatus';
+    status.className = 'sr-only';
+    status.setAttribute('aria-live', 'polite');
+    card.insertBefore(status, question);
+  }
+
+  return { button, status };
 }
 
 function currentSourceRow() {
@@ -24,12 +55,12 @@ function canUseCloudStars() {
 }
 
 function setStarStatus(message = '') {
-  if (!elements.starQuestionStatus) return;
-  elements.starQuestionStatus.textContent = message;
+  const { status } = ensureStarControls();
+  if (status) status.textContent = message;
 }
 
 export function renderStarControl() {
-  const button = elements.starQuestionButton;
+  const { button } = ensureStarControls();
   if (!button) return;
 
   const sourceRow = currentSourceRow();
@@ -45,6 +76,7 @@ export function renderStarControl() {
   const isStarred = starredRows.has(sourceRow);
   button.disabled = starRequestInFlight;
   button.setAttribute('aria-pressed', isStarred ? 'true' : 'false');
+  button.setAttribute('aria-label', isStarred ? 'Remove star from this question' : 'Star this question');
   button.textContent = isStarred ? '★ Starred' : '☆ Star';
   button.title = isStarred ? 'Remove this question from Starred questions' : 'Save this question to Starred questions';
 }
@@ -127,7 +159,8 @@ async function toggleCurrentQuestionStar() {
 }
 
 export function setupStarredQuestionUI() {
-  elements.starQuestionButton?.addEventListener('click', toggleCurrentQuestionStar);
+  const { button } = ensureStarControls();
+  button?.addEventListener('click', toggleCurrentQuestionStar);
   onAuthChange(async (snapshot) => {
     if (snapshot.status === 'signed-in') await refreshCurrentStars();
     else {
