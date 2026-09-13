@@ -15,6 +15,7 @@ import { loadSavedGoogleSheet, setSheetReadyHandler, setupSheetEvents } from './
 import { hideSheetReadyActions, setSavedSheetLoader, setupAccountUI, showSheetReadyActions } from './account-ui.js';
 import { installStarButtonStyles } from './star-button-style.js';
 import { setupStarredQuestionUI } from './stars-ui.js';
+import { setupSourceFocusUI } from './source-focus.js';
 import { restartAt, setupSessionEvents } from './session-next.js';
 import { ACTIVE_SESSION_STATUSES, transportAnchorIndex } from './session-transport.js';
 import { checkBrowserSupport, populateVoices } from './voice.js';
@@ -106,6 +107,7 @@ function initialize() {
   installStarButtonStyles();
   setupHomepageMarketing();
   setupFileImportUI();
+  setupSourceFocusUI(state);
   restoreSettings();
   setupBetaFunnel();
   setupSheetEvents();
