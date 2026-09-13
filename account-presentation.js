@@ -45,7 +45,7 @@ function installStyles() {
       top: 0;
       float: right;
       z-index: 1;
-      display: inline-grid;
+      display: none;
       place-items: center;
       width: 34px;
       height: 34px;
@@ -58,6 +58,10 @@ function installStyles() {
       font-size: 1.1rem;
       font-weight: 800;
       cursor: pointer;
+    }
+
+    #signInPanel.same3le-account-modal .account-modal-close {
+      display: inline-grid;
     }
 
     .account-modal-close:hover,
