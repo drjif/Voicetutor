@@ -1,9 +1,15 @@
 import { isSignedIn, loadSupabaseClient, onAuthChange } from './auth.js';
+import { refreshMyDecks } from './account-ui.js';
 import { elements, state, updateControls } from './dom.js';
-import { createSavedSourceRepository } from './saved-sources.js';
+import {
+  createSavedSourceRepository,
+  inferDeckDisplayName
+} from './saved-sources.js';
 import { loadSavedGoogleSheet } from './sheet-v2.js';
 import {
+  canOfferStarredQuestion,
   createStarredQuestionRepository,
+  findSavedSourceForSheet,
   starredCountsBySource,
   starredRowsForSource
 } from './starred-questions.js';
@@ -12,6 +18,7 @@ let loadedSourceId = null;
 let starredRows = new Set();
 let starRequestInFlight = false;
 let decoratingDecks = false;
+let resolvingSourcePromise = null;
 
 async function repositories() {
   const client = await loadSupabaseClient();
@@ -58,11 +65,21 @@ function currentSourceRow() {
   return Number.isInteger(value) && value > 0 ? value : null;
 }
 
-function canUseCloudStars() {
-  return isSignedIn()
-    && state.sourceKind === 'google-sheet'
-    && Boolean(state.savedSourceId)
-    && Boolean(currentSourceRow());
+function currentQuestionCanBeStarred() {
+  return canOfferStarredQuestion({
+    sourceKind: state.sourceKind,
+    sourceRow: currentSourceRow()
+  });
+}
+
+function currentQuestionIsStarred() {
+  const sourceRow = currentSourceRow();
+  return Boolean(
+    sourceRow
+    && state.savedSourceId
+    && loadedSourceId === state.savedSourceId
+    && starredRows.has(sourceRow)
+  );
 }
 
 function setStarStatus(message = '') {
@@ -78,40 +95,88 @@ function setDeckStatus(message = '', type = 'neutral') {
   status.dataset.type = type;
 }
 
+function focusSignIn() {
+  const panel = document.querySelector('#signInPanel');
+  panel?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  window.setTimeout(() => document.querySelector('#accountEmail')?.focus(), 250);
+}
+
 export function renderStarControl() {
   const { button } = ensureStarControls();
   if (!button) return;
 
-  const sourceRow = currentSourceRow();
-  const ready = canUseCloudStars() && loadedSourceId === state.savedSourceId;
-  button.hidden = !ready;
-  if (!ready) {
+  const eligible = currentQuestionCanBeStarred();
+  button.hidden = !eligible;
+  if (!eligible) {
     button.disabled = false;
     button.setAttribute('aria-pressed', 'false');
     if (button.textContent !== '☆ Star') button.textContent = '☆ Star';
     return;
   }
 
-  const isStarred = starredRows.has(sourceRow);
-  const label = isStarred ? '★ Starred' : '☆ Star';
+  const isStarred = currentQuestionIsStarred();
+  const label = starRequestInFlight
+    ? (isStarred ? '★ Updating…' : '☆ Saving…')
+    : (isStarred ? '★ Starred' : '☆ Star');
+
   button.disabled = starRequestInFlight;
   button.setAttribute('aria-pressed', isStarred ? 'true' : 'false');
   button.setAttribute('aria-label', isStarred ? 'Remove star from this question' : 'Star this question');
   if (button.textContent !== label) button.textContent = label;
-  button.title = isStarred ? 'Remove this question from Starred questions' : 'Save this question to Starred questions';
+
+  if (!isSignedIn()) {
+    button.title = 'Sign in to star this question and sync it across devices.';
+  } else if (!state.savedSourceId) {
+    button.title = 'Star this question. same3le will save this Google Sheet reference to My decks so the star can sync.';
+  } else {
+    button.title = isStarred ? 'Remove this question from Starred questions' : 'Save this question to Starred questions';
+  }
+}
+
+async function resolveCurrentSavedSource({ createIfMissing = false } = {}) {
+  if (!isSignedIn() || !currentQuestionCanBeStarred()) return null;
+  if (state.savedSourceId) return state.savedSourceId;
+  if (resolvingSourcePromise) return resolvingSourcePromise;
+
+  const identity = state.googleSheetIdentity;
+  if (!identity?.spreadsheetId) return null;
+
+  resolvingSourcePromise = (async () => {
+    const { sources } = await repositories();
+    if (!sources) return null;
+
+    const savedSources = await sources.list();
+    const existing = findSavedSourceForSheet(savedSources, identity);
+    if (existing?.id) {
+      state.savedSourceId = existing.id;
+      return existing.id;
+    }
+
+    if (!createIfMissing) return null;
+
+    const result = await sources.upsert({
+      source_type: 'google-sheet',
+      spreadsheet_id: identity.spreadsheetId,
+      sheet_gid: identity.sheetGid,
+      display_name: inferDeckDisplayName({ displayName: state.sourceName }),
+      last_source_row: currentSourceRow(),
+      last_opened_at: new Date().toISOString()
+    });
+    state.savedSourceId = result.record.id;
+    state.sourceName = result.record.display_name;
+    await refreshMyDecks();
+    return result.record.id;
+  })();
+
+  try {
+    return await resolvingSourcePromise;
+  } finally {
+    resolvingSourcePromise = null;
+  }
 }
 
 export async function refreshCurrentStars() {
-  if (!isSignedIn() || state.sourceKind !== 'google-sheet' || !state.savedSourceId) {
-    loadedSourceId = null;
-    starredRows = new Set();
-    renderStarControl();
-    return [];
-  }
-
-  const sourceId = state.savedSourceId;
-  const { stars } = await repositories();
-  if (!stars) {
+  if (!isSignedIn() || !currentQuestionCanBeStarred()) {
     loadedSourceId = null;
     starredRows = new Set();
     renderStarControl();
@@ -119,6 +184,21 @@ export async function refreshCurrentStars() {
   }
 
   try {
+    const sourceId = state.savedSourceId || await resolveCurrentSavedSource({ createIfMissing: false });
+    if (!sourceId) {
+      loadedSourceId = null;
+      starredRows = new Set();
+      renderStarControl();
+      return [];
+    }
+
+    if (loadedSourceId === sourceId) {
+      renderStarControl();
+      return [...starredRows];
+    }
+
+    const { stars } = await repositories();
+    if (!stars) return [];
     const rows = await stars.listForSource(sourceId);
     if (state.savedSourceId !== sourceId) return [];
     loadedSourceId = sourceId;
@@ -128,12 +208,10 @@ export async function refreshCurrentStars() {
     return [...starredRows];
   } catch (error) {
     console.warn('Starred questions could not be loaded', error);
-    if (state.savedSourceId === sourceId) {
-      loadedSourceId = null;
-      starredRows = new Set();
-      setStarStatus('Starred questions are temporarily unavailable.');
-      renderStarControl();
-    }
+    loadedSourceId = null;
+    starredRows = new Set();
+    setStarStatus('Starred questions are temporarily unavailable.');
+    renderStarControl();
     return [];
   }
 }
@@ -172,35 +250,49 @@ export function applyStarredQuestionSubset(sourceRows) {
 }
 
 async function toggleCurrentQuestionStar() {
-  if (!canUseCloudStars() || starRequestInFlight) return;
-  const sourceId = state.savedSourceId;
+  if (!currentQuestionCanBeStarred() || starRequestInFlight) return;
+
+  if (!isSignedIn()) {
+    setStarStatus('Sign in to star this question and sync it across devices.');
+    focusSignIn();
+    return;
+  }
+
   const sourceRow = currentSourceRow();
   if (!sourceRow) return;
 
-  const { stars } = await repositories();
-  if (!stars) return;
-
-  const wasStarred = loadedSourceId === sourceId && starredRows.has(sourceRow);
   starRequestInFlight = true;
   renderStarControl();
   try {
+    const sourceId = await resolveCurrentSavedSource({ createIfMissing: true });
+    if (!sourceId) throw new Error('This Google Sheet could not be connected to My decks.');
+
+    const { stars } = await repositories();
+    if (!stars) throw new Error('Account sync is unavailable.');
+
+    if (loadedSourceId !== sourceId) {
+      const rows = await stars.listForSource(sourceId);
+      loadedSourceId = sourceId;
+      starredRows = new Set(starredRowsForSource(rows, sourceId));
+    }
+
+    const wasStarred = starredRows.has(sourceRow);
     if (wasStarred) {
       await stars.remove(sourceId, sourceRow);
       starredRows.delete(sourceRow);
       setStarStatus('Removed from Starred questions.');
     } else {
       await stars.add(sourceId, sourceRow);
-      if (loadedSourceId !== sourceId) starredRows = new Set();
-      loadedSourceId = sourceId;
       starredRows.add(sourceRow);
       setStarStatus('Saved to Starred questions.');
     }
+
     window.dispatchEvent(new CustomEvent('same3le:stars-changed', {
       detail: { savedSourceId: sourceId }
     }));
   } catch (error) {
     console.warn('Starred question could not be updated', error);
-    setStarStatus('Could not update this star. Try again.');
+    setStarStatus(error.message || 'Could not update this star. Try again.');
   } finally {
     starRequestInFlight = false;
     renderStarControl();
@@ -246,10 +338,6 @@ async function refreshDeckStarDecorations() {
       const buttonText = count ? `★ Review starred (${count})` : '☆ Review starred';
       if (reviewButton.textContent !== buttonText) reviewButton.textContent = buttonText;
     });
-
-    if (canUseCloudStars() && loadedSourceId !== state.savedSourceId) {
-      await refreshCurrentStars();
-    }
   } catch (error) {
     console.warn('Star counts could not be loaded', error);
   } finally {
@@ -305,8 +393,10 @@ function observeCurrentQuestion() {
   const question = document.querySelector('#currentQuestion');
   if (!question) return;
   const observer = new MutationObserver(() => {
-    if (canUseCloudStars() && loadedSourceId !== state.savedSourceId) refreshCurrentStars();
-    else renderStarControl();
+    // Visibility is synchronous: the star is available with the question,
+    // before any answer reveal or background account lookup completes.
+    renderStarControl();
+    if (isSignedIn() && currentQuestionCanBeStarred()) refreshCurrentStars();
   });
   observer.observe(question, { childList: true, characterData: true, subtree: true });
 }
@@ -331,6 +421,8 @@ export function setupStarredQuestionUI() {
   observeMyDecks();
   window.addEventListener('same3le:stars-changed', refreshDeckStarDecorations);
   onAuthChange(async (snapshot) => {
+    // Always render first so account/network work can never delay the control.
+    renderStarControl();
     if (snapshot.status === 'signed-in') {
       await Promise.all([refreshCurrentStars(), refreshDeckStarDecorations()]);
     } else {
