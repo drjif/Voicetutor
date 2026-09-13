@@ -156,7 +156,16 @@ function updateSummary() {
   summary.hidden = false;
 }
 
-function applyFocus({ preserveExpansion = false } = {}) {
+function syncChangeSourceButton() {
+  const section = document.querySelector('#your-questions');
+  const button = document.querySelector('#changeSourceButton');
+  if (!section || !button) return;
+  const expanded = section.dataset.sourceOptions === 'expanded';
+  button.textContent = expanded ? 'Hide source options' : 'Change source';
+  button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+}
+
+function applyFocus({ preserveExpansion = false, preserveStage = false } = {}) {
   const section = document.querySelector('#your-questions');
   if (!section) return;
 
@@ -166,26 +175,21 @@ function applyFocus({ preserveExpansion = false } = {}) {
     delete section.dataset.sourceKind;
     delete section.dataset.sourceStage;
     delete section.dataset.sourceOptions;
+    syncChangeSourceButton();
     return;
   }
 
   section.dataset.sourceKind = presentation.kind;
-  section.dataset.sourceStage = presentation.stage;
+  if (!preserveStage || !section.dataset.sourceStage) section.dataset.sourceStage = presentation.stage;
   if (!preserveExpansion || !section.dataset.sourceOptions) section.dataset.sourceOptions = 'collapsed';
-
-  const button = document.querySelector('#changeSourceButton');
-  if (button) {
-    const expanded = section.dataset.sourceOptions === 'expanded';
-    button.textContent = expanded ? 'Hide source options' : 'Change source';
-    button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-  }
+  syncChangeSourceButton();
 }
 
 function toggleSourceOptions() {
   const section = document.querySelector('#your-questions');
   if (!section || !state.questions.length) return;
   section.dataset.sourceOptions = section.dataset.sourceOptions === 'expanded' ? 'collapsed' : 'expanded';
-  applyFocus({ preserveExpansion: true });
+  applyFocus({ preserveExpansion: true, preserveStage: true });
 }
 
 function enterStudyFocus() {
@@ -193,7 +197,18 @@ function enterStudyFocus() {
   if (!section || !state.questions.length) return;
   section.dataset.sourceStage = 'study';
   section.dataset.sourceOptions = 'collapsed';
-  applyFocus({ preserveExpansion: true });
+  applyFocus({ preserveExpansion: true, preserveStage: true });
+}
+
+function observeLoadedQuestions() {
+  const startRow = document.querySelector('#startRow');
+  if (!startRow) return;
+  const observer = new MutationObserver(() => {
+    // Importers keep their existing DOM and handlers. We only react after
+    // they populate the shared question selector successfully.
+    applyFocus({ preserveExpansion: true });
+  });
+  observer.observe(startRow, { childList: true });
 }
 
 export function setupSourceFocusUI() {
@@ -208,5 +223,6 @@ export function setupSourceFocusUI() {
   window.addEventListener('same3le:source-ready', () => applyFocus());
   window.addEventListener('same3le:source-saved', () => enterStudyFocus());
 
+  observeLoadedQuestions();
   applyFocus({ preserveExpansion: true });
 }
