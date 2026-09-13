@@ -2,10 +2,27 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  canOfferStarredQuestion,
+  findSavedSourceForSheet,
   normalizeStarredQuestion,
   starredCountsBySource,
   starredRowsForSource
 } from '../starred-questions.js';
+
+test('Google Sheet questions can offer a star before the deck has a saved-source id', () => {
+  assert.equal(canOfferStarredQuestion({ sourceKind: 'google-sheet', sourceRow: 12 }), true);
+  assert.equal(canOfferStarredQuestion({ sourceKind: 'google-sheet', sourceRow: null }), false);
+  assert.equal(canOfferStarredQuestion({ sourceKind: 'paste', sourceRow: 12 }), false);
+});
+
+test('findSavedSourceForSheet resolves an already-saved Sheet by spreadsheet and tab identity', () => {
+  const sources = [
+    { id: 'one', spreadsheet_id: 'sheet-a', sheet_gid: '0' },
+    { id: 'two', spreadsheet_id: 'sheet-b', sheet_gid: '123' }
+  ];
+  assert.equal(findSavedSourceForSheet(sources, { spreadsheetId: 'sheet-b', sheetGid: '123' })?.id, 'two');
+  assert.equal(findSavedSourceForSheet(sources, { spreadsheetId: 'sheet-b', sheetGid: '999' }), null);
+});
 
 test('normalizeStarredQuestion stores only deck and row references', () => {
   assert.deepEqual(normalizeStarredQuestion({
