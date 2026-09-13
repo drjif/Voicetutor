@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v17-star-visible-immediately';
+const CACHE_NAME = 'same3le-v17-star-button-contrast';
 const ASSETS = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ const ASSETS = [
   './analytics.js',
   './starred-questions.js',
   './stars-ui.js',
+  './star-button-style.js',
   './homepage-marketing.js',
   './file-import-ui.js',
   './file-import.js',
