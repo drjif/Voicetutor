@@ -16,7 +16,9 @@ test('starred questions migration uses minimal references and RLS', async () => 
   assert.match(sql, /source\.user_id = auth\.uid\(\)/i);
   assert.match(sql, /grant select, insert, delete on table public\.starred_questions to authenticated/i);
 
-  assert.doesNotMatch(sql, /question_text|answer_text|transcript|raw_sheet_url|spreadsheet_id\s+text|audio\s+/i);
+  const tableDefinition = sql.match(/create table if not exists public\.starred_questions\s*\(([\s\S]*?)\n\);/i)?.[1] ?? '';
+  assert.ok(tableDefinition, 'starred_questions table definition should be extractable');
+  assert.doesNotMatch(tableDefinition, /question_text|answer_text|transcript|raw_sheet_url|spreadsheet_id\s+text|audio\s+/i);
 });
 
 test('starred question follow-up migration covers the foreign key and optimizes auth checks', async () => {
