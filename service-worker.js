@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v17-focused-source';
+const CACHE_NAME = 'same3le-v18-study-workspace';
 const ASSETS = [
   './',
   './index.html',
