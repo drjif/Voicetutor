@@ -4,6 +4,21 @@ function asPositiveInteger(value) {
   return number;
 }
 
+export function canOfferStarredQuestion(input = {}) {
+  return input.sourceKind === 'google-sheet' && Boolean(asPositiveInteger(input.sourceRow));
+}
+
+export function findSavedSourceForSheet(sources, identity = {}) {
+  const spreadsheetId = String(identity.spreadsheetId ?? identity.spreadsheet_id ?? '').trim();
+  const sheetGid = String(identity.sheetGid ?? identity.sheet_gid ?? identity.gid ?? '0').trim() || '0';
+  if (!spreadsheetId || !/^[0-9]+$/.test(sheetGid)) return null;
+
+  return (sources ?? []).find((source) => (
+    String(source.spreadsheet_id ?? source.spreadsheetId ?? '').trim() === spreadsheetId
+    && String(source.sheet_gid ?? source.sheetGid ?? source.gid ?? '0').trim() === sheetGid
+  )) ?? null;
+}
+
 export function normalizeStarredQuestion(row = {}) {
   const sourceRow = asPositiveInteger(row.source_row ?? row.sourceRow);
   const savedSourceId = String(row.saved_source_id ?? row.savedSourceId ?? '').trim();
