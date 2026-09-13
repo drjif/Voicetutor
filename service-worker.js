@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v17-starred-questions';
+const CACHE_NAME = 'same3le-v18-star-visible-immediately';
 const ASSETS = [
   './',
   './index.html',
