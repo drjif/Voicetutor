@@ -88,15 +88,16 @@ export function renderStarControl() {
   if (!ready) {
     button.disabled = false;
     button.setAttribute('aria-pressed', 'false');
-    button.textContent = '☆ Star';
+    if (button.textContent !== '☆ Star') button.textContent = '☆ Star';
     return;
   }
 
   const isStarred = starredRows.has(sourceRow);
+  const label = isStarred ? '★ Starred' : '☆ Star';
   button.disabled = starRequestInFlight;
   button.setAttribute('aria-pressed', isStarred ? 'true' : 'false');
   button.setAttribute('aria-label', isStarred ? 'Remove star from this question' : 'Star this question');
-  button.textContent = isStarred ? '★ Starred' : '☆ Star';
+  if (button.textContent !== label) button.textContent = label;
   button.title = isStarred ? 'Remove this question from Starred questions' : 'Save this question to Starred questions';
 }
 
@@ -230,7 +231,8 @@ async function refreshDeckStarDecorations() {
         countLabel.className = 'deck-opened';
         copy.append(countLabel);
       }
-      countLabel.textContent = count ? `★ ${count} starred` : '☆ No starred questions yet';
+      const countText = count ? `★ ${count} starred` : '☆ No starred questions yet';
+      if (countLabel.textContent !== countText) countLabel.textContent = countText;
 
       let reviewButton = actions.querySelector('[data-deck-starred]');
       if (!reviewButton) {
@@ -241,7 +243,8 @@ async function refreshDeckStarDecorations() {
         actions.insertBefore(reviewButton, actions.querySelector('[data-deck-rename]'));
       }
       reviewButton.disabled = count === 0;
-      reviewButton.textContent = count ? `★ Review starred (${count})` : '☆ Review starred';
+      const buttonText = count ? `★ Review starred (${count})` : '☆ Review starred';
+      if (reviewButton.textContent !== buttonText) reviewButton.textContent = buttonText;
     });
 
     if (canUseCloudStars() && loadedSourceId !== state.savedSourceId) {
