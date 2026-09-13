@@ -21,6 +21,12 @@ test('account modal reuses the existing sign-in panel and blocks the old scroll 
   assert.doesNotMatch(source, /cloneNode\(/);
 });
 
+test('modal-only close control does not leak into the embedded landing-page panel', async () => {
+  const source = await readFile(accountPresentationPath, 'utf8');
+  assert.match(source, /\.account-modal-close\s*\{[\s\S]*?display:\s*none/);
+  assert.match(source, /#signInPanel\.same3le-account-modal \.account-modal-close\s*\{[\s\S]*?display:\s*inline-grid/);
+});
+
 test('focused workspace keeps the existing My decks panel as a compact switcher', async () => {
   const source = await readFile(accountPresentationPath, 'utf8');
   assert.match(source, /#your-questions\.source-workspace-collapsed > :not\(#myDecksPanel\)/);
