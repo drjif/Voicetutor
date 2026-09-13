@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v17-ga4';
+const CACHE_NAME = 'same3le-v19-starred-questions';
 const ASSETS = [
   './',
   './index.html',
@@ -8,6 +8,8 @@ const ASSETS = [
   './marketing.css',
   './app.js',
   './analytics.js',
+  './starred-questions.js',
+  './stars-ui.js',
   './homepage-marketing.js',
   './file-import-ui.js',
   './file-import.js',
