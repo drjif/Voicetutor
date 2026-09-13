@@ -136,12 +136,19 @@ export function renderStarControl() {
 async function resolveCurrentSavedSource({ createIfMissing = false } = {}) {
   if (!isSignedIn() || !currentQuestionCanBeStarred()) return null;
   if (state.savedSourceId) return state.savedSourceId;
-  if (resolvingSourcePromise) return resolvingSourcePromise;
 
   const identity = state.googleSheetIdentity;
   if (!identity?.spreadsheetId) return null;
 
-  resolvingSourcePromise = (async () => {
+  if (resolvingSourcePromise) {
+    const pendingLookup = resolvingSourcePromise;
+    const resolvedSourceId = await pendingLookup;
+    if (resolvedSourceId || !createIfMissing) return resolvedSourceId;
+    if (resolvingSourcePromise === pendingLookup) resolvingSourcePromise = null;
+    if (state.savedSourceId) return state.savedSourceId;
+  }
+
+  const sourceResolution = (async () => {
     const { sources } = await repositories();
     if (!sources) return null;
 
@@ -168,10 +175,11 @@ async function resolveCurrentSavedSource({ createIfMissing = false } = {}) {
     return result.record.id;
   })();
 
+  resolvingSourcePromise = sourceResolution;
   try {
-    return await resolvingSourcePromise;
+    return await sourceResolution;
   } finally {
-    resolvingSourcePromise = null;
+    if (resolvingSourcePromise === sourceResolution) resolvingSourcePromise = null;
   }
 }
 
