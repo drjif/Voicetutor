@@ -13,6 +13,7 @@ import { setupHomepageMarketing } from './homepage-marketing.js';
 import { handleWakeLockPreferenceChange, releaseSessionWakeLock, setupPowerManagement } from './power.js';
 import { loadSavedGoogleSheet, setSheetReadyHandler, setupSheetEvents } from './sheet-v2.js';
 import { hideSheetReadyActions, setSavedSheetLoader, setupAccountUI, showSheetReadyActions } from './account-ui.js';
+import { setupAccountPresentation } from './account-presentation.js';
 import { installStarButtonStyles } from './star-button-style.js';
 import { setupStarredQuestionUI } from './stars-ui.js';
 import { setupSourceFocusUI } from './source-focus.js';
@@ -107,6 +108,7 @@ function initialize() {
   installStarButtonStyles();
   setupHomepageMarketing();
   setupFileImportUI();
+  setupAccountPresentation();
   setupSourceFocusUI(state);
   restoreSettings();
   setupBetaFunnel();
