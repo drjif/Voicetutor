@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v18-study-workspace';
+const CACHE_NAME = 'same3le-v19-account-presentation';
 const ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const ASSETS = [
   './starred-questions.js',
   './stars-ui.js',
   './star-button-style.js',
+  './account-presentation.js',
   './source-focus.js',
   './homepage-marketing.js',
   './file-import-ui.js',
