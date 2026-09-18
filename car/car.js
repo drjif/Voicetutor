@@ -15,6 +15,7 @@ import {
   starredRowsForSource
 } from '../starred-questions.js';
 import { buildQuestionBank, detectColumns, parseDelimited } from '../sheet-data.js';
+import { createCarAudioRepository } from './car-audio.js';
 
 const ui = {
   accountGate: document.querySelector('#accountGate'),
@@ -52,14 +53,16 @@ const state = {
   index: 0,
   starredRows: new Set(),
   starRowsAll: [],
-  audioManifest: null,
+  audioMap: new Map(),
   playing: false,
+  preparing: false,
   runToken: 0,
   answerVisible: false,
   progressTimer: null
 };
 
 let repositoriesPromise = null;
+let audioRepositoryPromise = null;
 
 function setStatus(element, message = '', type = 'neutral') {
   element.textContent = message;
@@ -72,11 +75,28 @@ async function repositories() {
     const client = await loadSupabaseClient();
     if (!client) throw new Error('Account sync is unavailable.');
     return {
+      client,
       sources: createSavedSourceRepository(client),
       stars: createStarredQuestionRepository(client)
     };
   })();
   return repositoriesPromise;
+}
+
+async function audioRepository() {
+  if (audioRepositoryPromise) return audioRepositoryPromise;
+  audioRepositoryPromise = (async () => {
+    const { client } = await repositories();
+    const user = currentUser();
+    if (!user?.id) throw new Error('Sign in to prepare Car Mode audio.');
+    return createCarAudioRepository(client, user);
+  })();
+  return audioRepositoryPromise;
+}
+
+function resetRepositories() {
+  repositoriesPromise = null;
+  audioRepositoryPromise = null;
 }
 
 function stopDrive(message = '') {
@@ -87,12 +107,18 @@ function stopDrive(message = '') {
     ui.mediaPlayer.removeAttribute('src');
     ui.mediaPlayer.load();
   } catch {}
+  ui.playButton.disabled = false;
   ui.playButton.textContent = '▶ Start Drive';
   if (message) setStatus(ui.driveStatus, message);
 }
 
 function currentCard() {
   return state.cards[state.index] ?? null;
+}
+
+function audioEntry(card) {
+  const row = Number(card?.sourceRow);
+  return Number.isInteger(row) ? state.audioMap.get(row) ?? null : null;
 }
 
 function renderCard({ reveal = false } = {}) {
@@ -118,7 +144,7 @@ function renderCard({ reveal = false } = {}) {
   ui.progressBar.style.width = `${((state.index + 1) / state.cards.length) * 100}%`;
   ui.previousButton.disabled = state.index <= 0;
   ui.nextButton.disabled = state.index >= state.cards.length - 1;
-  ui.playButton.disabled = false;
+  ui.playButton.disabled = state.preparing;
 
   const starred = state.starredRows.has(Number(card.sourceRow));
   ui.starButton.disabled = false;
@@ -234,34 +260,15 @@ function recordsFromRows(rows) {
   });
 }
 
-async function loadAudioManifest(sourceId) {
-  const explicit = new URLSearchParams(window.location.search).get('manifest');
-  const candidates = explicit
-    ? [explicit]
-    : [`../car-audio/manifests/${encodeURIComponent(sourceId)}.json`];
-
-  for (const candidate of candidates) {
-    try {
-      const response = await fetch(candidate, { cache: 'no-store' });
-      if (!response.ok) continue;
-      const manifest = await response.json();
-      if (manifest?.cards && typeof manifest.cards === 'object') return manifest;
-    } catch {
-      // A missing manifest simply means this deck has not had Tesla-safe audio prepared yet.
-    }
-  }
-  return null;
-}
-
 async function openDeck(source) {
   stopDrive();
+  state.audioMap = new Map();
   setStatus(ui.deckStatus, `Loading ${source.display_name}…`, 'loading');
   try {
     const { stars } = await repositories();
-    const [rows, savedStars, manifest] = await Promise.all([
+    const [rows, savedStars] = await Promise.all([
       fetchSheetRows(source),
-      stars.listForSource(source.id),
-      loadAudioManifest(source.id)
+      stars.listForSource(source.id)
     ]);
     const cards = recordsFromRows(rows);
     if (!cards.length) throw new Error('No usable question-answer rows were found in this deck.');
@@ -270,7 +277,6 @@ async function openDeck(source) {
     state.allCards = cards;
     state.cards = cards;
     state.starredRows = new Set(starredRowsForSource(savedStars, source.id));
-    state.audioManifest = manifest;
     state.index = 0;
 
     if (source.last_source_row) {
@@ -284,11 +290,22 @@ async function openDeck(source) {
     ui.drivePanel.hidden = false;
     ui.reviewSet.value = 'all';
     renderCard();
+    setStatus(ui.driveStatus, 'Checking your cached Car Mode audio…', 'loading');
 
-    if (manifest) {
-      setStatus(ui.driveStatus, 'Tesla-safe audio is ready for this deck.', 'success');
-    } else {
-      setStatus(ui.driveStatus, 'This deck is connected and synced, but its MP3 audio has not been prepared yet.', 'loading');
+    try {
+      const audio = await audioRepository();
+      state.audioMap = await audio.loadForSource(source.id, cards);
+      const count = state.audioMap.size;
+      setStatus(
+        ui.driveStatus,
+        count
+          ? `${count} of ${cards.length} questions already have cached Car Mode audio. Missing audio will be generated once and saved as you go.`
+          : 'No cached Car Mode audio yet. Tap Start Drive once to prepare the first question; then tap Start Drive again to begin playback.',
+        count ? 'success' : 'neutral'
+      );
+    } catch (error) {
+      console.warn('Cached Car Mode audio could not be loaded', error);
+      setStatus(ui.driveStatus, error.message || 'Cached audio could not be loaded. New audio can still be prepared when you start.', 'error');
     }
   } catch (error) {
     console.warn('Car Mode deck load failed', error);
@@ -330,7 +347,7 @@ async function toggleStar() {
     } else {
       await stars.add(state.source.id, sourceRow);
       state.starredRows.add(sourceRow);
-      setStatus(ui.driveStatus, 'Starred. This will also appear starred in your regular same3le deck.', 'success');
+      setStatus(ui.driveStatus, 'Starred. This is the same star used by your regular same3le deck.', 'success');
     }
     renderCard({ reveal: state.answerVisible });
   } catch (error) {
@@ -339,11 +356,6 @@ async function toggleStar() {
   } finally {
     ui.starButton.disabled = false;
   }
-}
-
-function audioEntry(card) {
-  if (!state.audioManifest || !card) return null;
-  return state.audioManifest.cards?.[String(card.sourceRow)] ?? null;
 }
 
 function wait(ms, token) {
@@ -395,10 +407,55 @@ function playMedia(url, token) {
   });
 }
 
+async function ensureAudio(card, { quiet = false } = {}) {
+  const sourceRow = Number(card?.sourceRow);
+  if (!Number.isInteger(sourceRow) || !state.source?.id) throw new Error('This question cannot be prepared for Car Mode.');
+  const existing = state.audioMap.get(sourceRow);
+  if (existing) return existing;
+
+  if (!quiet) setStatus(ui.driveStatus, 'Generating and caching Tesla-safe MP3 audio for this question…', 'loading');
+  const audio = await audioRepository();
+  const prepared = await audio.ensureCard(state.source.id, card);
+  state.audioMap.set(sourceRow, prepared);
+  return prepared;
+}
+
+function warmAhead(fromIndex, count = 2) {
+  const cards = state.cards.slice(fromIndex, fromIndex + count);
+  for (const card of cards) {
+    if (audioEntry(card)) continue;
+    ensureAudio(card, { quiet: true }).catch((error) => {
+      console.warn('Car Mode warm-ahead generation failed', error);
+    });
+  }
+}
+
+async function prepareCurrentAudio() {
+  const card = currentCard();
+  if (!card || state.preparing) return;
+  state.preparing = true;
+  ui.playButton.disabled = true;
+  ui.playButton.textContent = 'Preparing audio…';
+  try {
+    await ensureAudio(card);
+    warmAhead(state.index + 1, 2);
+    setStatus(ui.driveStatus, 'Audio ready. Tap Start Drive again to begin through the Tesla speakers.', 'success');
+  } catch (error) {
+    console.warn('Car Mode audio preparation failed', error);
+    setStatus(ui.driveStatus, error.message || 'Audio could not be prepared.', 'error');
+  } finally {
+    state.preparing = false;
+    ui.playButton.disabled = false;
+    ui.playButton.textContent = '▶ Start Drive';
+  }
+}
+
 async function runDrive() {
   if (!state.cards.length || state.playing) return;
-  if (!state.audioManifest) {
-    setStatus(ui.driveStatus, 'Audio for this deck has not been prepared yet. The account, stars, and resume position are already connected; MP3 generation is the remaining backend step.', 'error');
+  const firstCard = currentCard();
+  const firstAudio = audioEntry(firstCard);
+  if (!firstAudio) {
+    await prepareCurrentAudio();
     return;
   }
 
@@ -410,16 +467,26 @@ async function runDrive() {
   try {
     while (state.index < state.cards.length && token === state.runToken && state.playing) {
       const card = currentCard();
-      const audio = audioEntry(card);
+      let audio = audioEntry(card);
+      if (!audio) {
+        setStatus(ui.driveStatus, 'Preparing the next question…', 'loading');
+        audio = await ensureAudio(card, { quiet: true });
+      }
+
       renderCard({ reveal: false });
       setStatus(ui.driveStatus, 'Reading question…', 'loading');
-      await playMedia(audio?.question, token);
+      const questionPlayback = playMedia(audio.question, token);
+      warmAhead(state.index + 1, 2);
+      await questionPlayback;
+
       setStatus(ui.driveStatus, `Recall pause: ${ui.recallPause.value} seconds`, 'loading');
       await wait(Number(ui.recallPause.value) * 1000, token);
+
       renderCard({ reveal: true });
       setStatus(ui.driveStatus, 'Reading answer…', 'loading');
-      await playMedia(audio?.answer, token);
+      await playMedia(audio.answer, token);
       await wait(1200, token);
+
       if (state.index >= state.cards.length - 1) break;
       state.index += 1;
     }
@@ -448,13 +515,16 @@ async function handleAuthSnapshot(snapshot) {
   const signedIn = snapshot?.status === 'signed-in' && Boolean(snapshot?.user?.id || currentUser()?.id);
   if (!signedIn) {
     stopDrive();
+    resetRepositories();
+    state.source = null;
+    state.audioMap = new Map();
     ui.accountGate.hidden = false;
     ui.deckPanel.hidden = true;
     ui.drivePanel.hidden = true;
     ui.signInLink.hidden = false;
     ui.accountStatus.textContent = snapshot?.status === 'unavailable'
       ? 'Account sync is unavailable right now.'
-      : 'Sign in first so Car Mode can use your saved decks, stars, and resume position.';
+      : 'Sign in first so Car Mode can use your saved decks, stars, resume position, and private audio cache.';
     return;
   }
 
@@ -484,5 +554,4 @@ ui.playButton.addEventListener('click', () => {
 });
 
 onAuthChange(handleAuthSnapshot);
-const initialAuth = await initializeAuth();
-await handleAuthSnapshot(initialAuth);
+await initializeAuth();
