@@ -10,9 +10,5 @@
     "check": "npm run test && npm run check:js && npm run check:site",
     "set-domain": "node scripts/set-domain.mjs",
     "serve": "python3 -m http.server 4173"
-  },
-  "dependencies": {
-    "@ai-sdk/gateway": "4.0.86",
-    "ai": "7.0.105"
   }
 }
