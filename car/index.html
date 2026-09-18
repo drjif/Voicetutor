@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>same3le Car Mode</title>
+  <meta name="description" content="Car Mode for hands-off same3le review using the same saved deck, stars, and progress as your account." />
+  <link rel="icon" href="../favicon.ico" sizes="48x48" />
+  <link rel="stylesheet" href="./car.css" />
+</head>
+<body>
+  <main class="car-shell">
+    <header class="car-header">
+      <a class="brand" href="../" aria-label="Back to same3le">
+        <span class="brand-mark">3</span>
+        <span><strong>same3le</strong><small>Car Mode</small></span>
+      </a>
+      <a class="exit-link" href="../">Exit Car Mode</a>
+    </header>
+
+    <section id="accountGate" class="panel account-gate">
+      <p class="eyebrow">Your account</p>
+      <h1>Drive review from the same deck.</h1>
+      <p id="accountStatus" class="muted">Checking your same3le account…</p>
+      <a id="signInLink" class="button secondary" href="../#account" hidden>Sign in on same3le</a>
+    </section>
+
+    <section id="deckPanel" class="panel" hidden>
+      <div class="panel-heading-row">
+        <div>
+          <p class="eyebrow">Choose a saved deck</p>
+          <h2>Your decks</h2>
+        </div>
+        <button id="refreshDecks" class="button ghost small" type="button">Refresh</button>
+      </div>
+      <p class="muted">Car Mode reads the same saved Google Sheet deck used by your regular study view. Stars and resume position are shared with your account.</p>
+      <div id="deckList" class="deck-list" aria-live="polite"></div>
+      <p id="deckStatus" class="status" aria-live="polite"></p>
+    </section>
+
+    <section id="drivePanel" class="panel drive-panel" hidden>
+      <div class="drive-topline">
+        <div>
+          <p class="eyebrow">Now reviewing</p>
+          <h2 id="deckName">Deck</h2>
+        </div>
+        <button id="changeDeck" class="button ghost small" type="button">Change deck</button>
+      </div>
+
+      <div class="progress-copy">
+        <span id="progressText">Question 1 of 1</span>
+        <span id="syncText">Synced</span>
+      </div>
+      <div class="progress-track"><span id="progressBar"></span></div>
+
+      <article class="question-card">
+        <div class="card-label">Question</div>
+        <div id="questionText" class="question-text"></div>
+      </article>
+
+      <article id="answerCard" class="answer-card" hidden>
+        <div class="card-label">Answer</div>
+        <div id="answerText" class="answer-text"></div>
+      </article>
+
+      <div class="primary-controls">
+        <button id="playButton" class="button primary jumbo" type="button">▶ Start Drive</button>
+        <button id="starButton" class="button star jumbo-secondary" type="button" aria-pressed="false">☆ Star</button>
+      </div>
+
+      <div class="transport-grid">
+        <button id="previousButton" class="button secondary" type="button">← Previous</button>
+        <button id="revealButton" class="button secondary" type="button">Show answer</button>
+        <button id="nextButton" class="button secondary" type="button">Next →</button>
+      </div>
+
+      <section class="settings-card" aria-labelledby="driveSettingsHeading">
+        <h3 id="driveSettingsHeading">Drive settings</h3>
+        <label>
+          Recall pause
+          <select id="recallPause">
+            <option value="3">3 seconds</option>
+            <option value="5" selected>5 seconds</option>
+            <option value="7">7 seconds</option>
+            <option value="10">10 seconds</option>
+          </select>
+        </label>
+        <label>
+          Review set
+          <select id="reviewSet">
+            <option value="all">Full deck</option>
+            <option value="starred">Starred only</option>
+          </select>
+        </label>
+      </section>
+
+      <div id="audioNotice" class="notice">
+        <strong>Tesla-safe MP3 playback.</strong>
+        <span>When a question does not already have audio, same3le generates it once, saves it privately to your account, and reuses it on later drives. Audio generation sends the question and answer text to Fish Audio through Vercel AI Gateway. Do not use patient information or other regulated sensitive data.</span>
+      </div>
+
+      <audio id="mediaPlayer" preload="metadata" playsinline></audio>
+      <p id="driveStatus" class="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script type="module" src="./car.js"></script>
+</body>
+</html>
