@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <title>same3le Car Mode Audio Test</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top, #26334d, #111827 42%, #070b12); color: #f8fafc; }
+    .shell { width: min(980px, 100%); margin: 0 auto; padding: 42px 28px 64px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 800; }
+    .mark { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: #ff5a1f; color: white; }
+    .eyebrow { margin: 52px 0 10px; color: #fb923c; font-size: 16px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(42px, 7vw, 76px); line-height: .98; letter-spacing: -.045em; max-width: 850px; }
+    .sub { max-width: 760px; font-size: 22px; line-height: 1.5; color: #cbd5e1; }
+    .card { margin-top: 34px; padding: 30px; border: 1px solid rgba(255,255,255,.14); border-radius: 28px; background: rgba(15,23,42,.82); box-shadow: 0 30px 90px rgba(0,0,0,.32); }
+    .status { display: inline-flex; align-items: center; gap: 9px; padding: 10px 14px; border-radius: 999px; background: #1e293b; font-weight: 800; color: #cbd5e1; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: #64748b; }
+    .status[data-state="playing"] .dot { background: #22c55e; box-shadow: 0 0 0 7px rgba(34,197,94,.12); }
+    .phase { margin: 28px 0 8px; font-size: 18px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: .08em; }
+    .prompt { min-height: 112px; font-size: clamp(28px, 4.5vw, 48px); line-height: 1.16; font-weight: 800; letter-spacing: -.025em; }
+    button { width: 100%; min-height: 92px; margin-top: 24px; border: 0; border-radius: 22px; background: #ff5a1f; color: white; font: inherit; font-size: 30px; font-weight: 900; cursor: pointer; touch-action: manipulation; }
+    button:active { transform: translateY(1px); }
+    .secondary { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .secondary button { min-height: 68px; margin-top: 14px; background: #263244; font-size: 20px; }
+    audio { width: 100%; margin-top: 22px; }
+    .note { margin: 24px 0 0; color: #94a3b8; font-size: 17px; line-height: 1.55; }
+    .ok { color: #86efac; font-weight: 800; }
+    @media (max-width: 640px) { .shell { padding: 28px 18px 48px; } .card { padding: 22px; border-radius: 22px; } .secondary { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand"><span class="mark">3</span><span>same3le</span></div>
+    <p class="eyebrow">Car mode · native audio proof</p>
+    <h1>Can your Tesla hear same3le?</h1>
+    <p class="sub">This test deliberately avoids browser speech synthesis. It plays a normal MP3 through a standard HTML audio element—the same playback path a future Tesla Listen &amp; Review mode would use.</p>
+
+    <section class="card">
+      <div id="status" class="status" data-state="idle"><span class="dot"></span><span id="statusText">Ready</span></div>
+      <div id="phase" class="phase">Audio test</div>
+      <div id="prompt" class="prompt">Tap Start Audio Test. You should hear a question, a short recall pause, then the answer.</div>
+
+      <button id="start" type="button">▶ Start Audio Test</button>
+      <div class="secondary">
+        <button id="restart" type="button">↺ Restart</button>
+        <button id="pause" type="button">⏸ Pause</button>
+      </div>
+
+      <audio id="player" preload="auto" controls playsinline src="data:audio/mpeg;base64,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kfMuZdwQMq6BTRKGNC7xLNEQGQsWgMlqL+8CAK4w9Fr/4xTEzA4aSsQBjDgB+jHwmPer01IkjcJv/5sSu4gMLMWUGwt1kogAwAFVbrry5pX/4xTEtg0JaugBgygAeLPFTo06k6kX+S/////qSpMk3ATA4QLcJmxpnjMogxuUrHX/4xTEpAa4PtCpxRgAVJmbNS+H8v4aG2YBlcXWokgYZwZGbinEkxHLkTwmGwmJOuP/4xTErAepCtwAKATADZF/1/80cUbpopwlF+pokn/jJPKH/W9u0K8api3dNql1cKT/4xTEsAbg+vTIAEYZAv0f///zn9WDc4s+DTf/q/yjv/5QMx4O/UbINMqV////693/4xTEtwdA7vmQAEYJ6oRNPIRU+0VY1LSLjawEsNgsPhyvCHmjlAjJ4FAQVbC4+aD/4xTEvQe4AzpeCEZO8d//oexZ8ECgYvvVpu2rYcVeUZKCIqIhScCRUhAsfBEr////4xTEwQeQ1tWRRRgB//zUP//M/U0w2/5qf890R0ejkip7Oif/zGf/saOVlRywADT/4xTExQw5RuABgzgADK5HPnR0yU1zNAjZLVScCZRRGPhkt///////////qSLH9an/4xTEtwd48sABghAARWb1MNN9DiIuMMf8w1L/upQ5KiZGV8QqK94W/AC3gCiS3///4xTEvAe4BrwByRAA/////////+oihEAEA4003///NHgfA+HSJtVMQU1FMy4xMDD/4xTEwAc4SszJSQAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFX/4xTExg1SUtwBiTgBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFX/4xTEsw5aUtTLjDgAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFX/4xTEnApKApgBkDgAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFX/4xTElQAAA0gBwAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFX/4xTEuAAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/4xTE2wAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/4xTE3AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/4xTE3AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/4xTE3AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/4xTE3AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/4xTE3AAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=" aria-label="Tesla audio compatibility test"></audio>
+      <p class="note"><strong>Expected audio:</strong> “Question. What is the gold standard test for achalasia?” → about 3 seconds of silence → “Answer. High resolution esophageal manometry.”</p>
+      <p id="result" class="note">If you hear both parts through the car speakers, the key Tesla audio path is confirmed.</p>
+    </section>
+  </main>
+  <script>
+    const player = document.getElementById('player');
+    const start = document.getElementById('start');
+    const restart = document.getElementById('restart');
+    const pause = document.getElementById('pause');
+    const status = document.getElementById('status');
+    const statusText = document.getElementById('statusText');
+    const phase = document.getElementById('phase');
+    const prompt = document.getElementById('prompt');
+    const result = document.getElementById('result');
+
+    function setPlaying(isPlaying) {
+      status.dataset.state = isPlaying ? 'playing' : 'idle';
+      statusText.textContent = isPlaying ? 'Playing native audio' : (player.ended ? 'Test complete' : 'Ready');
+      pause.textContent = isPlaying ? '⏸ Pause' : '▶ Resume';
+    }
+
+    function updateCue() {
+      const t = player.currentTime || 0;
+      if (player.ended) {
+        phase.textContent = 'Test complete';
+        prompt.textContent = 'Did you hear the question and the answer through the Tesla speakers?';
+        result.innerHTML = '<span class="ok">If yes, native audio works.</span> The next build can connect this playback method to actual same3le decks.';
+        return;
+      }
+      if (t < 3.9) {
+        phase.textContent = 'Question';
+        prompt.textContent = 'What is the gold standard test for achalasia?';
+      } else if (t < 6.8) {
+        phase.textContent = 'Recall pause';
+        prompt.textContent = 'Think of your answer…';
+      } else {
+        phase.textContent = 'Answer';
+        prompt.textContent = 'High-resolution esophageal manometry.';
+      }
+    }
+
+    async function playFromCurrent() {
+      try {
+        await player.play();
+        setPlaying(true);
+      } catch (error) {
+        setPlaying(false);
+        statusText.textContent = 'Playback blocked';
+        result.textContent = 'Tesla blocked programmatic playback. Try the native play button in the audio bar below.';
+      }
+    }
+
+    start.addEventListener('click', async () => {
+      if (player.ended) player.currentTime = 0;
+      await playFromCurrent();
+    });
+
+    restart.addEventListener('click', async () => {
+      player.currentTime = 0;
+      updateCue();
+      await playFromCurrent();
+    });
+
+    pause.addEventListener('click', async () => {
+      if (player.paused || player.ended) await playFromCurrent();
+      else player.pause();
+    });
+
+    player.addEventListener('play', () => setPlaying(true));
+    player.addEventListener('pause', () => setPlaying(false));
+    player.addEventListener('timeupdate', updateCue);
+    player.addEventListener('ended', () => { setPlaying(false); updateCue(); });
+    updateCue();
+  </script>
+</body>
+</html>
