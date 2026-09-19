@@ -1,3 +1,4 @@
+import { getVercelOidcToken } from '@vercel/oidc';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../supabase-config.js';
 
 const MODEL = 'fish-audio/s2.1-pro-free';
@@ -55,8 +56,21 @@ async function ownsSavedSource(token, savedSourceId) {
   return Array.isArray(rows) && rows.length === 1;
 }
 
+async function gatewayAuthToken() {
+  if (process.env.AI_GATEWAY_API_KEY) return process.env.AI_GATEWAY_API_KEY;
+  try {
+    return await getVercelOidcToken();
+  } catch (error) {
+    console.error('Could not obtain Vercel OIDC token for AI Gateway', {
+      name: error?.name,
+      message: error?.message
+    });
+    return '';
+  }
+}
+
 async function synthesize(text) {
-  const gatewayToken = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
+  const gatewayToken = await gatewayAuthToken();
   if (!gatewayToken) {
     const error = new Error('AI Gateway authentication is not configured for this deployment.');
     error.code = 'GATEWAY_AUTH_MISSING';
