@@ -10,5 +10,8 @@
     "check": "npm run test && npm run check:js && npm run check:site",
     "set-domain": "node scripts/set-domain.mjs",
     "serve": "python3 -m http.server 4173"
+  },
+  "dependencies": {
+    "@vercel/oidc": "3.8.8"
   }
 }
