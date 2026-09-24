@@ -83,6 +83,18 @@ function setupPreferences() {
   }));
 }
 
+function setupCarModeEntry() {
+  const actions = document.querySelector('.header-actions');
+  if (!actions || actions.querySelector('[data-car-mode-link]')) return;
+  const link = document.createElement('a');
+  link.href = './car/';
+  link.className = 'button ghost compact-button';
+  link.dataset.carModeLink = '';
+  link.textContent = '🚗 Car Mode';
+  link.title = 'Open Tesla-friendly hands-off review using your same3le account, stars, and resume position.';
+  actions.insertBefore(link, elements.installButton || null);
+}
+
 function setupInstallation() {
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
@@ -122,6 +134,7 @@ function initialize() {
   setupSessionEvents();
   setupPreferences();
   setupPowerManagement();
+  setupCarModeEntry();
   setupInstallation();
   checkBrowserSupport();
   populateVoices();
