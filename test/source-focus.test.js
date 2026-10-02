@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
-import { buildSourceFocusModel } from '../source-focus.js';
+import { buildSourceFocusModel, buildWorkspacePresentation } from '../source-focus.js';
+
+const sourceFocusPath = new URL('../source-focus.js', import.meta.url);
 
 test('source focus stays inactive until a usable deck exists', () => {
   assert.deepEqual(buildSourceFocusModel({ sourceKind: 'none', questions: [] }), {
@@ -43,4 +46,42 @@ test('local modalities get human-readable source labels', () => {
   assert.equal(anki.countText, '2 questions');
   assert.equal(paste.label, 'Pasted questions');
   assert.equal(paste.name, 'Pasted questions');
+});
+
+test('workspace becomes focused only after a usable deck exists', () => {
+  assert.deepEqual(buildWorkspacePresentation({ sourceKind: 'none', questions: [], status: 'idle' }), {
+    state: 'landing',
+    sessionActive: false
+  });
+
+  assert.deepEqual(buildWorkspacePresentation({ sourceKind: 'google-sheet', questions: [{}], status: 'idle' }), {
+    state: 'ready',
+    sessionActive: false
+  });
+});
+
+test('running, paused, and completed sessions prioritize the player', () => {
+  for (const status of ['running', 'listening', 'waiting', 'paused', 'complete']) {
+    assert.deepEqual(buildWorkspacePresentation({ sourceKind: 'paste', questions: [{}], status }), {
+      state: 'session',
+      sessionActive: true
+    });
+  }
+
+  assert.deepEqual(buildWorkspacePresentation({ sourceKind: 'paste', questions: [{}], status: 'idle' }), {
+    state: 'ready',
+    sessionActive: false
+  });
+});
+
+test('focused workspace collapses marketing and onboarding without removing source DOM', async () => {
+  const source = await readFile(sourceFocusPath, 'utf8');
+  assert.match(source, /body\[data-same3le-workspace="ready"\] \.hero/);
+  assert.match(source, /body\[data-same3le-workspace="ready"\] #start-studying/);
+  assert.match(source, /body\[data-same3le-workspace="ready"\] \.free-product-strip/);
+  assert.match(source, /body\[data-same3le-workspace="ready"\] \.how-card/);
+  assert.match(source, /#your-questions\.source-workspace-collapsed/);
+  assert.match(source, /sourceSection\.classList\.toggle\('source-workspace-collapsed'/);
+  assert.match(source, /document\.body\.dataset\.same3leWorkspace = workspace\.state/);
+  assert.match(source, /observer\.observe\(statusBadge, \{ attributes: true, attributeFilter: \['data-status'\] \}\)/);
 });

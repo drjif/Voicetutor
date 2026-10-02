@@ -12,6 +12,8 @@ const SOURCE_LABELS = Object.freeze({
   demo: 'Demo'
 });
 
+const ACTIVE_WORKSPACE_STATUSES = new Set(['running', 'listening', 'waiting', 'paused', 'complete']);
+
 let runtimeState = null;
 let sourceSection = null;
 let studySetup = null;
@@ -46,6 +48,18 @@ export function buildSourceFocusModel(state = {}) {
     questionCount: questions.length,
     saved,
     countText: `${questions.length} question${questions.length === 1 ? '' : 's'}${saved ? ' · Saved' : ''}`
+  };
+}
+
+export function buildWorkspacePresentation(state = {}) {
+  const source = buildSourceFocusModel(state);
+  if (!source.ready) return { state: 'landing', sessionActive: false };
+
+  const status = String(state.status ?? 'idle');
+  const sessionActive = ACTIVE_WORKSPACE_STATUSES.has(status);
+  return {
+    state: sessionActive ? 'session' : 'ready',
+    sessionActive
   };
 }
 
@@ -107,6 +121,125 @@ function installStyles() {
       white-space: nowrap;
     }
 
+    /*
+     * Once a usable deck exists, same3le becomes an application workspace.
+     * These sections remain mounted; presentation alone removes onboarding
+     * and marketing surfaces from the active study path.
+     */
+    body[data-same3le-workspace="ready"] .hero,
+    body[data-same3le-workspace="session"] .hero,
+    body[data-same3le-workspace="ready"] #start-studying,
+    body[data-same3le-workspace="session"] #start-studying,
+    body[data-same3le-workspace="ready"] .free-product-strip,
+    body[data-same3le-workspace="session"] .free-product-strip,
+    body[data-same3le-workspace="ready"] .how-card,
+    body[data-same3le-workspace="session"] .how-card,
+    body[data-same3le-workspace="ready"] .site-discover-nav,
+    body[data-same3le-workspace="session"] .site-discover-nav,
+    body[data-same3le-workspace="ready"] .marketing-nav,
+    body[data-same3le-workspace="session"] .marketing-nav,
+    body[data-same3le-workspace="ready"] .prototype-badge,
+    body[data-same3le-workspace="session"] .prototype-badge {
+      display: none !important;
+    }
+
+    body[data-same3le-workspace="ready"] .layout,
+    body[data-same3le-workspace="session"] .layout {
+      gap: 14px;
+    }
+
+    body[data-same3le-workspace="ready"] #study-setup,
+    body[data-same3le-workspace="session"] #study-setup {
+      padding: clamp(16px, 2vw, 22px);
+    }
+
+    body[data-same3le-workspace="ready"] #study-setup > .section-heading,
+    body[data-same3le-workspace="session"] #study-setup > .section-heading {
+      margin-bottom: 14px;
+    }
+
+    body[data-same3le-workspace="ready"] #study-setup > .section-heading .step,
+    body[data-same3le-workspace="session"] #study-setup > .section-heading .step,
+    body[data-same3le-workspace="ready"] #study-setup > .section-heading p,
+    body[data-same3le-workspace="session"] #study-setup > .section-heading p {
+      display: none !important;
+    }
+
+    body[data-same3le-workspace="ready"] #study-setup > .section-heading h2,
+    body[data-same3le-workspace="session"] #study-setup > .section-heading h2 {
+      margin: 0;
+      font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+      letter-spacing: -0.025em;
+    }
+
+    body[data-same3le-workspace="ready"] #study-setup .three-mode-picker {
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    body[data-same3le-workspace="ready"] #study-setup .mode-card {
+      min-height: 0;
+      padding: 12px 14px;
+    }
+
+    body[data-same3le-workspace="ready"] #study-setup .mode-copy small {
+      display: none !important;
+    }
+
+    body[data-same3le-workspace="ready"] #wakeLockControl {
+      margin: 10px 0;
+      padding: 10px 12px;
+    }
+
+    body[data-same3le-workspace="ready"] #wakeLockStatus {
+      display: none !important;
+    }
+
+    body[data-same3le-workspace="ready"] #study-setup .advanced-options {
+      margin: 10px 0;
+    }
+
+    body[data-same3le-workspace="ready"] #study-setup .start-button {
+      margin-top: 12px;
+    }
+
+    body[data-same3le-workspace="ready"] #study-setup .start-note {
+      margin: 8px 0 0;
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    body[data-same3le-workspace="ready"] .source-focus-bar {
+      margin-bottom: 14px;
+    }
+
+    /*
+     * During an actual session the existing controls remain mounted, but the
+     * question/player becomes the visual priority. Stopping the session returns
+     * to the compact ready state automatically through state.status.
+     */
+    body[data-same3le-workspace="session"] #study-setup > .section-heading,
+    body[data-same3le-workspace="session"] #study-setup .three-mode-picker,
+    body[data-same3le-workspace="session"] #wakeLockControl,
+    body[data-same3le-workspace="session"] #study-setup .advanced-options,
+    body[data-same3le-workspace="session"] #startButton,
+    body[data-same3le-workspace="session"] #startNote {
+      display: none !important;
+    }
+
+    body[data-same3le-workspace="session"] #study-setup {
+      padding: 12px 16px;
+    }
+
+    body[data-same3le-workspace="session"] .source-focus-bar {
+      margin: 0;
+      padding: 10px 12px;
+    }
+
+    body[data-same3le-workspace="session"] #sessionPanel {
+      scroll-margin-top: 16px;
+    }
+
     @media (max-width: 640px) {
       .source-focus-bar {
         align-items: stretch;
@@ -119,6 +252,11 @@ function installStyles() {
 
       .source-focus-bar .button {
         width: 100%;
+      }
+
+      body[data-same3le-workspace="ready"] #study-setup,
+      body[data-same3le-workspace="session"] #study-setup {
+        padding: 14px;
       }
     }
   `;
@@ -159,10 +297,25 @@ function ensureBar() {
   return sourceBar;
 }
 
+function scrollToStudySetup() {
+  window.requestAnimationFrame(() => {
+    studySetup?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
+function scrollToSessionPanel() {
+  window.requestAnimationFrame(() => {
+    document.querySelector('#sessionPanel:not([hidden])')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
 function renderFromState() {
   if (!runtimeState || !ensureBar()) return;
   const model = buildSourceFocusModel(runtimeState);
+  const workspace = buildWorkspacePresentation(runtimeState);
+  const previousWorkspace = document.body.dataset.same3leWorkspace || 'landing';
 
+  document.body.dataset.same3leWorkspace = workspace.state;
   sourceBar.hidden = !model.ready;
   sourceSection.classList.toggle('source-workspace-collapsed', model.ready && !chooserExpanded);
   sourceSection.dataset.activeSource = model.ready ? model.kind : 'none';
@@ -173,12 +326,10 @@ function renderFromState() {
   sourceCount.textContent = model.countText;
   changeSourceButton.textContent = chooserExpanded ? 'Use current source' : 'Change source';
   changeSourceButton.setAttribute('aria-expanded', chooserExpanded ? 'true' : 'false');
-}
 
-function scrollToStudySetup() {
-  window.requestAnimationFrame(() => {
-    studySetup?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
+  if (workspace.state === 'session' && previousWorkspace !== 'session' && !chooserExpanded) {
+    scrollToSessionPanel();
+  }
 }
 
 function syncFromState() {
@@ -283,6 +434,12 @@ export function setupSourceFocusUI(state) {
   if (startRow) {
     const observer = new MutationObserver(scheduleSync);
     observer.observe(startRow, { childList: true, subtree: true, attributes: true, attributeFilter: ['disabled'] });
+  }
+
+  const statusBadge = document.querySelector('#statusBadge');
+  if (statusBadge) {
+    const observer = new MutationObserver(scheduleSync);
+    observer.observe(statusBadge, { attributes: true, attributeFilter: ['data-status'] });
   }
 
   document.addEventListener('click', captureNavigationToSource, true);
