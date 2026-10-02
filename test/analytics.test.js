@@ -84,7 +84,10 @@ test('GA event wrapper drops user content and identifiers', () => {
       email: 'person@example.com',
       user_id: 'user-123',
       supabase_id: 'supabase-123',
-      deck_name: 'private deck'
+      deck_name: 'private deck',
+      memory_image_hash: 'private-image-hash',
+      memory_image_path: 'user/private-image.webp',
+      memory_image_contents: 'do not send image content'
     });
 
     assert.equal(sent, true);
@@ -149,7 +152,7 @@ test('every production HTML page has the privacy-safe GA4 tag immediately after 
 test('privacy policy discloses GA4 and exclusions', async () => {
   const privacy = await fs.readFile(path.join(ROOT, 'privacy/index.html'), 'utf8');
   assert.match(privacy, /Google Analytics 4/i);
-  assert.match(privacy, /does not intentionally send question text, answer text, spoken responses, transcripts, filenames, Google Sheet URLs or identifiers, email addresses, account or Supabase user identifiers, or deck names to Google Analytics/i);
+  assert.match(privacy, /does not intentionally send question text, answer text, spoken responses, transcripts, filenames, Google Sheet URLs or identifiers, email addresses, account or Supabase user identifiers, deck names, or memory-image contents to Google Analytics/i);
   assert.match(privacy, /without Google Signals/i);
   assert.match(privacy, /does not enable Google Ads or remarketing/i);
 });

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v17-library-first-study-controls';
+const CACHE_NAME = 'same3le-v17-memory-images-review';
 const ASSETS = [
   './',
   './index.html',
@@ -14,6 +14,8 @@ const ASSETS = [
   './source-focus.js',
   './library-workspace.js',
   './study-presentation.js',
+  './memory-images.js',
+  './memory-image-ui.js',
   './homepage-marketing.js',
   './file-import-ui.js',
   './file-import.js',
