@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v18-library-first-study-controls';
+const CACHE_NAME = 'same3le-v17-library-first-study-controls';
 const ASSETS = [
   './',
   './index.html',
