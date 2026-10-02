@@ -10,12 +10,14 @@ import {
 import { setupBetaFunnel } from './beta.js';
 import { setupFileImportUI } from './file-import-ui.js';
 import { setupHomepageMarketing } from './homepage-marketing.js';
+import { setupLibraryWorkspace } from './library-workspace.js';
 import { handleWakeLockPreferenceChange, releaseSessionWakeLock, setupPowerManagement } from './power.js';
 import { loadSavedGoogleSheet, setSheetReadyHandler, setupSheetEvents } from './sheet-v2.js';
 import { hideSheetReadyActions, setSavedSheetLoader, setupAccountUI, showSheetReadyActions } from './account-ui.js';
 import { installStarButtonStyles } from './star-button-style.js';
 import { setupStarredQuestionUI } from './stars-ui.js';
 import { setupSourceFocusUI } from './source-focus.js';
+import { setupStudyPresentation } from './study-presentation.js';
 import { restartAt, setupSessionEvents } from './session-next.js';
 import { ACTIVE_SESSION_STATUSES, transportAnchorIndex } from './session-transport.js';
 import { checkBrowserSupport, populateVoices } from './voice.js';
@@ -108,6 +110,8 @@ function initialize() {
   setupHomepageMarketing();
   setupFileImportUI();
   setupSourceFocusUI(state);
+  setupLibraryWorkspace(state);
+  setupStudyPresentation();
   restoreSettings();
   setupBetaFunnel();
   setupSheetEvents();
