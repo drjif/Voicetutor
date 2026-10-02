@@ -19,7 +19,8 @@ create table if not exists public.memory_image_assets (
 
 alter table public.memory_image_assets enable row level security;
 
-grant select, insert, update, delete on public.memory_image_assets to authenticated;
+revoke all on table public.memory_image_assets from anon, authenticated;
+grant select, insert, update, delete on table public.memory_image_assets to authenticated;
 
 drop policy if exists "Users can read own memory image metadata" on public.memory_image_assets;
 create policy "Users can read own memory image metadata"
@@ -62,6 +63,9 @@ using ((select auth.uid()) = user_id);
 
 create index if not exists memory_image_assets_source_idx
 on public.memory_image_assets (user_id, saved_source_id, source_row);
+
+create index if not exists memory_image_assets_saved_source_id_idx
+on public.memory_image_assets (saved_source_id);
 
 create index if not exists memory_image_assets_hash_idx
 on public.memory_image_assets (user_id, image_hash);
