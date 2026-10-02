@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v17-focused-source';
+const CACHE_NAME = 'same3le-v18-library-first-study-controls';
 const ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,8 @@ const ASSETS = [
   './stars-ui.js',
   './star-button-style.js',
   './source-focus.js',
+  './library-workspace.js',
+  './study-presentation.js',
   './homepage-marketing.js',
   './file-import-ui.js',
   './file-import.js',
@@ -38,6 +40,11 @@ const ASSETS = [
   './auth.js',
   './saved-sources.js',
   './account-ui.js',
+  './car/index.html',
+  './car/car.css',
+  './car/car.js',
+  './car/car-audio.js',
+  './car/car-presentation.js',
   './manifest.webmanifest',
   './icon.svg',
   './favicon.ico',
