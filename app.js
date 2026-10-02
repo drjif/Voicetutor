@@ -11,6 +11,7 @@ import { setupBetaFunnel } from './beta.js';
 import { setupFileImportUI } from './file-import-ui.js';
 import { setupHomepageMarketing } from './homepage-marketing.js';
 import { setupLibraryWorkspace } from './library-workspace.js';
+import { setupMemoryImageUI } from './memory-image-ui.js';
 import { handleWakeLockPreferenceChange, releaseSessionWakeLock, setupPowerManagement } from './power.js';
 import { loadSavedGoogleSheet, setSheetReadyHandler, setupSheetEvents } from './sheet-v2.js';
 import { hideSheetReadyActions, setSavedSheetLoader, setupAccountUI, showSheetReadyActions } from './account-ui.js';
@@ -112,6 +113,7 @@ function initialize() {
   setupSourceFocusUI(state);
   setupLibraryWorkspace(state);
   setupStudyPresentation();
+  setupMemoryImageUI(state);
   restoreSettings();
   setupBetaFunnel();
   setupSheetEvents();
