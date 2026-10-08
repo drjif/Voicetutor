@@ -1,4 +1,4 @@
-const CACHE_NAME = 'same3le-v17-memory-images-review';
+const CACHE_NAME = 'same3le-v17-car-mode-navigation-ux';
 const ASSETS = [
   './',
   './index.html',
