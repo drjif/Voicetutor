@@ -504,11 +504,21 @@ async function runDrive() {
   }
 }
 
+function centerQuestionInViewport() {
+  const questionCard = ui.questionText?.closest('.question-card');
+  if (!questionCard) return;
+  window.requestAnimationFrame(() => {
+    questionCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+}
+
 function changeIndex(delta) {
   stopDrive();
   if (!state.cards.length) return;
+  const previousIndex = state.index;
   state.index = Math.max(0, Math.min(state.cards.length - 1, state.index + delta));
   renderCard();
+  if (state.index !== previousIndex) centerQuestionInViewport();
 }
 
 async function handleAuthSnapshot(snapshot) {
