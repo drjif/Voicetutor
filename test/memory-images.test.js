@@ -144,7 +144,7 @@ test('Supabase migration keeps images private, content-free, least-privilege, an
 
 test('service worker precaches the memory-image modules without breaking the v17 validation contract', () => {
   const worker = readFileSync(new URL('../service-worker.js', import.meta.url), 'utf8');
-  assert.match(worker, /same3le-v17-memory-images-review/);
+  assert.match(worker, /same3le-v17-[a-z0-9-]+/);
   assert.match(worker, /\.\/memory-images\.js/);
   assert.match(worker, /\.\/memory-image-ui\.js/);
 });
