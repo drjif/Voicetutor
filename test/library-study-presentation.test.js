@@ -61,12 +61,17 @@ test('automatic answer phases keep the answer visible without redundant reveal c
   assert.equal(answer.showRevealControl, false);
 });
 
-test('Car Mode loads the layout layer that moves reveal and navigation controls', () => {
+test('Car Mode keeps reveal, navigation, and star actions in thumb-friendly study order', () => {
   const html = readFileSync(new URL('../car/index.html', import.meta.url), 'utf8');
   const presentation = readFileSync(new URL('../car/car-presentation.js', import.meta.url), 'utf8');
+  const car = readFileSync(new URL('../car/car.js', import.meta.url), 'utf8');
 
   assert.match(html, /car-presentation\.js/);
   assert.match(presentation, /questionCard\.insertAdjacentElement\('afterend', revealControls\)/);
   assert.match(presentation, /answerCard\.insertAdjacentElement\('afterend', transportGrid\)/);
   assert.match(presentation, /transportGrid\.append\(previousButton, nextButton\)/);
+  assert.match(presentation, /transportGrid\.insertAdjacentElement\('afterend', starControls\)/);
+  assert.match(presentation, /starControls\.append\(starButton\)/);
+  assert.match(car, /scrollIntoView\(\{ behavior: 'smooth', block: 'center' \}\)/);
+  assert.match(car, /if \(state\.index !== previousIndex\) centerQuestionInViewport\(\)/);
 });
