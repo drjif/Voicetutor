@@ -112,7 +112,18 @@
 .check[hidden] { display: none; }
 .check input { width: 20px; height: 20px; accent-color: var(--orange); }
 
-.preview-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: white; }
+/* Soft edge shadows show that a wide preview scrolls sideways (they disappear at each end). */
+.preview-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background:
+    linear-gradient(to right, white 30%, rgba(255, 255, 255, 0)) left center / 40px 100% no-repeat local,
+    linear-gradient(to left, white 30%, rgba(255, 255, 255, 0)) right center / 40px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(23, 23, 23, 0.16), transparent) left center / 14px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(23, 23, 23, 0.16), transparent) right center / 14px 100% no-repeat scroll,
+    white;
+}
 .preview { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 .preview th, .preview td { min-width: 120px; max-width: 360px; padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; line-height: 1.45; white-space: pre-line; word-break: break-word; }
 .preview th { background: var(--soft); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; white-space: normal; }

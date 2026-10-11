@@ -18,16 +18,46 @@ const BLOCK_OPEN = /<(?:div|p|li|tr|h[1-6]|ul|ol|table|blockquote)\b/gi;
 export const MAX_STUDY_CARDS = 25000;
 
 /**
+ * cleanAnkiText() from anki-import.js without its entity decoding, for text with no "&".
+ * The app decodes entities through the DOM, which is slow on big decks; with no "&" there is
+ * nothing to decode, so the result is the same. (Tests compare the two.)
+ */
+function stripLikeApp(text) {
+  return text
+    .replace(/\[sound:[^\]]+\]/gi, ' ')
+    .replace(/<img\b[^>]*\balt=(?:"([^"]*)"|'([^']*)')[^>]*>/gi, (_, doubleAlt, singleAlt) => ` ${doubleAlt ?? singleAlt ?? ''} `)
+    .replace(/<br\s*\/?\s*>/gi, '\n')
+    .replace(/<\/(div|p|li|tr|h[1-6])\s*>/gi, '\n')
+    .replace(/<li\b[^>]*>/gi, '• ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\r\n?/g, '\n')
+    .replace(/\u00a0/g, ' ')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\s*\n\s*/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+/**
  * Plain text the way the app cleans Anki fields, plus a line break before block elements:
  * Anki's editor writes "Line one<div>Line two</div>", which should stay two lines.
  */
 export function plainText(value) {
-  return cleanAnkiText(String(value ?? '').replace(BLOCK_OPEN, '<br>$&'));
+  const text = String(value ?? '').replace(BLOCK_OPEN, '<br>$&');
+  return text.includes('&') ? cleanAnkiText(text) : stripLikeApp(text);
 }
 
-function hasContent(raw, html) {
-  if (plainText(raw)) return true;
-  return html && /<img\b|\[sound:/i.test(String(raw ?? ''));
+// Each note is cleaned once, however many times the options change.
+const plainCache = new WeakMap();
+const cardCache = new WeakMap();
+
+function plainFields(note) {
+  let fields = plainCache.get(note);
+  if (!fields) {
+    fields = note.fields.map(plainText);
+    plainCache.set(note, fields);
+  }
+  return fields;
 }
 
 function clozeNumbers(text) {
@@ -53,14 +83,27 @@ function clozeCard(text, target, html) {
  * with text is the back. Image occlusion notes are pictures, so they make no text cards.
  */
 export function noteCards(note, { html = false } = {}) {
+  if (!html) {
+    let cards = cardCache.get(note);
+    if (!cards) {
+      cards = makeCards(note, false);
+      cardCache.set(note, cards);
+    }
+    return cards;
+  }
+  return makeCards(note, true);
+}
+
+function makeCards(note, html) {
   const first = note.fields[0] ?? '';
   if (HAS_CLOZE.test(first)) {
     if (IMAGE_OCCLUSION.test(first)) return [];
     return clozeNumbers(first).map((number) => clozeCard(first, number, html)).filter((card) => card.front && card.back);
   }
-  const backRaw = note.fields.slice(1).find((value) => hasContent(value, html)) ?? '';
-  const front = html ? String(first).trim() : plainText(first);
-  const back = html ? String(backRaw).trim() : plainText(backRaw);
+  const plain = plainFields(note);
+  const index = note.fields.findIndex((value, i) => i > 0 && (plain[i] || (html && /<img\b|\[sound:/i.test(value))));
+  const front = html ? String(first).trim() : plain[0];
+  const back = index < 0 ? '' : html ? String(note.fields[index]).trim() : plain[index];
   return front && back ? [{ front, back }] : [];
 }
 
@@ -160,9 +203,8 @@ export function buildTable(deck, { mode = 'fields', html = false, tags = true, d
     return candidates.length <= 3 ? candidates.join(' / ') : '';
   });
   const showType = usedTypes.length > 1;
-  const text = (value) => (html ? String(value ?? '') : plainText(value));
   const rows = notes.map((note) => [
-    ...Array.from({ length: width }, (_, index) => text(note.fields[index] ?? '')),
+    ...Array.from({ length: width }, (_, index) => (html ? String(note.fields[index] ?? '') : plainFields(note)[index] ?? '')),
     ...extras(note),
     ...(showType ? [types.get(note.typeId)?.name ?? ''] : [])
   ]);
