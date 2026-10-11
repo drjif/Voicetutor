@@ -121,6 +121,29 @@
 .steps strong { display: block; margin: 5px 0 4px; }
 .steps p { margin: 0; color: var(--muted); line-height: 1.6; }
 
+/* Drag and drop (mouse devices): hint, plus a clear target while a file is dragged over the page. */
+.drop-hint { display: none; margin: -6px 0 0; color: var(--muted); font-size: 0.85rem; }
+@media (hover: hover) and (pointer: fine) { .drop-hint { display: block; } }
+.converter { position: relative; }
+.converter.is-dragging { outline: 3px dashed var(--orange); outline-offset: 6px; }
+.converter.is-dragging::after {
+  content: attr(data-drop-label);
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  border-radius: inherit;
+  background: rgba(255, 240, 232, 0.94);
+  color: var(--orange-dark);
+  font-size: 1.35rem;
+  font-weight: 900;
+  text-align: center;
+  pointer-events: none;
+}
+.file-button:focus-within { outline: 3px solid #1d4ed8; outline-offset: 3px; }
+
 @media (max-width: 620px) {
   .settings-grid { grid-template-columns: 1fr; }
   .download-row { grid-template-columns: 1fr 1fr; }

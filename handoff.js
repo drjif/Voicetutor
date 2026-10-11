@@ -8,6 +8,8 @@
 // Privacy: the cards never leave the browser, live only in this tab, expire after
 // HANDOFF_TTL_MS, and are deleted as soon as they are read.
 
+import { trackToolEvent } from './tool-analytics.js';
+
 export const HANDOFF_KEY = 'same3le.handoff.v1';
 export const HANDOFF_TTL_MS = 15 * 60 * 1000;
 export const HANDOFF_MAX_CHARS = 2_000_000;
@@ -65,9 +67,12 @@ function applyHandoff() {
   textarea.dispatchEvent(new Event('input', { bubbles: true }));
   loadButton.click();
 
-  try {
-    if (typeof window.gtag === 'function') window.gtag('event', 'tool_handoff_loaded', { source: handoff.source });
-  } catch { /* analytics must never block studying */ }
+  // The app reports the outcome synchronously on #pasteStatus; record what really happened.
+  const loaded = document.querySelector('#pasteStatus')?.dataset.type === 'success';
+  trackToolEvent('tool_handoff_loaded', handoff.source, {
+    result: loaded ? 'success' : 'error',
+    question_count: (handoff.text.match(/^Q: /gm) || []).length
+  });
 }
 
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
