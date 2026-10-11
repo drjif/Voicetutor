@@ -62,6 +62,23 @@ export function trackToolEvent(name, tool, params = {}, onSent) {
   }
 }
 
+/**
+ * Record that a tool page was opened. If analytics is on hold until the visitor answers the
+ * consent banner (consent.js), the view is recorded again once they allow analytics, so
+ * people who accept still enter the funnel at step 1.
+ */
+export function trackToolView(tool) {
+  trackToolEvent('tool_viewed', tool);
+  try {
+    const consent = typeof window !== 'undefined' ? window.same3leConsent : null;
+    if (consent && typeof consent.held === 'function' && consent.held()) {
+      window.addEventListener('same3le:consent', (event) => {
+        if (event?.detail?.analytics === 'granted') trackToolEvent('tool_viewed', tool);
+      }, { once: true });
+    }
+  } catch { /* analytics must never break the tool */ }
+}
+
 /** Track an event, then go to `url` as soon as GA confirms it — never waiting more than `maxWaitMs`. */
 export function trackThenNavigate(name, tool, params, url, maxWaitMs = 350) {
   let gone = false;

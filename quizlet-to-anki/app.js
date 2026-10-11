@@ -1,6 +1,6 @@
 import { parseQuizletExport, toAnkiText, toCsv, toSame3lePaste, fileSlug } from './convert.js';
 import { storeHandoff } from '../handoff.js';
-import { trackToolEvent, trackThenNavigate } from '../tool-analytics.js';
+import { trackToolEvent, trackThenNavigate, trackToolView } from '../tool-analytics.js';
 
 const TOOL = 'quizlet-to-anki';
 const MAX_FILE_BYTES = 20 * 1024 * 1024;
@@ -269,5 +269,5 @@ studyLink.addEventListener('click', async (event) => {
 });
 
 document.documentElement.classList.add('js');
-track('tool_viewed');
+trackToolView(TOOL);
 render();

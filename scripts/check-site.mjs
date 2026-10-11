@@ -251,6 +251,18 @@ const vercel = await read('vercel.json');
 expect('vercel.json', vercel, /"trailingSlash": true/, 'missing trailing-slash normalization');
 expect('vercel.json', vercel, /\/index\.html/, 'missing index.html redirect');
 
+// Consent defaults must be set before the Google tag on every page that loads it.
+for (const relativePath of ['index.html', ...seoPages, ...legalPages, 'medical-disclaimer/index.html']) {
+  const source = await read(relativePath);
+  const tag = source.indexOf('googletagmanager.com/gtag/js');
+  if (tag === -1) continue;
+  const consent = source.indexOf('<script src="/consent.js"></script>');
+  if (consent === -1 || consent > tag) errors.push(`${relativePath}: consent.js must load before the Google tag`);
+}
+const privacyPolicy = await read('privacy/index.html');
+expect('privacy/index.html', privacyPolicy, /data-consent-reset/, 'privacy policy must let visitors change their analytics cookie choice');
+expect('privacy/index.html', privacyPolicy, /Free converter tools/, 'privacy policy must describe the free converter tools');
+
 const secretPattern = /service_role|DATABASE_PASSWORD|JWT_SECRET|postgres(ql)?:\/\/[^:\s]+:[^@\s]+@/i;
 for (const relativePath of ['supabase-config.js', 'auth.js', 'saved-sources.js', 'account-ui.js', 'index.html', 'app.js']) {
   const source = await read(relativePath);

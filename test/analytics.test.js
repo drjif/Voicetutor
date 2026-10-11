@@ -25,6 +25,7 @@ const productionHtmlPages = [
   'pricing/index.html',
   'privacy/index.html',
   'quiz-me-from-my-notes/index.html',
+  'quizlet-to-anki/index.html',
   'terms/index.html',
   'voice-flashcards/index.html'
 ];
@@ -133,13 +134,13 @@ test('all requested custom event names are implemented', async () => {
   }
 });
 
-test('every production HTML page has the privacy-safe GA4 tag immediately after head', async () => {
+test('every production HTML page has consent defaults, then the privacy-safe GA4 tag, immediately after head', async () => {
   for (const relativePath of productionHtmlPages) {
     const html = await fs.readFile(path.join(ROOT, relativePath), 'utf8');
     assert.match(
       html,
-      new RegExp(`<head>\\s*<!-- Google tag \\(gtag\\.js\\) -->\\s*<script async src="https://www\\.googletagmanager\\.com/gtag/js\\?id=${MEASUREMENT_ID}"`),
-      `${relativePath} is missing the Google tag immediately after <head>`
+      new RegExp(`<head>\\s*<script src="/consent\\.js"></script>\\s*<!-- Google tag \\(gtag\\.js\\) -->\\s*<script async src="https://www\\.googletagmanager\\.com/gtag/js\\?id=${MEASUREMENT_ID}"`),
+      `${relativePath} must open <head> with consent.js followed immediately by the Google tag`
     );
     assert.match(html, new RegExp(`gtag\\('config', '${MEASUREMENT_ID}'`), `${relativePath} missing GA4 config`);
     assert.match(html, /send_page_view:\s*false/, `${relativePath} must suppress automatic full-URL page views`);
