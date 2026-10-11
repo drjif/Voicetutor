@@ -10,6 +10,7 @@ const seoPages = [
   'google-sheets-flashcards/index.html',
   'active-recall-out-loud/index.html',
   'medical-students/index.html',
+  'quizlet-to-anki/index.html',
   'pricing/index.html',
   'about/index.html'
 ];
@@ -203,6 +204,7 @@ expect('index.html', homepage, /href="\/quiz-me-from-my-notes\/"/, 'homepage doe
 expect('index.html', homepage, /href="\/google-sheets-flashcards\/"/, 'homepage does not link google-sheets');
 expect('index.html', homepage, /href="\/active-recall-out-loud\/"/, 'homepage does not link active-recall');
 expect('index.html', homepage, /href="\/medical-students\/"/, 'homepage does not link medical-students');
+expect('index.html', homepage, /href="\/quizlet-to-anki\/"/, 'homepage does not link the Quizlet to Anki tool');
 expect('index.html', homepage, /same3le is a free browser app that turns your question-and-answer list into a spoken tutor/, 'missing crawlable definition');
 expect('index.html', homepage, /Free\. Optional Pro later\./, 'missing honest free positioning');
 

@@ -19,6 +19,7 @@ same3le (https://www.same3le.com/) is a free in-browser spoken Q&A tutor and voi
 - Google Sheets flashcards: https://www.same3le.com/google-sheets-flashcards/
 - Active recall out loud: https://www.same3le.com/active-recall-out-loud/
 - Medical students: https://www.same3le.com/medical-students/
+- Quizlet to Anki converter (free tool, runs in the browser, no sign-up): https://www.same3le.com/quizlet-to-anki/
 - Pricing: https://www.same3le.com/pricing/
 - About: https://www.same3le.com/about/
 - Educational and medical disclaimer: https://www.same3le.com/medical-disclaimer/
