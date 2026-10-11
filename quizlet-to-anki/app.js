@@ -1,4 +1,5 @@
 import { parseQuizletExport, toAnkiText, toCsv, toSame3lePaste, fileSlug } from './convert.js';
+import { storeHandoff } from '../handoff.js';
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -212,8 +213,11 @@ copyAnki.addEventListener('click', async () => {
 studyLink.addEventListener('click', async (event) => {
   if (!cards.length) return;
   event.preventDefault();
-  await copyText(toSame3lePaste(cards));
-  track('quizlet_tool_cta', { cards: countBucket(cards.length) });
+  const paste = toSame3lePaste(cards);
+  // Preferred: hand the cards straight to the app in this tab. Fallback: clipboard.
+  const handedOff = storeHandoff(paste, 'quizlet-to-anki');
+  if (!handedOff) await copyText(paste);
+  track('quizlet_tool_cta', { cards: countBucket(cards.length), method: handedOff ? 'handoff' : 'clipboard' });
   window.location.href = studyLink.href;
 });
 

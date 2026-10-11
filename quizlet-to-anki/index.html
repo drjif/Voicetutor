@@ -26,10 +26,10 @@
   <link rel="icon" href="/favicon.ico" sizes="48x48" />
   <link rel="icon" href="/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <meta property="og:image" content="https://www.same3le.com/og-image.png" />
+  <meta property="og:image" content="https://www.same3le.com/quizlet-to-anki/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="same3le spoken tutor loop: the app asks a question, you answer out loud, then it continues." />
+  <meta property="og:image:alt" content="Quizlet to Anki converter by same3le: a tab-separated Quizlet export becomes an Anki-ready file, free and in your browser." />
   <meta property="og:site_name" content="same3le" />
   <meta property="og:title" content="Quizlet to Anki Converter — Free, No Sign-Up" />
   <meta property="og:description" content="Paste a Quizlet export and download an Anki-ready file in seconds. Free, no sign-up, and your cards never leave your browser." />
@@ -38,7 +38,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Quizlet to Anki Converter — Free, No Sign-Up" />
   <meta name="twitter:description" content="Paste a Quizlet export and download an Anki-ready file in seconds. Free, no sign-up, and your cards never leave your browser." />
-  <meta name="twitter:image" content="https://www.same3le.com/og-image.png" />
+  <meta name="twitter:image" content="https://www.same3le.com/quizlet-to-anki/og.png" />
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -65,7 +65,7 @@
       "operatingSystem": "Web browser",
       "description": "A free browser tool that converts a Quizlet text export into a file Anki can import, or into CSV. Runs locally with no sign-up.",
       "url": "https://www.same3le.com/quizlet-to-anki/",
-      "image": "https://www.same3le.com/og-image.png",
+      "image": "https://www.same3le.com/quizlet-to-anki/og.png",
       "isAccessibleForFree": true,
       "offers": {
         "@type": "Offer",
@@ -137,12 +137,12 @@
         {
           "@type": "HowToStep",
           "name": "Export the set from Quizlet.",
-          "text": "Open the set, select the three-dot menu and choose Export. Keep Tab between term and definition and New line between rows, then copy the text."
+          "text": "On the Quizlet website, open a set you created, select the more menu (…) and choose Export. Pick Tab between term and definition, then select Copy text."
         },
         {
           "@type": "HowToStep",
           "name": "Paste it into the converter.",
-          "text": "Paste the text into the box on this page, or open the exported .txt file. Check the preview of your first cards."
+          "text": "Paste the text into the box on this page. The separators are detected automatically, and the preview shows your first cards."
         },
         {
           "@type": "HowToStep",
@@ -180,7 +180,15 @@
           "name": "How do I export a set from Quizlet?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Open the set in Quizlet, select the three-dot menu and choose Export. Keep Tab between term and definition and New line between rows, then copy the text or download the file."
+            "text": "On the Quizlet website, go to Your library, then Flashcard sets, and open the set. Select the more menu (…), choose Export, pick Tab between term and definition, and select Copy text."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I convert a Quizlet set someone else made?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Only if its creator exports it. Quizlet lets you export sets you created, on its website, and not copies of other people's sets. Ask the creator to export the set and send you the text, then paste it here."
           }
         },
         {
@@ -319,7 +327,7 @@
           <button id="copyAnki" class="button outline" type="button">Copy text</button>
         </div>
         <div class="next-step">
-          <p><strong>Want to drill these out loud?</strong> same3le reads each card aloud and listens for your answer. Your cards are copied when you tap the button. Paste them on the next page.</p>
+          <p><strong>Want to drill these out loud?</strong> same3le reads each card aloud and listens for your answer. One tap opens your cards in the app, ready to start.</p>
           <a id="studyOutLoud" class="button primary" href="/#pasteQuestions">Study these cards out loud — free</a>
         </div>
       </div>
@@ -332,8 +340,8 @@
         <p>Quizlet can export a set as plain text. Anki can import plain text. This page fixes the formatting in between so the import works on the first try.</p>
       </div>
       <ol class="steps">
-        <li><div><strong>Export the set from Quizlet.</strong><p>Open the set, select the three-dot menu and choose Export. Keep Tab between term and definition and New line between rows, then copy the text.</p></div></li>
-        <li><div><strong>Paste it into the converter.</strong><p>Paste the text into the box on this page, or open the exported .txt file. Check the preview of your first cards.</p></div></li>
+        <li><div><strong>Export the set from Quizlet.</strong><p>On the Quizlet website, open a set you created, select the more menu (…) and choose Export. Pick Tab between term and definition, then select Copy text.</p></div></li>
+        <li><div><strong>Paste it into the converter.</strong><p>Paste the text into the box on this page. The separators are detected automatically, and the preview shows your first cards.</p></div></li>
         <li><div><strong>Download the Anki file.</strong><p>Select Download for Anki to save a .txt file that already tells Anki which separator and settings to use.</p></div></li>
         <li><div><strong>Import it in Anki.</strong><p>In Anki desktop choose File, then Import, select the file, confirm the Basic note type and your deck, and select Import. Sync to see the cards on your phone.</p></div></li>
       </ol>
@@ -355,7 +363,7 @@
         <ul>
           <li>Images, diagrams and audio, because Quizlet’s text export leaves them out</li>
           <li>Your Quizlet progress, stars and study history</li>
-          <li>Sets you can’t export from Quizlet in the first place</li>
+          <li>Sets you didn’t create, because Quizlet only exports your own sets</li>
         </ul>
         <p>Anki schedules every imported card as new, so your reviews start fresh.</p>
         <p class="date-modified">Updated <time datetime="2026-10-11">October 11, 2026</time></p>
@@ -367,7 +375,8 @@
       <div class="faq">
         <details><summary>Is this Quizlet to Anki converter free?</summary><p>Yes. It is free, needs no account or sign-up, and the tool sets no limit on how many cards you convert.</p></details>
         <details><summary>Are my flashcards uploaded to a server?</summary><p>No. The conversion runs in your browser with JavaScript. The text you paste or open is not sent to a same3le server.</p></details>
-        <details><summary>How do I export a set from Quizlet?</summary><p>Open the set in Quizlet, select the three-dot menu and choose Export. Keep Tab between term and definition and New line between rows, then copy the text or download the file.</p></details>
+        <details><summary>How do I export a set from Quizlet?</summary><p>On the Quizlet website, go to Your library, then Flashcard sets, and open the set. Select the more menu (…), choose Export, pick Tab between term and definition, and select Copy text.</p></details>
+        <details><summary>Can I convert a Quizlet set someone else made?</summary><p>Only if its creator exports it. Quizlet lets you export sets you created, on its website, and not copies of other people&#39;s sets. Ask the creator to export the set and send you the text, then paste it here.</p></details>
         <details><summary>Does it keep images and audio from Quizlet?</summary><p>No. Quizlet&#39;s text export contains only terms and definitions, so images and audio are not included. You can add them to the cards in Anki after importing.</p></details>
         <details><summary>What if my terms or definitions contain commas?</summary><p>Export from Quizlet with Tab between term and definition. The converter splits each line at the first tab, so commas inside your cards stay where they are.</p></details>
         <details><summary>Which versions of Anki can import the file?</summary><p>Anki 2.1.54 and later read the settings at the top of the file automatically. In older versions, choose Tab as the field separator and turn on Allow HTML in fields when you import.</p></details>

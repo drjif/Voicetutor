@@ -23,6 +23,7 @@ const legalPages = [
   'contact/index.html'
 ];
 const errors = [];
+const pageImages = [];
 
 async function read(relativePath) {
   try {
@@ -72,7 +73,14 @@ function expectSeoHead(relativePath, source, route) {
   expect(relativePath, source, /<meta name="description" content="[^"]{80,}"/i, 'missing substantial meta description');
   expect(relativePath, source, new RegExp(`<link rel="canonical" href="${ORIGIN.replaceAll('.', '\\.')}/${route}"`), 'missing www canonical');
   expect(relativePath, source, new RegExp(`property="og:url" content="${ORIGIN.replaceAll('.', '\\.')}/${route}"`), 'missing www og:url');
-  expect(relativePath, source, /property="og:image" content="https:\/\/www\.same3le\.com\/og-image\.png"/, 'missing og:image');
+  const ogImage = source.match(/property="og:image" content="(https:\/\/www\.same3le\.com\/[^"]+\.png)"/)?.[1];
+  if (!ogImage) {
+    errors.push(`${relativePath}: missing og:image`);
+  } else if (ogImage !== `${ORIGIN}/og-image.png`) {
+    pageImages.push({ relativePath, file: ogImage.slice(ORIGIN.length + 1) });
+  }
+  const twitterImage = source.match(/name="twitter:image" content="([^"]+)"/)?.[1];
+  if (twitterImage && ogImage && twitterImage !== ogImage) errors.push(`${relativePath}: twitter:image must match og:image`);
   expect(relativePath, source, /name="twitter:card" content="summary_large_image"/, 'missing Twitter card');
   expect(relativePath, source, /<h1[^>]*>[\s\S]+?<\/h1>/i, 'missing H1');
   expect(relativePath, source, /href="\/marketing\.css"/i, 'missing shared stylesheet');
@@ -158,6 +166,20 @@ expect('llms.txt', llms, /https:\/\/www\.same3le\.com\/voice-flashcards\//, 'mis
 await read('favicon.ico');
 await read('apple-touch-icon.png');
 await read('og-image.png');
+for (const { relativePath, file } of pageImages) {
+  try {
+    const bytes = await fs.readFile(path.join(root, file));
+    const width = bytes.readUInt32BE(16);
+    const height = bytes.readUInt32BE(20);
+    if (width !== 1200 || height !== 630) errors.push(`${relativePath}: ${file} must be 1200x630 (is ${width}x${height})`);
+  } catch (error) {
+    errors.push(`${relativePath}: og:image ${file} does not exist`);
+  }
+}
+for (const relativePath of seoPages.filter((p) => p !== 'quizlet-to-anki/index.html')) {
+  const source = await read(relativePath);
+  expect(relativePath, source, /href="\/quizlet-to-anki\/"/, 'does not link the Quizlet to Anki tool');
+}
 await read('vercel.json');
 
 const shell = await read('homepage-marketing.js');
