@@ -126,5 +126,8 @@
   .download-row { grid-template-columns: 1fr 1fr; }
   .download-row .button:first-child { grid-column: 1 / -1; }
   .converter { border-radius: 18px; box-shadow: 0 12px 30px rgba(23,23,23,0.06); }
+  .mini-actions { display: grid; grid-template-columns: auto auto auto; gap: 6px; width: 100%; }
+  .mini-button { justify-content: center; padding: 8px 9px; font-size: 0.84rem; }
+  .next-step .button { text-align: center; }
   #quizletInput { min-height: 150px; font-size: 16px; }
 }
