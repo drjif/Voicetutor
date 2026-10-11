@@ -11,6 +11,7 @@ const seoPages = [
   'active-recall-out-loud/index.html',
   'medical-students/index.html',
   'quizlet-to-anki/index.html',
+  'chatgpt-to-anki/index.html',
   'pricing/index.html',
   'about/index.html'
 ];
@@ -176,9 +177,11 @@ for (const { relativePath, file } of pageImages) {
     errors.push(`${relativePath}: og:image ${file} does not exist`);
   }
 }
-for (const relativePath of seoPages.filter((p) => p !== 'quizlet-to-anki/index.html')) {
-  const source = await read(relativePath);
-  expect(relativePath, source, /href="\/quizlet-to-anki\/"/, 'does not link the Quizlet to Anki tool');
+for (const tool of ['quizlet-to-anki', 'chatgpt-to-anki']) {
+  for (const relativePath of seoPages.filter((p) => p !== `${tool}/index.html`)) {
+    const source = await read(relativePath);
+    expect(relativePath, source, new RegExp(`href="/${tool}/"`), `does not link the ${tool} tool`);
+  }
 }
 await read('vercel.json');
 
@@ -227,6 +230,7 @@ expect('index.html', homepage, /href="\/google-sheets-flashcards\/"/, 'homepage 
 expect('index.html', homepage, /href="\/active-recall-out-loud\/"/, 'homepage does not link active-recall');
 expect('index.html', homepage, /href="\/medical-students\/"/, 'homepage does not link medical-students');
 expect('index.html', homepage, /href="\/quizlet-to-anki\/"/, 'homepage does not link the Quizlet to Anki tool');
+expect('index.html', homepage, /href="\/chatgpt-to-anki\/"/, 'homepage does not link the ChatGPT to Anki tool');
 expect('index.html', homepage, /same3le is a free browser app that turns your question-and-answer list into a spoken tutor/, 'missing crawlable definition');
 expect('index.html', homepage, /Free\. Optional Pro later\./, 'missing honest free positioning');
 

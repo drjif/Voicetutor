@@ -55,6 +55,17 @@ test('onSent is passed to GA as a callback, and runs immediately when GA is miss
   assert.equal(sent, 2, 'no window/gtag: callback still runs so navigation never hangs');
 });
 
+test('the prompt-copy event is allowed and carries only the tool name', () => {
+  const calls = [];
+  globalThis.window = { gtag: (...args) => calls.push(args) };
+  try {
+    assert.equal(trackToolEvent('tool_prompt_copied', 'chatgpt-to-anki', { prompt: 'secret' }), true);
+    assert.deepEqual(calls[0], ['event', 'tool_prompt_copied', { tool: 'chatgpt-to-anki' }]);
+  } finally {
+    delete globalThis.window;
+  }
+});
+
 test('every funnel event name fits GA4 limits', () => {
   for (const name of TOOL_EVENTS) {
     assert.match(name, /^[a-z][a-z0-9_]{0,39}$/);

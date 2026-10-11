@@ -13,6 +13,7 @@ export const TOOL_EVENTS = new Set([
   'tool_viewed',
   'tool_converted',
   'tool_example_used',
+  'tool_prompt_copied',
   'tool_file_opened',
   'tool_downloaded',
   'tool_study_clicked',

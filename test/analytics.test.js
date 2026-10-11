@@ -26,6 +26,7 @@ const productionHtmlPages = [
   'privacy/index.html',
   'quiz-me-from-my-notes/index.html',
   'quizlet-to-anki/index.html',
+  'chatgpt-to-anki/index.html',
   'terms/index.html',
   'voice-flashcards/index.html'
 ];
