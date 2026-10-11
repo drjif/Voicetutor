@@ -194,6 +194,13 @@
   text-transform: uppercase;
 }
 
+@media (max-width: 620px) {
+  .homepage-tools-label {
+    flex-basis: 100%;
+    text-align: center;
+  }
+}
+
 @media (max-width: 980px) {
   .study-path-grid {
     grid-template-columns: 1fr;

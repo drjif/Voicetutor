@@ -22,7 +22,7 @@ import {
   toQuizletText,
   toTsv
 } from '../apkg-to-csv/convert.js';
-import { cardsFromAnkiFields } from '../anki-import.js';
+import { cardsFromAnkiFields, cleanAnkiText } from '../anki-import.js';
 import { parsePastedQuestions } from '../paste-data.js';
 
 const fixture = (name) => new URL(`./fixtures/apkg/${name}`, import.meta.url);
@@ -329,6 +329,19 @@ test('plain text keeps Anki line breaks and drops media markup', () => {
   assert.equal(plainText('One<div>Two</div><div>Three</div>'), 'One\nTwo\nThree');
   assert.equal(plainText('Hear it [sound:a.mp3]<img src="x.png">'), 'Hear it');
   assert.equal(plainText('<ul><li>alpha</li><li>beta</li></ul>'), '• alpha\n• beta');
+});
+
+test('the fast cleaning path matches the app’s cleanAnkiText exactly', () => {
+  const pieces = ['Line', ' ', '\n', '\t', '<br>', '<br/>', '<BR >', '<div>', '</div>', '<p class="x">', '</p>', '<li>', '</li>',
+    '<ul>', '</ul>', '<b>', '</b>', '<img src="a.png">', '<img alt="diagram" src="b.png">', "<img alt='x'>", '[sound:a.mp3]',
+    'é', '中', '\u00a0', '  ', '<span style="color:red">', '</span>', '<h2>', '</h2>', 'text', ',', '"', '<', '>', '[', ']'];
+  let seed = 7;
+  const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const block = /<(?:div|p|li|tr|h[1-6]|ul|ol|table|blockquote)\b/gi;
+  for (let index = 0; index < 3000; index += 1) {
+    const text = Array.from({ length: 1 + Math.floor(random() * 16) }, () => pieces[Math.floor(random() * pieces.length)]).join('');
+    assert.equal(plainText(text), cleanAnkiText(text.replace(block, '<br>$&')), JSON.stringify(text));
+  }
 });
 
 test('deck filter includes subdecks', async () => {
