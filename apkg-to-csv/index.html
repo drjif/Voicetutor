@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/consent.js"></script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8FVETBN9N5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-8FVETBN9N5', { send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false });
+    window.addEventListener('DOMContentLoaded', function () {
+      var safeLocation = window.location.origin + window.location.pathname;
+      var safeReferrer = '';
+      try { if (document.referrer) { var referrerUrl = new URL(document.referrer); safeReferrer = referrerUrl.origin + referrerUrl.pathname; } } catch (error) {}
+      gtag('event', 'page_view', { page_title: document.title, page_location: safeLocation, page_referrer: safeReferrer });
+    }, { once: true });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ff5a1f" />
+  <title>APKG to CSV Converter — Open Anki Decks Free | same3le</title>
+  <meta name="description" content="Turn an Anki .apkg deck into a CSV for Excel, Google Sheets or Quizlet. Free, no sign-up, works on phones, and your deck never leaves your browser." />
+  <link rel="canonical" href="https://www.same3le.com/apkg-to-csv/" />
+  <link rel="stylesheet" href="/marketing.css" />
+  <link rel="stylesheet" href="/apkg-to-csv/tool.css" />
+  <link rel="modulepreload" href="/apkg-to-csv/vendor/fzstd.js" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta property="og:image" content="https://www.same3le.com/apkg-to-csv/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="APKG to CSV converter by same3le: an Anki deck becomes a CSV with every field and tag, free and in your browser." />
+  <meta property="og:site_name" content="same3le" />
+  <meta property="og:title" content="APKG to CSV Converter — Open Anki Decks Free" />
+  <meta property="og:description" content="Turn an Anki .apkg deck into a CSV for Excel, Google Sheets or Quizlet. Free, no sign-up, works on phones, and your deck never leaves your browser." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.same3le.com/apkg-to-csv/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="APKG to CSV Converter — Open Anki Decks Free" />
+  <meta name="twitter:description" content="Turn an Anki .apkg deck into a CSV for Excel, Google Sheets or Quizlet. Free, no sign-up, works on phones, and your deck never leaves your browser." />
+  <meta name="twitter:image" content="https://www.same3le.com/apkg-to-csv/og.png" />
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.same3le.com/#organization",
+      "name": "same3le",
+      "url": "https://www.same3le.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.same3le.com/logo.png"
+      },
+      "image": "https://www.same3le.com/og-image.png"
+    },
+    {
+      "@type": [
+        "SoftwareApplication",
+        "WebApplication"
+      ],
+      "@id": "https://www.same3le.com/apkg-to-csv/#tool",
+      "name": "APKG to CSV Converter",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web browser",
+      "description": "A free browser tool that converts Anki .apkg and .colpkg decks to CSV or TSV, or to text for Quizlet. Runs locally with no upload and no sign-up.",
+      "url": "https://www.same3le.com/apkg-to-csv/",
+      "image": "https://www.same3le.com/apkg-to-csv/og.png",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Converts Anki .apkg and .colpkg files to CSV and TSV",
+        "Reads modern and older Anki package formats",
+        "Keeps every field, tag and deck name",
+        "Front and back mode splits cloze deletions into cards",
+        "Copies cards in Quizlet’s import format",
+        "Runs in the browser with no upload and no sign-up"
+      ],
+      "publisher": {
+        "@id": "https://www.same3le.com/#organization"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.same3le.com/apkg-to-csv/#webpage",
+      "url": "https://www.same3le.com/apkg-to-csv/",
+      "name": "APKG to CSV Converter — Open Anki Decks Free",
+      "dateModified": "2026-10-11",
+      "isPartOf": {
+        "@id": "https://www.same3le.com/#website"
+      },
+      "mainEntity": {
+        "@id": "https://www.same3le.com/apkg-to-csv/#tool"
+      },
+      "publisher": {
+        "@id": "https://www.same3le.com/#organization"
+      },
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          ".tool-hero .answer",
+          ".section-heading h2"
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "same3le",
+          "item": "https://www.same3le.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "APKG to CSV converter",
+          "item": "https://www.same3le.com/apkg-to-csv/"
+        }
+      ]
+    },
+    {
+      "@type": "HowTo",
+      "name": "How to convert an Anki deck to CSV",
+      "totalTime": "PT1M",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "name": "Get the deck as an .apkg file.",
+          "text": "Download a shared deck from AnkiWeb, or export your own: in Anki on a computer, choose File, then Export, pick Anki Deck Package (.apkg), choose the deck and select Export. AnkiDroid and AnkiMobile can export a deck too."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Choose or drop it here.",
+          "text": "Select Choose .apkg file, or drop the file onto this page. Your browser reads it in a moment, even when the deck is full of images, because only the text is read."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Pick your columns.",
+          "text": "All fields gives one row per note with every field in its own column. Front & back gives two columns, one row per card, with cloze deletions split into separate cards."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Download or copy.",
+          "text": "Download CSV for Excel, Numbers or Google Sheets, download TSV for tab-separated text, or select Copy for Quizlet to paste the cards into Quizlet’s Import box."
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is this APKG to CSV converter free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. It is free, needs no account or sign-up, and sets no limit on how many cards you convert."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my deck uploaded anywhere?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Your browser reads the file on your device, and nothing from it is sent to same3le or anyone else. Even a deck with thousands of images is fine, because only the text is read."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I export an .apkg file from Anki?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In Anki on a computer, choose File, then Export. Pick Anki Deck Package (.apkg), choose the deck, and select Export. You can leave Include media unticked, since the CSV only holds text."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does it work with the newest Anki format?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. It reads modern .apkg files, which Anki makes by default, and older ones exported with Support older Anki versions. It also opens .colpkg collection backups."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens to images and audio?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CSV files can only hold text, so images and audio are not included, and the converter tells you how many your deck has. If you tick Keep HTML formatting, the CSV keeps their file names inside the HTML."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How are cloze deletions handled?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "With All fields, cloze text stays as written, like {{c1::Paris}}. With Front & back, each blank becomes its own card: the front shows the sentence with […] in place of the answer, and the back shows the answer."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I move an Anki deck to Quizlet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Open the deck here and select Copy for Quizlet. Then, on the Quizlet website, choose Create, then Flashcard set, then Import, and paste. Quizlet only imports on its website, not in its app."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I study the cards without installing Anki?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. same3le, the free app that made this converter, reads each question aloud and listens to your spoken answer in the browser. Use the button under your converted deck to start."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-shell site-header">
+    <a class="brand" href="/" aria-label="same3le home"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>same3le</strong><small>recite to me</small></span></a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="/voice-flashcards/">Voice flashcards</a>
+      <a href="/quiz-me-from-my-notes/">Quiz from notes</a>
+      <a href="/google-sheets-flashcards/">Google Sheets</a>
+      <a href="/active-recall-out-loud/">Active recall</a>
+      <a href="/medical-students/">Medical students</a>
+      <a href="/pricing/">Pricing</a>
+      <a href="/about/">About</a>
+      <a href="/medical-disclaimer/">Medical disclaimer</a>
+      <a href="/contact/">Contact</a>
+      <a href="/terms/">Terms</a>
+      <a href="/privacy/">Privacy</a>
+      <a class="nav-cta" href="/#your-questions">Use the free app</a>
+    </nav>
+  </header>
+
+  <main id="content" class="site-shell">
+    <section class="tool-hero">
+      <p class="eyebrow">Free tool · No sign-up</p>
+      <h1>APKG to CSV converter</h1>
+      <p class="answer">Choose or drop an Anki .apkg file below to download its cards as a CSV for Excel, Google Sheets or Quizlet. Every field and tag comes along, it works on phones, and your deck is read on your device, so it’s never uploaded.</p>
+    </section>
+
+    <section class="converter" aria-labelledby="converter-heading" data-drop-label="Drop your Anki deck to convert it">
+      <h2 id="converter-heading" class="sr-only">Convert your Anki deck</h2>
+      <div class="pick">
+        <label class="button primary pick-button file-button">Choose .apkg file<input id="apkgFile" type="file" /></label>
+        <button id="loadExample" class="mini-button" type="button">Try an example deck</button>
+      </div>
+      <p class="pick-note"><span class="drop-hint">Or drop it anywhere on this page. </span>Works with .apkg and .colpkg files from Anki, AnkiDroid and AnkiMobile.</p>
+
+      <noscript><p class="convert-status noscript-note" data-type="warning">This converter needs JavaScript. Without it, Anki’s own File, Export, Notes in Plain Text option makes a tab-separated file.</p></noscript>
+      <p id="convertStatus" class="convert-status" data-type="neutral" role="status" aria-live="polite">Your deck is read on this device and never uploaded.</p>
+
+      <div id="convertResult" class="result" hidden>
+        <p id="deckSummary" class="detected"></p>
+        <div class="options">
+          <fieldset class="segmented">
+            <legend>Columns</legend>
+            <input id="modeFields" class="seg-input" type="radio" name="columns" value="fields" checked /><label for="modeFields">All fields</label>
+            <input id="modeCards" class="seg-input" type="radio" name="columns" value="cards" /><label for="modeCards">Front &amp; back</label>
+          </fieldset>
+          <p id="modeHint" class="field-hint"></p>
+          <div class="settings-grid">
+            <div id="deckField" class="field" hidden>
+              <label for="deckSelect">Deck</label>
+              <select id="deckSelect"></select>
+            </div>
+            <div id="typeField" class="field" hidden>
+              <label for="typeSelect">Note type</label>
+              <select id="typeSelect"></select>
+            </div>
+          </div>
+          <div class="checks">
+            <label id="tagsField" class="check"><input id="includeTags" type="checkbox" checked /> Include tags</label>
+            <label class="check"><input id="keepHtml" type="checkbox" /> Keep HTML formatting</label>
+          </div>
+        </div>
+        <div class="preview-wrap">
+          <table class="preview">
+            <caption class="sr-only">The first rows of your CSV</caption>
+            <thead><tr id="previewHead"></tr></thead>
+            <tbody id="previewBody"></tbody>
+          </table>
+        </div>
+        <p id="previewMore" class="preview-more"></p>
+        <p id="mediaNote" class="media-note" hidden></p>
+        <div class="download-row">
+          <button id="downloadCsv" class="button primary" type="button">Download CSV</button>
+          <button id="downloadTsv" class="button outline" type="button">Download TSV</button>
+          <button id="copyQuizlet" class="button outline" type="button">Copy for Quizlet</button>
+        </div>
+        <div class="next-step">
+          <p><strong>Want to drill these out loud?</strong> same3le reads each card aloud and listens for your answer. One tap opens this deck in the app, ready to start.</p>
+          <p id="studyNote" class="study-note" hidden></p>
+          <a id="studyOutLoud" class="button primary" href="/#pasteQuestions">Study these cards out loud — free</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="section-heading">
+        <p class="eyebrow">Step by step</p>
+        <h2>How to convert an Anki deck to CSV</h2>
+        <p>An .apkg file is a zipped database, so spreadsheets can’t open it directly. This page reads it in your browser and writes a plain CSV that Excel, Google Sheets and other apps understand.</p>
+      </div>
+      <ol class="steps">
+        <li><div><strong>Get the deck as an .apkg file.</strong><p>Download a shared deck from AnkiWeb, or export your own: in Anki on a computer, choose File, then Export, pick Anki Deck Package (.apkg), choose the deck and select Export. AnkiDroid and AnkiMobile can export a deck too.</p></div></li>
+        <li><div><strong>Choose or drop it here.</strong><p>Select Choose .apkg file, or drop the file onto this page. Your browser reads it in a moment, even when the deck is full of images, because only the text is read.</p></div></li>
+        <li><div><strong>Pick your columns.</strong><p>All fields gives one row per note with every field in its own column. Front &amp; back gives two columns, one row per card, with cloze deletions split into separate cards.</p></div></li>
+        <li><div><strong>Download or copy.</strong><p>Download CSV for Excel, Numbers or Google Sheets, download TSV for tab-separated text, or select Copy for Quizlet to paste the cards into Quizlet’s Import box.</p></div></li>
+      </ol>
+    </section>
+
+    <section class="content-section two-column">
+      <div class="prose">
+        <h2>What the converter keeps</h2>
+        <ul>
+          <li>Every note and every field, in the order Anki stores them</li>
+          <li>Tags, plus the deck and subdeck each note is in</li>
+          <li>Cloze deletions, as written or split into one card per blank</li>
+          <li>Line breaks, accents, symbols and non-Latin scripts</li>
+          <li>The original HTML formatting, if you tick Keep HTML formatting</li>
+        </ul>
+        <p>It reads both kinds of .apkg file: the modern format Anki uses by default and the older one made with Support older Anki versions. It also opens .colpkg collection backups.</p>
+        <p>Going the other way? Turn a Quizlet set into Anki cards with the free <a href="/quizlet-to-anki/">Quizlet to Anki converter</a>, or AI-made flashcards with the <a href="/chatgpt-to-anki/">ChatGPT to Anki converter</a>.</p>
+      </div>
+      <div class="prose">
+        <h2>What it can’t move</h2>
+        <ul>
+          <li>Images and audio, because CSV files hold text only</li>
+          <li>Review history, due dates and other scheduling</li>
+          <li>Card templates and styling</li>
+          <li>Image occlusion cards, because they’re pictures rather than text</li>
+        </ul>
+        <p>Your deck in Anki stays exactly as it was. The converter only reads a copy of the file.</p>
+        <p class="date-modified">Updated <time datetime="2026-10-11">October 11, 2026</time></p>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="section-heading"><p class="eyebrow">Common questions</p><h2>APKG to CSV FAQ</h2></div>
+      <div class="faq">
+        <details><summary>Is this APKG to CSV converter free?</summary><p>Yes. It is free, needs no account or sign-up, and sets no limit on how many cards you convert.</p></details>
+        <details><summary>Is my deck uploaded anywhere?</summary><p>No. Your browser reads the file on your device, and nothing from it is sent to same3le or anyone else. Even a deck with thousands of images is fine, because only the text is read.</p></details>
+        <details><summary>How do I export an .apkg file from Anki?</summary><p>In Anki on a computer, choose File, then Export. Pick Anki Deck Package (.apkg), choose the deck, and select Export. You can leave Include media unticked, since the CSV only holds text.</p></details>
+        <details><summary>Does it work with the newest Anki format?</summary><p>Yes. It reads modern .apkg files, which Anki makes by default, and older ones exported with Support older Anki versions. It also opens .colpkg collection backups.</p></details>
+        <details><summary>What happens to images and audio?</summary><p>CSV files can only hold text, so images and audio are not included, and the converter tells you how many your deck has. If you tick Keep HTML formatting, the CSV keeps their file names inside the HTML.</p></details>
+        <details><summary>How are cloze deletions handled?</summary><p>With All fields, cloze text stays as written, like {{c1::Paris}}. With Front &amp; back, each blank becomes its own card: the front shows the sentence with […] in place of the answer, and the back shows the answer.</p></details>
+        <details><summary>Can I move an Anki deck to Quizlet?</summary><p>Yes. Open the deck here and select Copy for Quizlet. Then, on the Quizlet website, choose Create, then Flashcard set, then Import, and paste. Quizlet only imports on its website, not in its app.</p></details>
+        <details><summary>Can I study the cards without installing Anki?</summary><p>Yes. same3le, the free app that made this converter, reads each question aloud and listens to your spoken answer in the browser. Use the button under your converted deck to start.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="site-shell footer-grid has-tools">
+    <div><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">3</span><span class="brand-copy"><strong>same3le</strong><small>voice flashcards that quiz you out loud</small></span></a><p>same3le is an educational study tool, not medical advice. It must not be used for patient care. Anki and Quizlet are trademarks of their respective owners; this tool is not affiliated with either.</p></div>
+    <div><h3>Use cases</h3><a href="/voice-flashcards/">Voice flashcards</a><a href="/quiz-me-from-my-notes/">Quiz from notes</a><a href="/google-sheets-flashcards/">Google Sheets</a><a href="/active-recall-out-loud/">Active recall</a><a href="/medical-students/">Medical students</a></div>
+    <div><h3>Free tools</h3><a href="/quizlet-to-anki/">Quizlet to Anki converter</a><a href="/chatgpt-to-anki/">ChatGPT to Anki converter</a><a href="/apkg-to-csv/">APKG to CSV converter</a></div>
+    <div><h3>Product</h3><a href="/">Open the app</a><a href="/pricing/">Pricing</a><a href="/about/">About</a><a href="/contact/">Contact</a></div>
+    <div><h3>Legal</h3><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/acceptable-use/">Acceptable use</a><a href="/medical-disclaimer/">Medical disclaimer</a></div>
+  </div>
+  <div class="site-shell footer-bottom">© 2026 same3le. Educational study software. Paid subscriptions are not yet active. Legal operator details will be completed before checkout launches.</div></footer>
+
+  <script type="module" src="/apkg-to-csv/app.js"></script>
+</body>
+</html>

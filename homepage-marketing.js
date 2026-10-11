@@ -115,7 +115,7 @@ function addStudyPaths() {
 
     <div class="own-ai-note">
       <strong>Already pay for an AI assistant?</strong>
-      <span>Let it create the questions. Copy the Q&A into same3le. Your AI makes the deck; same3le handles the spoken practice.</span>
+      <span>Let it create the questions. Copy the Q&A into same3le. Your AI makes the deck; same3le handles the spoken practice. Want the same cards in Anki too? Use the free <a href="/chatgpt-to-anki/">ChatGPT to Anki converter</a>.</span>
     </div>
   `;
 
