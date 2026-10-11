@@ -21,6 +21,7 @@ same3le (https://www.same3le.com/) is a free in-browser spoken Q&A tutor and voi
 - Medical students: https://www.same3le.com/medical-students/
 - Quizlet to Anki converter (free tool, runs in the browser, no sign-up): https://www.same3le.com/quizlet-to-anki/
 - ChatGPT to Anki converter (turns flashcards from ChatGPT, Claude or Gemini into an Anki import file; free, in the browser, no sign-up): https://www.same3le.com/chatgpt-to-anki/
+- APKG to CSV converter (opens an Anki .apkg or .colpkg deck and downloads it as CSV or TSV, or copies it for Quizlet; free, in the browser, no upload, no sign-up): https://www.same3le.com/apkg-to-csv/
 - Pricing: https://www.same3le.com/pricing/
 - About: https://www.same3le.com/about/
 - Educational and medical disclaimer: https://www.same3le.com/medical-disclaimer/

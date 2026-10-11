@@ -12,6 +12,7 @@ const seoPages = [
   'medical-students/index.html',
   'quizlet-to-anki/index.html',
   'chatgpt-to-anki/index.html',
+  'apkg-to-csv/index.html',
   'pricing/index.html',
   'about/index.html'
 ];
@@ -177,7 +178,7 @@ for (const { relativePath, file } of pageImages) {
     errors.push(`${relativePath}: og:image ${file} does not exist`);
   }
 }
-for (const tool of ['quizlet-to-anki', 'chatgpt-to-anki']) {
+for (const tool of ['quizlet-to-anki', 'chatgpt-to-anki', 'apkg-to-csv']) {
   for (const relativePath of seoPages.filter((p) => p !== `${tool}/index.html`)) {
     const source = await read(relativePath);
     expect(relativePath, source, new RegExp(`href="/${tool}/"`), `does not link the ${tool} tool`);
@@ -231,6 +232,8 @@ expect('index.html', homepage, /href="\/active-recall-out-loud\/"/, 'homepage do
 expect('index.html', homepage, /href="\/medical-students\/"/, 'homepage does not link medical-students');
 expect('index.html', homepage, /href="\/quizlet-to-anki\/"/, 'homepage does not link the Quizlet to Anki tool');
 expect('index.html', homepage, /href="\/chatgpt-to-anki\/"/, 'homepage does not link the ChatGPT to Anki tool');
+expect('index.html', homepage, /href="\/apkg-to-csv\/"/, 'homepage does not link the APKG to CSV tool');
+expect('index.html', homepage, /<nav class="homepage-use-cases homepage-free-tools" aria-label="Free tools">/, 'homepage footer lost its Free tools group');
 expect('index.html', homepage, /same3le is a free browser app that turns your question-and-answer list into a spoken tutor/, 'missing crawlable definition');
 expect('index.html', homepage, /Free\. Optional Pro later\./, 'missing honest free positioning');
 
@@ -266,6 +269,11 @@ for (const relativePath of ['index.html', ...seoPages, ...legalPages, 'medical-d
 const privacyPolicy = await read('privacy/index.html');
 expect('privacy/index.html', privacyPolicy, /data-consent-reset/, 'privacy policy must let visitors change their analytics cookie choice');
 expect('privacy/index.html', privacyPolicy, /Free converter tools/, 'privacy policy must describe the free converter tools');
+expect('privacy/index.html', privacyPolicy, /mailto:info@same3le\.com/, 'privacy policy must give a contact email');
+for (const relativePath of seoPages) {
+  const source = await read(relativePath);
+  expect(relativePath, source, /<h3>Free tools<\/h3>/, 'footer is missing the Free tools group');
+}
 
 const secretPattern = /service_role|DATABASE_PASSWORD|JWT_SECRET|postgres(ql)?:\/\/[^:\s]+:[^@\s]+@/i;
 for (const relativePath of ['supabase-config.js', 'auth.js', 'saved-sources.js', 'account-ui.js', 'index.html', 'app.js']) {

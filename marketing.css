@@ -185,6 +185,9 @@ button, input { font: inherit; }
 .footer-grid a { display: block; margin: 6px 0; text-decoration: none; }
 .footer-grid a:hover { color: var(--ink); }
 .footer-bottom { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.78rem; line-height: 1.5; }
+/* Footers with a "Free tools" column: five columns on wide screens, brand on its own row on tablets. */
+@media (min-width: 851px) { .footer-grid.has-tools { grid-template-columns: 1.3fr repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 621px) and (max-width: 850px) { .footer-grid.has-tools > :first-child { grid-column: 1 / -1; } }
 .date-modified { margin: 0 0 18px; color: var(--muted); font-size: 0.88rem; }
 
 @media (max-width: 850px) {
