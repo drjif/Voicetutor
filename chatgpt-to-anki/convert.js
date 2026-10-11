@@ -217,7 +217,7 @@ function parseCloze(block) {
 // ---- Main entry --------------------------------------------------------------------------
 
 const SHAPE_LABELS = {
-  labels: 'Q: / A: style labels',
+  labels: 'question-and-answer labels',
   table: 'a table',
   tabs: 'tab-separated rows',
   semicolons: 'semicolon-separated rows',

@@ -71,7 +71,7 @@ test('prefers the largest code block over surrounding chatter', () => {
 
 test('reports the shape it recognised', () => {
   assert.equal(normalizeAiText('What is ATP?;ATP\nWhy?;Because').shape, 'semicolons');
-  assert.equal(parseAiFlashcards(FORMATS['Front/Back labels']).format, 'Q: / A: style labels');
+  assert.equal(parseAiFlashcards(FORMATS['Front/Back labels']).format, 'question-and-answer labels');
 });
 
 test('swap puts the answer on the front', () => {
