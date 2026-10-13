@@ -13,6 +13,10 @@ const seoPages = [
   'quizlet-to-anki/index.html',
   'chatgpt-to-anki/index.html',
   'apkg-to-csv/index.html',
+  'nclex-pharmacology-flashcards/index.html',
+  'study-while-working-nursing/index.html',
+  'nremt-flashcards/index.html',
+  'memorize-bible-verses/index.html',
   'pricing/index.html',
   'about/index.html'
 ];
@@ -236,6 +240,13 @@ expect('index.html', homepage, /href="\/apkg-to-csv\/"/, 'homepage does not link
 expect('index.html', homepage, /<nav class="homepage-use-cases homepage-free-tools" aria-label="Free tools">/, 'homepage footer lost its Free tools group');
 expect('index.html', homepage, /same3le is a free browser app that turns your question-and-answer list into a spoken tutor/, 'missing crawlable definition');
 expect('index.html', homepage, /Free\. Optional Pro later\./, 'missing honest free positioning');
+
+for (const deckPage of ['nclex-pharmacology-flashcards', 'study-while-working-nursing', 'nremt-flashcards', 'memorize-bible-verses']) {
+  const source = await read(`${deckPage}/index.html`);
+  expect(`${deckPage}/index.html`, source, /<script type="text\/plain" id="starterDeck" data-tool="deck-[a-z-]+">\s*Q: /, 'missing starter deck');
+  expect(`${deckPage}/index.html`, source, /src="\/starter-deck\.js"/, 'missing starter-deck.js');
+  expect(`${deckPage}/index.html`, source, /data-study-deck/, 'missing study button');
+}
 
 const about = await read('about/index.html');
 expect('about/index.html', about, /does not automatically generate questions from PDFs/i, 'about missing PDF limitation');

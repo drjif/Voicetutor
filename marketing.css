@@ -246,3 +246,14 @@ button, input { font: inherit; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+/* Free starter decks on the audience pages (nclex-pharmacology-flashcards, nremt-flashcards, ...). */
+.deck-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: deck; }
+.deck-list li { counter-increment: deck; display: grid; gap: 4px; padding: 14px 16px 14px 52px; position: relative; border: 1px solid var(--line); border-radius: 14px; background: white; }
+.deck-list li::before { content: counter(deck); position: absolute; left: 14px; top: 14px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; color: white; background: var(--orange); font-size: 0.78rem; font-weight: 900; }
+.deck-q { font-weight: 800; line-height: 1.4; }
+.deck-a { color: var(--muted); line-height: 1.5; }
+.deck-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin: 20px 0 0; }
+.deck-fallback { color: var(--orange-dark); font-weight: 700; }
+.deck-fallback[hidden] { display: none; }
+@media (max-width: 760px) { .deck-list { grid-template-columns: 1fr; } }
