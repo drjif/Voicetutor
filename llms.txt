@@ -19,6 +19,10 @@ same3le (https://www.same3le.com/) is a free in-browser spoken Q&A tutor and voi
 - Google Sheets flashcards: https://www.same3le.com/google-sheets-flashcards/
 - Active recall out loud: https://www.same3le.com/active-recall-out-loud/
 - Medical students: https://www.same3le.com/medical-students/
+- NCLEX pharmacology flashcards (free 25-card starter deck): https://www.same3le.com/nclex-pharmacology-flashcards/
+- Nursing students who work (free normal-values deck, hands-free review): https://www.same3le.com/study-while-working-nursing/
+- EMT / NREMT flashcards (free starter deck): https://www.same3le.com/nremt-flashcards/
+- Memorize Bible verses out loud (free KJV verse deck): https://www.same3le.com/memorize-bible-verses/
 - Quizlet to Anki converter (free tool, runs in the browser, no sign-up): https://www.same3le.com/quizlet-to-anki/
 - ChatGPT to Anki converter (turns flashcards from ChatGPT, Claude or Gemini into an Anki import file; free, in the browser, no sign-up): https://www.same3le.com/chatgpt-to-anki/
 - APKG to CSV converter (opens an Anki .apkg or .colpkg deck and downloads it as CSV or TSV, or copies it for Quizlet; free, in the browser, no upload, no sign-up): https://www.same3le.com/apkg-to-csv/
