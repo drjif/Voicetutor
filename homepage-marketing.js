@@ -7,7 +7,7 @@ function ensureStylesheet() {
 }
 
 function setMetadata() {
-  document.title = 'same3le — Free Voice Flashcards That Quiz You Out Loud';
+  document.title = 'same3le — Free Spoken Study Tutor & Flashcard App';
   const description = document.querySelector('meta[name="description"]');
   if (description) {
     description.content = 'same3le is a free browser app that turns your question-and-answer list into a spoken tutor. Paste Q&A, load a Google Sheet or CSV, then answer out loud or listen and review.';
